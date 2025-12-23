@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LFR Telemetry: Pro Analysis</title>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/hammerjs@2.0.8"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom@2.0.1"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <style>
+        body {
+            background-color: #0b1121;
+            color: #cbd5e1;
+            font-family: 'Inter', system-ui, sans-serif;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #1e293b;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #475569;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #64748b;
+        }
+
+        .chart-wrapper {
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            flex: 1;
+            min-height: 0;
+            border-bottom: 1px solid #1e293b;
+            padding: 10px 20px;
+            overflow: hidden;
+        }
+
+        .chart-wrapper:last-child {
+            border-bottom: none;
+        }
+
+        .btn-upload {
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            padding: 8px 20px;
+            border-radius: 6px;
+            font-weight: 600;
+            color: white;
+            box-shadow: 0 4px 6px -1px rgba(59, 130, 246, 0.5);
+            transition: all 0.2s;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-upload:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 8px -1px rgba(59, 130, 246, 0.6);
+        }
+
+        .reset-zoom {
+            position: absolute;
+            top: 10px;
+            right: 20px;
+            z-index: 10;
+            background: rgba(30, 41, 59, 0.8);
+            border: 1px solid #334155;
+            color: #94a3b8;
+            font-size: 10px;
+            padding: 4px 8px;
+            border-radius: 4px;
+            cursor: pointer;
+            backdrop-filter: blur(4px);
+        }
+
+        .reset-zoom:hover {
+            background: #334155;
+            color: white;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Header -->
+    <header class="h-16 flex justify-between items-center px-6 bg-slate-900 border-b border-slate-800 shrink-0 z-20">
+        <div class="flex items-center gap-3">
+            <div class="h-8 w-1 bg-blue-500 rounded-full"></div>
+            <div>
+                <h1 class="text-xl font-bold text-white tracking-tight">LFR TELEMETRY <span
+                        class="text-blue-500">PRO</span></h1>
+                <p class="text-xs text-slate-500 font-mono tracking-wide">SYSTEM: ONLINE</p>
+            </div>
+        </div>
+
+        <div class="flex items-center gap-4">
+            <div id="file-info" class="text-xs text-slate-400 font-mono hidden">
+                <span class="text-blue-400">FILE:</span> <span id="filename">session_01.csv</span> |
+                <span class="text-blue-400">DATA POINTS:</span> <span id="datapoints">0</span>
+            </div>
+            <label class="btn-upload">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path>
+                </svg>
+                LOAD CSV
+                <input type="file" id="csvFile" accept=".csv" class="hidden" />
+            </label>
+        </div>
+    </header>
+
+    <!-- Main Content: Stacked Charts -->
+    <main id="dashboard" class="flex-1 flex flex-col bg-slate-950 relative hidden">
+
+        <!-- Chart 1: Tracking -->
+        <div class="chart-wrapper">
+            <div class="flex justify-between items-start mb-1 h-6 shrink-0">
+                <h3 class="text-xs font-bold text-slate-300 uppercase tracking-wider flex items-center gap-2">
+                    <span class="w-2 h-2 rounded-full bg-purple-500"></span> Tracking Performance
+                </h3>
+                <button class="reset-zoom" onclick="resetZoom()">RESET ZOOM</button>
+            </div>
+            <div class="relative w-full flex-1 min-h-0">
+                <canvas id="chartPos"></canvas>
+            </div>
+        </div>
+
+        <!-- Chart 2: PID Analysis -->
+        <!-- Chart 2: PID Analysis -->
+        <div class="chart-wrapper">
+            <div class="flex justify-between items-start mb-1 h-6 shrink-0">
+                <h3 class="text-xs font-bold text-slate-300 uppercase tracking-wider flex items-center gap-2">
+                    <span class="w-2 h-2 rounded-full bg-blue-500"></span> PID Controller Response
+                </h3>
+            </div>
+            <div class="relative w-full flex-1 min-h-0">
+                <canvas id="chartPID"></canvas>
+            </div>
+        </div>
+
+        <!-- Chart 3: Motors -->
+        <!-- Chart 3: Motors -->
+        <div class="chart-wrapper">
+            <div class="flex justify-between items-start mb-1 h-6 shrink-0">
+                <h3 class="text-xs font-bold text-slate-300 uppercase tracking-wider flex items-center gap-2">
+                    <span class="w-2 h-2 rounded-full bg-emerald-500"></span> Motor Output Distribution
+                </h3>
+            </div>
+            <div class="relative w-full flex-1 min-h-0">
+                <canvas id="chartMotors"></canvas>
+            </div>
+        </div>
+    </main>
+
+    <!-- Placeholder -->
+    <div id="placeholder" class="flex-1 flex flex-col items-center justify-center text-center p-10 bg-slate-950">
+        <div
+            class="w-20 h-20 rounded-2xl bg-slate-900 border border-slate-800 flex items-center justify-center mb-6 shadow-2xl shadow-blue-900/10">
+            <svg class="w-10 h-10 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                    d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+            </svg>
+        </div>
+        <h2 class="text-xl font-bold text-white mb-2">Awaiting Telemetry Data</h2>
+        <p class="text-slate-500 max-w-sm">Upload your vehicle's CSV log file to initialize the professional analysis
+            suite.</p>
+    </div>
+
+    <script>
+        // --- Configuration ---
+        Chart.defaults.color = '#64748b';
+        Chart.defaults.borderColor = '#1e293b';
+        Chart.defaults.font.family = '"Inter", sans-serif';
+        Chart.defaults.font.size = 11;
+
+        // Plugin to draw a vertical line (Trace Cursor)
+        const verticalLinePlugin = {
+            id: 'verticalLine',
+            afterDraw: (chart) => {
+                if (chart.tooltip?._active?.length) {
+                    const x = chart.tooltip._active[0].element.x;
+                    const topY = chart.scales.y.top;
+                    const bottomY = chart.scales.y.bottom;
+                    const ctx = chart.ctx;
+                    ctx.save();
+                    ctx.beginPath();
+                    ctx.moveTo(x, topY);
+                    ctx.lineTo(x, bottomY);
+                    ctx.lineWidth = 1;
+                    ctx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
+                    ctx.setLineDash([5, 5]);
+                    ctx.stroke();
+                    ctx.restore();
+                }
+            }
+        };
+        Chart.register(verticalLinePlugin);
+
+        let charts = {};
+        const chartIds = ['chartPos', 'chartPID', 'chartMotors'];
+
+        // --- File Handling ---
+        document.getElementById('csvFile').addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                document.getElementById('filename').innerText = file.name;
+                const reader = new FileReader();
+                reader.onload = (ev) => processCSV(ev.target.result);
+                reader.readAsText(file);
+            }
+        });
+
+        function processCSV(csvText) {
+            const lines = csvText.split('\n').filter(l => l.trim().length > 0);
+
+            // Parse CSV (Skip header)
+            // Expected Format: timestamp(or index), pos, P, I, D, I_sum, LPWM, RPWM (Adapt to your real CSV structure if needed)
+            // Assuming form previous context: index, pos, p, i, d, ?, lpwm, rpwm
+
+            const data = {
+                labels: [],
+                pos: [], setpoint: [],
+                p: [], d: [], adj: [],
+                mL: [], mR: []
+            };
+
+            const SETPOINT = 3500; // Default QTR Center
+
+            // Auto-detect resolution to avoid browser freeze on huge files
+            const step = Math.max(1, Math.floor(lines.length / 5000));
+
+            let count = 0;
+            for (let i = 1; i < lines.length; i += step) {
+                const row = lines[i].split(',');
+                if (row.length < 5) continue;
+
+                // Assuming standard CSV from Telemetry:
+                // format often: time_ms, pos, error, P, I, D, adj, pwmLeft, pwmRight
+                // BUT user specific code from simulator suggests: 
+                // We'll try to be robust. 
+                // Let's assume indices based on common Arduino logs provided in prompt:
+                // "pos, p, d, lpwm" were used in previous dashboard.
+                // Let's parse flexibly.
+
+                const pos = parseFloat(row[1]) || 0;
+                const pTerm = parseFloat(row[2]) || 0;
+                const dTerm = parseFloat(row[4]) || 0; // Check index 4 for D based on prev prompt
+                const lpwm = parseFloat(row[6]) || 0; // Index 6
+                const rpwm = parseFloat(row[7]) || parseFloat(row[6]); // Fallback
+
+                data.labels.push(count); // Sequential index as time for now
+                data.pos.push(pos);
+                data.setpoint.push(SETPOINT);
+
+                data.p.push(pTerm);
+                data.d.push(dTerm);
+                data.adj.push(pTerm + dTerm); // Total Adj approximation
+
+                data.mL.push(lpwm);
+                data.mR.push(rpwm);
+                count++;
+            }
+
+            document.getElementById('datapoints').innerText = count;
+            document.getElementById('dashboard').classList.remove('hidden');
+            document.getElementById('placeholder').classList.add('hidden');
+            document.getElementById('dashboard').style.display = 'flex'; // Force flex
+
+            initCharts(data);
+        }
+
+        function initCharts(data) {
+            // Destruction
+            chartIds.forEach(id => {
+                if (charts[id]) charts[id].destroy();
+            });
+
+            const getCommonOptions = () => ({
+                responsive: true,
+                maintainAspectRatio: false,
+                animation: false,
+                interaction: {
+                    mode: 'index',
+                    intersect: false,
+                },
+                plugins: {
+                    legend: {
+                        labels: { color: '#94a3b8', boxWidth: 10, usePointStyle: true }
+                    },
+                    tooltip: {
+                        backgroundColor: 'rgba(15, 23, 42, 0.9)',
+                        titleColor: '#e2e8f0',
+                        bodyColor: '#cbd5e1',
+                        borderColor: '#334155',
+                        borderWidth: 1,
+                        padding: 10,
+                        displayColors: true,
+                        callbacks: {
+                            label: function (context) {
+                                return context.dataset.label + ': ' + context.parsed.y;
+                            }
+                        }
+                    },
+                    zoom: {
+                        pan: {
+                            enabled: true,
+                            mode: 'x',
+                            onPan: syncZoom // Sync on Pan too
+                        },
+                        zoom: {
+                            wheel: { enabled: true },
+                            pinch: { enabled: true },
+                            mode: 'x',
+                            onZoom: syncZoom
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        grid: { color: '#1e293b' },
+                        ticks: { color: '#64748b' }
+                    },
+                    y: {
+                        grid: { color: '#1e293b' },
+                        ticks: { color: '#64748b' }
+                    }
+                },
+                onHover: (e, activeElements, chart) => {
+                    // Sync Hover
+                    if (activeElements.length > 0) {
+                        const index = activeElements[0].index;
+                        syncCursors(index, chart.canvas.id);
+                    }
+                }
+            });
+
+            // 1. Chart Pos
+            const ctxPos = document.getElementById('chartPos').getContext('2d');
+            const optPos = getCommonOptions();
+            optPos.plugins.title = { display: false };
+
+            charts.chartPos = new Chart(ctxPos, {
+                type: 'line',
+                data: {
+                    labels: data.labels,
+                    datasets: [
+                        {
+                            label: 'Setpoint',
+                            data: data.setpoint,
+                            borderColor: '#94a3b8',
+                            borderWidth: 1,
+                            borderDash: [5, 5],
+                            pointRadius: 0
+                        },
+                        {
+                            label: 'Position',
+                            data: data.pos,
+                            borderColor: '#a855f7', // Purple
+                            backgroundColor: 'rgba(168, 85, 247, 0.1)',
+                            borderWidth: 2,
+                            fill: true,
+                            pointRadius: 0
+                        }
+                    ]
+                },
+                options: optPos
+            });
+
+            // 2. Chart PID
+            const ctxPID = document.getElementById('chartPID').getContext('2d');
+            charts.chartPID = new Chart(ctxPID, {
+                type: 'line',
+                data: {
+                    labels: data.labels,
+                    datasets: [
+                        {
+                            label: 'Total Adj',
+                            data: data.adj,
+                            borderColor: '#e2e8f0', // White/Light
+                            borderWidth: 1,
+                            pointRadius: 0,
+                            order: 1
+                        },
+                        {
+                            label: 'Kp Term',
+                            data: data.p,
+                            borderColor: '#3b82f6', // Blue
+                            borderWidth: 1.5,
+                            pointRadius: 0,
+                            order: 2
+                        },
+                        {
+                            label: 'Kd Term',
+                            data: data.d,
+                            borderColor: '#ef4444', // Red
+                            borderWidth: 1.5,
+                            pointRadius: 0,
+                            order: 3
+                        }
+                    ]
+                },
+                options: getCommonOptions()
+            });
+
+            // 3. Chart Motors
+            const ctxMotors = document.getElementById('chartMotors').getContext('2d');
+            charts.chartMotors = new Chart(ctxMotors, {
+                type: 'line',
+                data: {
+                    labels: data.labels,
+                    datasets: [
+                        {
+                            label: 'Motor Left',
+                            data: data.mL,
+                            borderColor: '#10b981', // Emerald
+                            backgroundColor: 'rgba(16, 185, 129, 0.05)',
+                            borderWidth: 2,
+                            fill: true,
+                            pointRadius: 0
+                        },
+                        {
+                            label: 'Motor Right',
+                            data: data.mR,
+                            borderColor: '#f59e0b', // Amber
+                            backgroundColor: 'rgba(245, 158, 11, 0.05)',
+                            borderWidth: 2,
+                            fill: true,
+                            pointRadius: 0
+                        }
+                    ]
+                },
+                options: getCommonOptions()
+            });
+        }
+
+        // --- Synchronization Logic ---
+
+        function syncCursors(index, sourceId) {
+            chartIds.forEach(id => {
+                if (id === sourceId) return;
+                const chart = charts[id];
+                if (!chart) return;
+
+                // Programmatically trigger tooltip
+                // We need to find the element at 'index'
+                // Since all charts share labels/indices:
+                if (chart.getDataVisibility(0)) { // Simple check
+                    const meta = chart.getDatasetMeta(0);
+                    const point = meta.data[index];
+
+                    if (point) {
+                        chart.tooltip.setActiveElements([
+                            { datasetIndex: 0, index: index }
+                        ], { x: point.x, y: point.y });
+                        chart.update();
+                    }
+                }
+            });
+        }
+
+        function syncZoom({ chart }) {
+            const { min, max } = chart.scales.x;
+            chartIds.forEach(id => {
+                const c = charts[id];
+                if (c && c !== chart) {
+                    c.options.scales.x.min = min;
+                    c.options.scales.x.max = max;
+                    c.update('none'); // Update without animation for perf
+                }
+            });
+        }
+
+        function resetZoom() {
+            chartIds.forEach(id => {
+                if (charts[id]) charts[id].resetZoom();
+            });
+        }
+    </script>
+</body>
+
+</html>

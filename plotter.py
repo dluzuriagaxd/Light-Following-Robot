@@ -245,9 +245,14 @@ def main():
     global ble_mgr
     
     print("--- Binary Telemetry Mode ---")
+    
+    # Windows 10/11 compatibility for Bleak
+    if sys.platform == 'win32':
+        asyncio.set_event_loop_policy(asyncio.WindowsProactorEventLoopPolicy())
+        
     session_code = input("Enter Session Code: ").strip() or "telemetry"
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    log_filename = os.path.abspath(f"logs/bin_{session_code}_{timestamp}.csv")
+    log_filename = os.path.abspath(os.path.join("logs", f"bin_{session_code}_{timestamp}.csv"))
 
     ble_mgr = BLEManager(filename=log_filename)
     ble_mgr.start_thread()

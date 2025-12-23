@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Simulador QTR - SVG Model Integration</title>
+    <style>
+        :root { --bg: #050505; --panel: #111; --text: #00ffff; --accent: #ff0055; }
+        body { margin: 0; background: var(--bg); color: var(--text); font-family: 'Consolas', monospace; height: 100vh; display: flex; overflow: hidden; }
+        
+        .sidebar { width: 300px; background: var(--panel); border-right: 1px solid #333; padding: 20px; display: flex; flex-direction: column; gap: 15px; z-index: 10; box-shadow: 2px 0 20px rgba(0,0,0,0.5); }
+        h2 { margin: 0; font-size: 16px; color: white; border-bottom: 2px solid var(--accent); padding-bottom: 10px; }
+        
+        .box { background: #1a1a1a; padding: 10px; border-radius: 4px; border: 1px solid #333; }
+        .row { display: flex; justify-content: space-between; align-items: center; font-size: 12px; margin-bottom: 5px; color: #ccc; }
+        
+        .chk-row { display: flex; align-items: center; gap: 5px; cursor: pointer; }
+        input[type="checkbox"] { accent-color: var(--text); cursor: pointer; }
+        input[type="range"] { width: 100%; cursor: pointer; accent-color: var(--text); }
+        input[type="number"] { background: #222; border: 1px solid #444; color: var(--text); width: 60px; padding: 4px; text-align: right; }
+        
+        button { background: var(--text); color: black; border: none; padding: 12px; font-weight: bold; cursor: pointer; width: 100%; font-family: inherit; text-transform: uppercase; margin-bottom: 5px; }
+        button:hover { background: white; box-shadow: 0 0 10px var(--text); }
+        button.reset { background: #333; color: white; border: 1px solid #555; }
+        button.reset:hover { background: var(--accent); border-color: var(--accent); }
+
+        .led-strip { display: flex; gap: 4px; height: 20px; margin-top: 5px; background: #000; padding: 5px; border-radius: 20px; justify-content: center; }
+        .led { width: 12px; height: 12px; background: #222; border-radius: 50%; border: 1px solid #333; transition: 0.05s; }
+        .led.on { background: #ffaa00; box-shadow: 0 0 10px #ffaa00; border-color: white; }
+
+        .viewport { flex: 1; position: relative; background: #000; }
+        canvas { position: absolute; top: 0; left: 0; }
+        
+        .hud { position: absolute; top: 20px; right: 20px; background: rgba(0,0,0,0.8); padding: 15px; border: 1px solid #333; font-size: 11px; color: #888; pointer-events: none; }
+        .hud-val { color: var(--text); font-weight: bold; font-size: 14px; }
+        .graph-area { position: absolute; bottom: 0; left: 0; width: 100%; height: 180px; background: rgba(10,10,10,0.95); border-top: 1px solid #333; }
+        .msg { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); background: rgba(255,0,0,0.8); border: 2px solid red; padding: 20px; font-weight: bold; color: white; display: none; }
+    </style>
+</head>
+<body>
+
+<div class="sidebar">
+    <h2>🏎️ SVG REAL MODEL</h2>
+    
+    <div class="box">
+        <button onclick="toggleSim()" id="btnMain">▶ INICIAR</button>
+        <button class="reset" onclick="resetSim()">↺ RESET</button>
+        <div style="margin-top:10px; border-top:1px solid #333; padding-top:5px;">
+            <div class="row"><span>Time Scale:</span> <span id="tsVal" style="color:#fff">1.0x</span></div>
+            <input type="range" min="0.1" max="2.0" step="0.1" value="1.0" oninput="updateTimeScale(this.value)">
+        </div>
+    </div>
+
+    <div class="box">
+        <div style="color:white; margin-bottom:10px; font-weight:bold;">PID TUNING</div>
+        <div class="row"><label class="chk-row"><input type="checkbox" id="enKp" checked> Kp</label><input type="number" id="kp" value="0.08" step="0.01"></div>
+        <div class="row"><label class="chk-row"><input type="checkbox" id="enKd" checked> Kd</label><input type="number" id="kd" value="2.2" step="0.1"></div>
+        <div class="row"><label class="chk-row"><input type="checkbox" id="enKi" checked> Ki</label><input type="number" id="ki" value="0.005" step="0.001"></div>
+        <div class="row" style="margin-top:5px; padding-top:5px; border-top:1px solid #333;">
+            Vel. Base <input type="number" id="vel" value="150" step="10" max="255">
+        </div>
+    </div>
+
+    <div class="box">
+        <div style="color:white; margin-bottom:5px;">SENSOR ARRAY</div>
+        <div class="led-strip" id="ledBox"></div>
+        <div style="text-align:center; margin-top:5px; font-size:10px; color:#666;">
+            Modelo: SVG Cargado<br>Pitch: 0.375"
+        </div>
+    </div>
+</div>
+
+<div class="viewport" id="view">
+    <canvas id="trackCanvas"></canvas>
+    <canvas id="botCanvas"></canvas>
+    <div id="warnMsg" class="msg">¡SALIDA DE PISTA!</div>
+    <div class="hud">
+        ERROR: <span id="valErr" class="hud-val">0</span><br>
+        POS: <span id="valPos" class="hud-val">3500</span><br>
+        <div style="margin-top:5px; border-top:1px solid #444; padding-top:5px;">
+        L: <span id="valML" style="color:#fff">0</span> | R: <span id="valMR" style="color:#fff">0</span>
+        </div>
+    </div>
+    <div class="graph-area"><canvas id="graphCanvas"></canvas></div>
+</div>
+
+<script>
+    // --- 1. CONFIGURACIÓN BASADA EN SVG ---
+    const PPM = 10; 
+    
+    // CALIBRACIÓN DEL SVG:
+    // En el SVG, el eje Y va hacia abajo. El robot apunta hacia arriba (Y disminuye).
+    // Ruedas en Y ~ 810. Sensores en Y ~ 212.
+    // Distancia SVG = 810 - 212 = 598 unidades.
+    // Factor de Escala: Queremos que el robot mida unos 20cm (200px) de largo visual.
+    // Escala SVG = 0.25 (aprox).
+    const SVG_SCALE = 0.25;
+    
+    // Distancia física Calculada desde el SVG (Eje Trasero -> Sensores)
+    // 598 unidades SVG * 0.25 = ~149.5 pixeles = ~15cm
+    const SENSOR_DIST_PX = 598 * SVG_SCALE; 
+    
+    // PITCH EXACTO
+    const SENSOR_PITCH = 0.9525 * PPM; // 0.375 pulgadas = 9.525mm
+
+    const START = { x: 600, y: 100, ang: Math.PI }; 
+
+    let sim = { run: false, timeScale: 1.0 };
+    let bot = {
+        x: START.x, y: START.y, ang: START.ang,
+        vL: 0, vR: 0,
+        sens: [0,0,0,0,0,0,0,0],
+        pos: 3500, lastPos: 3500, err: 0, lastErr: 0, intBuff: []
+    };
+    let history = { err:[], adj:[] };
+
+    // Paths del SVG (Extraídos de tu archivo)
+    const svgChassis = new Path2D("M 298.74206,465.05562 V 699.38633 H 128.66332 v 151.1811 H 657.79717 V 699.38633 H 487.71843 V 465.05562 A 11.338583,11.338583 0 0 0 476.37985,453.71704 H 459.37198 V 245.84302 h 94.48819 A 18.897638,18.897638 0 0 0 572.7578,226.94538 V 196.70916 A 18.897638,18.897638 0 0 0 553.86017,177.81153 H 232.60032 a 18.897638,18.897638 0 0 0 -18.89763,18.89763 v 30.23622 a 18.897638,18.897638 0 0 0 18.89763,18.89764 h 94.48819 v 207.87402 h -17.00787 a 11.338583,11.338583 0 0 0 -11.33858,11.33858 z");
+    // Rueda Izq (Combinada)
+    const svgWheelL = new Path2D("M 15.277486,933.71699 H 109.76568 V 688.04775 H 15.277486 Z");
+    // Rueda Der
+    const svgWheelR = new Path2D("M 676.69481,688.04775 V 933.71699 H 771.183 V 688.04775 Z");
+
+    const cvTrack = document.getElementById('trackCanvas');
+    const cxTrack = cvTrack.getContext('2d', {willReadFrequently: true});
+    const cvBot = document.getElementById('botCanvas');
+    const cxBot = cvBot.getContext('2d');
+    const cvGraph = document.getElementById('graphCanvas');
+    const cxGraph = cvGraph.getContext('2d');
+
+    function init() {
+        resize();
+        window.addEventListener('resize', resize);
+        
+        const box = document.getElementById('ledBox');
+        box.innerHTML = '';
+        for(let i=0; i<8; i++) {
+            let l = document.createElement('div'); l.className='led'; l.id='led'+i; box.appendChild(l);
+        }
+        drawTrack();
+        drawBot();
+        loop();
+    }
+
+    function resize() {
+        const p = document.getElementById('view');
+        cvTrack.width = cvBot.width = cvGraph.width = p.clientWidth;
+        cvTrack.height = cvBot.height = p.clientHeight;
+        cvGraph.height = 180;
+        drawTrack();
+    }
+
+    function drawTrack() {
+        let w = cvTrack.width, h = cvTrack.height;
+        cxTrack.fillStyle = '#050505'; cxTrack.fillRect(0,0,w,h);
+        cxTrack.lineCap = 'round'; cxTrack.lineJoin = 'round';
+        cxTrack.lineWidth = 2.0 * PPM; 
+        cxTrack.shadowBlur = 15; cxTrack.shadowColor = '#00ffff'; cxTrack.strokeStyle = '#00ffff';
+        cxTrack.beginPath();
+        cxTrack.moveTo(900, 100); 
+        cxTrack.lineTo(300, 100);
+        cxTrack.bezierCurveTo(100, 100, 100, 400, 300, 400);
+        cxTrack.lineTo(500, 400);
+        cxTrack.bezierCurveTo(600, 400, 600, 600, 800, 600);
+        cxTrack.bezierCurveTo(1100, 600, 1100, 100, 900, 100);
+        cxTrack.stroke(); cxTrack.shadowBlur = 0;
+    }
+
+    function update() {
+        let Kp = document.getElementById('enKp').checked ? parseFloat(document.getElementById('kp').value) : 0;
+        let Kd = document.getElementById('enKd').checked ? parseFloat(document.getElementById('kd').value) : 0;
+        let Ki = document.getElementById('enKi').checked ? parseFloat(document.getElementById('ki').value) : 0;
+        
+        let elVel = document.getElementById('vel');
+        if(elVel.value > 255) elVel.value = 255;
+        let Base = parseFloat(elVel.value);
+
+        readSensors();
+
+        let setPoint = 3500;
+        let sum = bot.sens.reduce((a,b)=>a+b,0);
+        if(sum < 500) {
+            document.getElementById('warnMsg').style.display = 'block';
+            if(bot.lastErr > 0) bot.pos = 7000; else bot.pos = 0; 
+        } else {
+            document.getElementById('warnMsg').style.display = 'none';
+        }
+
+        bot.err = bot.pos - setPoint;
+        let P = bot.err;
+        let D = bot.err - bot.lastErr;
+        bot.intBuff.push(bot.err);
+        if(bot.intBuff.length > 20) bot.intBuff.shift();
+        let I = bot.intBuff.reduce((a,b)=>a+b,0);
+
+        let adj = (Kp * P) + (Kd * D) + (Ki * I);
+        bot.lastErr = bot.err;
+
+        // FÍSICA V5 (Estable)
+        if (adj > Base) adj = Base;
+        if (adj < -Base) adj = -Base;
+        bot.vL = Base - adj;
+        bot.vR = Base + adj;
+
+        // Cinemática
+        // Scale 255 = 800px/s (80cm/s)
+        let maxSpeed = 80 * PPM; 
+        let vL_px = (bot.vL / 255) * maxSpeed;
+        let vR_px = (bot.vR / 255) * maxSpeed;
+        
+        let vLin = (vL_px + vR_px) / 2;
+        // El ancho de rueda en tu SVG es aprox 660 unidades * 0.25 scale = 165px
+        let trackWidth = 165; 
+        let vAng = (vR_px - vL_px) / trackWidth; 
+
+        let dt = 0.016 * sim.timeScale;
+        bot.ang += vAng * dt;
+        bot.x += Math.cos(bot.ang) * vLin * dt;
+        bot.y += Math.sin(bot.ang) * vLin * dt;
+
+        if(sim.run) {
+            history.err.push(bot.err); history.adj.push(adj);
+            if(history.err.length > 300) { history.err.shift(); history.adj.shift(); }
+        }
+        updateUI();
+    }
+
+    function readSensors() {
+        let width = 7 * SENSOR_PITCH; 
+        let startY = -width / 2;
+        
+        let cx = Math.cos(bot.ang);
+        let cy = Math.sin(bot.ang);
+        let num=0, den=0;
+
+        for(let i=0; i<8; i++) {
+            let lat = startY + (i * SENSOR_PITCH);
+            // Trigonometría usando SENSOR_DIST_PX calculado del SVG
+            let sx = bot.x + (SENSOR_DIST_PX * cx) + (lat * -cy);
+            let sy = bot.y + (SENSOR_DIST_PX * cy) + (lat * cx);
+
+            let val = 0;
+            if(sx>0 && sx<cvTrack.width && sy>0 && sy<cvTrack.height) {
+                let px = cxTrack.getImageData(Math.floor(sx), Math.floor(sy), 1, 1).data;
+                if(px[1] > 100) val = 1000;
+            }
+            bot.sens[i] = val;
+            let ui = document.getElementById('led'+i);
+            if(val > 500) ui.className = 'led on'; else ui.className = 'led';
+            if(val > 0) { num += val * (i * 1000); den += val; }
+        }
+        if(den > 0) { bot.pos = num / den; bot.lastPos = bot.pos; }
+    }
+
+    function drawBot() {
+        let cx = cxBot;
+        cx.clearRect(0,0, cvBot.width, cvBot.height);
+        cx.save();
+        cx.translate(bot.x, bot.y);
+        // Rotación: +90 grados porque tu SVG apunta hacia Arriba (Y negativo), y el simulador 0 es Derecha (X positivo)
+        cx.rotate(bot.ang + Math.PI/2); 
+        cx.scale(SVG_SCALE, SVG_SCALE); // Escalar SVG al mundo
+        
+        // Centrar en el Eje Trasero. 
+        // Según tu SVG, el eje Y de las ruedas está aprox en 810. Centro X en 393.
+        cx.translate(-393, -810);
+
+        // -- DIBUJO SVG --
+        cx.lineWidth = 4;
+        
+        // Ruedas
+        cx.fillStyle = '#ff0055'; // Pink
+        cx.fill(svgWheelL);
+        cx.fill(svgWheelR);
+
+        // Chasis
+        cx.fillStyle = 'rgba(40,40,40,0.95)';
+        cx.strokeStyle = '#00ffff';
+        cx.fill(svgChassis);
+        cx.stroke(svgChassis);
+
+        // Sensores (Visualización sobre el SVG)
+        // La caja de sensores en el SVG está en Y ~ 212
+        let sensY = 212;
+        let sensX = 393; // Centro X
+        let w = (7 * SENSOR_PITCH) / SVG_SCALE; // Des-escalar para dibujar en espacio SVG
+        
+        // Puntos sensores
+        for(let i=0; i<8; i++) {
+            // Invertimos lat porque estamos rotados
+            let lat = (-w/2) + (i * (SENSOR_PITCH/SVG_SCALE));
+            cx.beginPath(); 
+            cx.arc(sensX + lat, sensY, 15, 0, Math.PI*2); // Radio visual grande en escala SVG
+            cx.fillStyle = bot.sens[i] > 500 ? '#ffaa00' : '#004400';
+            cx.fill();
+        }
+
+        cx.restore();
+        drawGraph();
+    }
+
+    function drawGraph() {
+        let w = cvGraph.width, h = cvGraph.height;
+        let cx = cxGraph;
+        cx.clearRect(0,0,w,h);
+        cx.strokeStyle = '#333';
+        cx.beginPath(); cx.moveTo(0, h/2); cx.lineTo(w, h/2); cx.stroke();
+        if(history.err.length < 2) return;
+        cx.strokeStyle = '#ff0055'; cx.lineWidth = 2; cx.beginPath();
+        let step = w / 300;
+        history.err.forEach((v,i) => {
+            let y = (h/2) - (v * 0.04);
+            if(i==0) cx.moveTo(i*step, y); else cx.lineTo(i*step, y);
+        });
+        cx.stroke();
+        cx.strokeStyle = 'rgba(0,255,255,0.5)'; cx.lineWidth = 1; cx.beginPath();
+        history.adj.forEach((v,i) => {
+            let y = (h/2) - (v * 0.4);
+            if(i==0) cx.moveTo(i*step, y); else cx.lineTo(i*step, y);
+        });
+        cx.stroke();
+    }
+
+    function updateUI() {
+        document.getElementById('valErr').innerText = Math.round(bot.err);
+        document.getElementById('valPos').innerText = Math.round(bot.pos);
+        document.getElementById('valML').innerText = Math.round(bot.vL);
+        document.getElementById('valMR').innerText = Math.round(bot.vR);
+    }
+    function updateTimeScale(val) { sim.timeScale = parseFloat(val); document.getElementById('tsVal').innerText = val + 'x'; }
+    function toggleSim() { sim.run = !sim.run; document.getElementById('btnMain').innerText = sim.run ? "⏸ PAUSAR" : "▶ INICIAR"; if(sim.run) loop(); }
+    function resetSim() {
+        sim.run = false; document.getElementById('btnMain').innerText = "▶ INICIAR";
+        bot.x = START.x; bot.y = START.y; bot.ang = START.ang;
+        bot.vL=0; bot.vR=0; bot.err=0; bot.lastErr=0;
+        history.err=[]; history.adj=[];
+        document.getElementById('warnMsg').style.display='none';
+        drawBot();
+    }
+    function loop() { if(sim.run) { update(); drawBot(); requestAnimationFrame(loop); } }
+    init();
+</script>
+</body>
+</html>
