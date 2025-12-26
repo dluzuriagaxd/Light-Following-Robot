@@ -1,0 +1,27 @@
+---
+title: "Fase 3: Motores"
+order: 6
+description: "Filtrado de ruido (Caps 104) y control con TB6612FNG."
+---
+
+# Propulsión y Filtrado
+
+Los motores eléctricos generan chispas diminutas (ruido electromagnético) que vuelven loco al Arduino. Vamos a silenciar ese ruido.
+
+## Filtrado de Ruido (CRÍTICO)
+Debes soldar **3 capacitores cerámicos (104)** por cada motor de la siguiente manera:
+1.  Un capacitor entre los dos terminales del motor.
+2.  Un capacitor desde un terminal a la carcasa metálica del motor.
+3.  Otro capacitor desde el otro terminal a la carcasa metálica.
+
+## Cableado de Ingeniería
+**Trenza los cables** del motor (enróllalos entre sí) antes de conectarlos al Shield. Esto crea un efecto de cancelación de interferencias.
+
+## El Driver TB6612FNG
+Conecta las salidas A y B del driver a tus motores. A diferencia del L298N, este driver no desperdicia energía en calor, enviando toda la potencia de la batería de 9V directamente a las ruedas.
+
+## Prueba de Fuego
+Crea una función simple `Motores(int vel_izq, int vel_der)` y verifica que al enviar valores positivos, el robot avance. 
+
+> [!DEBUG]
+> **¿Gira al revés?** No desoldes nada. Simplemente invierte los cables en las terminales del driver o cambia la polaridad en tu función de código.

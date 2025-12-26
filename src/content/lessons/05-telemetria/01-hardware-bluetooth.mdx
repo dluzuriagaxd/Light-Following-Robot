@@ -1,0 +1,28 @@
+---
+title: "Hardware Bluetooth"
+order: 10
+description: "Fabricación de un Mini-Shield modular para telemetría."
+---
+
+# Preparación del Módulo de Datos
+
+En robótica de competencia, los cables sueltos son el enemigo #1. Para el Bluetooth, no usaremos jumpers directos. Vamos a fabricar una solución pro.
+
+## El Problema de los 5V
+Los módulos HC-05 y HC-06 operan a 3.3V en su pin **RX**. El Arduino Nano entrega 5V. Si los conectas directamente, acortarás la vida de tu Bluetooth o lo quemarás al instante.
+
+## Solución: El "Mini-Shield" Modular
+Te enseñaremos a fabricar una placa pequeña usando un pedazo de **baquelita perforada** (perfboard).
+
+### Componentes de la Placa
+1.  **Zócalo para BT**: No sueldes el Bluetooth directamente; usa pines hembra para poder quitarlo y ponerlo.
+2.  **Divisor de Voltaje**: Suelda dos resistencias (ej. 1K y 2K) para bajar la señal TX del Arduino a los 3.3V que necesita el RX del Bluetooth.
+3.  **Botón de Arranque**: Aprovecha para integrar el pulsador en la misma placa.
+
+## Ventajas de este Enfoque
+*   **Limpieza**: Menos "espagueti" de cables en tu robot.
+*   **Modularidad**: Puedes pasar el sistema de telemetría de un robot a otro en segundos.
+*   **Fiabilidad**: Las soldaduras en baquelita son mil veces más resistentes que los conectores de los jumpers.
+
+> [!TIP]
+> Si diseñas bien tu Mini-Shield, este puede conectarse directamente sobre los pines del Shield de expansión I/O, creando una torre compacta de tecnología.

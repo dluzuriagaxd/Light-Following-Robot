@@ -1,0 +1,88 @@
+---
+import '../styles/global.css';
+import Sidebar from '../components/Sidebar.astro';
+
+interface Props {
+	title: string;
+	fullWidth?: boolean;
+	sidebarHidden?: boolean;
+}
+
+const { title, fullWidth = false, sidebarHidden = false } = Astro.props;
+---
+
+<html lang="es">
+	<head>
+		<meta charset="utf-8" />
+		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<meta name="viewport" content="width=device-width" />
+		<meta name="generator" content={Astro.generator} />
+		<title>{title} | LFR Telemetry</title>
+		<link rel="preconnect" href="https://fonts.googleapis.com">
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+		<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+		<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css" integrity="sha384-n8MVd81YfXqR6697nM9T0zXU5p6M/vT4vNXZ4v9z8550qM/8550qM/8550qM/8550qM" crossorigin="anonymous">
+	</head>
+	<body class="bg-[#0a0a0a] text-[#ededed] font-sans selection:bg-brand-orange/30 selection:text-brand-orange">
+		<!-- Header (Mobile always, Desktop if forced hide) -->
+		<header class:list={[
+			"flex items-center justify-between p-4 border-b border-border-dark bg-black/80 backdrop-blur-xl sticky top-0 z-50",
+			{ "lg:hidden": !sidebarHidden }
+		]}>
+			<div class="flex items-center gap-3">
+				<div class="w-8 h-8 bg-brand-orange rounded shadow-[0_0_15px_rgba(249,115,22,0.3)] flex items-center justify-center font-bold text-black text-sm">L</div>
+				<span class="font-bold tracking-tight text-white">LFR Telemetry</span>
+			</div>
+			<button id="menu-toggle" class="p-2 text-white/70 hover:text-brand-orange active:scale-95 transition-all" aria-label="Abrir menú">
+				<svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7" />
+				</svg>
+			</button>
+		</header>
+
+		<div class="flex">
+			<Sidebar hiddenInitially={sidebarHidden} />
+
+			<!-- main Content Area -->
+			<main class="flex-1 flex flex-col min-h-screen overflow-x-hidden">
+				<div class:list={[
+					"flex-1 w-full mx-auto",
+					{ "max-w-4xl px-6 py-12 lg:py-24": !fullWidth }
+				]}>
+					<slot />
+				</div>
+				
+				<footer class:list={[
+					"w-full mx-auto px-6 py-8 border-t border-white/5 text-[10px] text-white/20 uppercase tracking-widest font-bold flex justify-between items-center",
+					{ "max-w-4xl": !fullWidth }
+				]}>
+					<span>© 2024 LFR Telemetry System</span>
+					<span class="text-brand-blue">Open Source Educational Project</span>
+				</footer>
+			</main>
+		<script>
+			const menuToggle = document.getElementById('menu-toggle');
+			const sidebar = document.getElementById('sidebar');
+			const overlay = document.getElementById('sidebar-overlay');
+
+			function toggleMenu() {
+				const isHidden = sidebar?.classList.contains('-translate-x-full');
+				
+				if (isHidden) {
+					sidebar?.classList.remove('-translate-x-full');
+					overlay?.classList.remove('hidden');
+					setTimeout(() => overlay?.classList.remove('opacity-0'), 0);
+					document.body.classList.add('overflow-hidden');
+				} else {
+					sidebar?.classList.add('-translate-x-full');
+					overlay?.classList.add('opacity-0');
+					setTimeout(() => overlay?.classList.add('hidden'), 300);
+					document.body.classList.remove('overflow-hidden');
+				}
+			}
+
+			menuToggle?.addEventListener('click', toggleMenu);
+			overlay?.addEventListener('click', toggleMenu);
+		</script>
+	</body>
+</html>

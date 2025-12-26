@@ -1,0 +1,33 @@
+---
+title: "Análisis y Optimización"
+order: 13
+description: "Tutorial de interpretación de gráficas y ajuste fino."
+---
+
+# Análisis de Ingeniería
+
+El verdadero secreto de los campeones no es un código perfecto, sino un análisis de datos superior.
+
+## Interpretación de Gráficas
+
+Al observar las gráficas de telemetría, fíjate en:
+*   **Oscilaciones**: Si la posición cruza el Setpoint demasiadas veces, tu **Kp** es muy alto o tu **Kd** muy bajo.
+*   **Error Estacionario**: Si el robot se mantiene cerca pero no "pisa" la línea en rectas, aumenta ligeramente **Ki**.
+*   **Respuesta Lenta**: Si el robot no reacciona a tiempo en curvas, aumenta **Kp**.
+
+## El Dashboard Pro
+
+Para un análisis más profundo de los logs CSV generados por `Potter.py`, utiliza nuestro Dashboard dedicado.
+
+---
+
+<div class="p-8 rounded-[2.5rem] bg-gradient-to-br from-brand-blue/20 to-black border border-brand-blue/20 my-12 text-center">
+    <h3 class="text-2xl font-black text-white mb-4">¿Listo para el análisis de nivel ingeniería?</h3>
+    <p class="text-white/60 mb-8 max-w-lg mx-auto">Carga tus archivos CSV en el Dashboard de Telemetría para desglosar el comportamiento de cada término PID.</p>
+    <a href="/telemetria" class="inline-flex items-center gap-3 px-8 py-4 bg-brand-blue text-black font-black rounded-2xl hover:scale-105 transition-transform active:scale-95">
+        ABRIR DASHBOARD DE ANÁLISIS
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+        </svg>
+    </a>
+</div>

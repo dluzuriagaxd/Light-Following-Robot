@@ -1,0 +1,22 @@
+---
+title: "Teoría de Control"
+order: 8
+description: "Conceptos básicos de control realimentado y PID."
+---
+
+# Teoría de Control (PID)
+
+El control PID es el algoritmo más utilizado en robótica industrial y de competencia. Su función es calcular la corrección necesaria para que el robot se mantenga sobre la línea.
+
+## Las Tres Acciones
+
+1.  **Proporcional (P)**: La corrección es proporcional al error actual. Si el robot está muy lejos de la línea, la corrección es fuerte.
+2.  **Integral (I)**: Acumula el error histórico para eliminar el error de estado estacionario (offset).
+3.  **Derivativo (D)**: Predice la tendencia del error basándose en su velocidad de cambio, amortiguando las oscilaciones.
+
+## El Lazo Reaslimentado
+
+El sistema lee la posición del sensor, calcula la diferencia respecto al centro (Setpoint), y aplica la corrección a los motores. Este ciclo se repite cientos de veces por segundo.
+
+> [!TIP]
+> Un buen ajuste de las constantes Kp, Ki y Kd es la clave para una carrera fluida y rápida.

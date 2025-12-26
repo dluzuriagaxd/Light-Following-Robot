@@ -1,0 +1,38 @@
+---
+import { getCollection } from 'astro:content';
+import LessonLayout from '../../layouts/LessonLayout.astro';
+
+export async function getStaticPaths() {
+  const lessons = await getCollection('lessons');
+  return lessons.map((entry) => ({
+    params: { slug: entry.slug },
+    props: { entry },
+  }));
+}
+
+const { entry } = Astro.props;
+const { Content, headings } = await entry.render();
+
+// Fetch and sort all lessons to find navigation links
+const allLessons = (await getCollection('lessons')).sort((a, b) => a.data.order - b.data.order);
+const currentIndex = allLessons.findIndex(lesson => lesson.slug === entry.slug);
+
+const prevLesson = currentIndex > 0 ? {
+  slug: allLessons[currentIndex - 1].slug,
+  title: allLessons[currentIndex - 1].data.title
+} : undefined;
+
+const nextLesson = currentIndex < allLessons.length - 1 ? {
+  slug: allLessons[currentIndex + 1].slug,
+  title: allLessons[currentIndex + 1].data.title
+} : undefined;
+---
+
+<LessonLayout 
+    title={entry.data.title} 
+    headings={headings}
+    prevLesson={prevLesson}
+    nextLesson={nextLesson}
+>
+  <Content />
+</LessonLayout>

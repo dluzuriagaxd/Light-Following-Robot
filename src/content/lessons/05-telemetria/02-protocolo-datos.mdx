@@ -1,0 +1,27 @@
+---
+title: "Protocolo de Datos"
+order: 11
+description: "Estructuras de datos y envío binario para alta velocidad."
+---
+
+# Optimización del Envío (Binario)
+
+Enviar datos como texto (ASCII) es fácil de leer pero lento e ineficiente para el ancho de banda del Bluetooth. Para una telemetría suave, utilizaremos un **Protocolo Binario**.
+
+## Estructura (Struct)
+Definimos un paquete compacto que contiene solo la información esencial:
+
+```cpp
+struct TelemetryPacket {
+  uint16_t position;
+  int16_t p_term;
+  int16_t i_term;
+  int16_t d_term;
+  uint32_t timestamp;
+};
+```
+
+## Ventajas
+*   **Velocidad**: Reducción del tráfico de datos en más de un 60%.
+*   **Precisión**: No hay pérdida de resolución por redondeo de strings.
+*   **Robustez**: Implementaremos un Checksum para asegurar que los datos no se corrompan en el aire.

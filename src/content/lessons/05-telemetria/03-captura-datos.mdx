@@ -1,0 +1,24 @@
+---
+title: "Captura de Datos"
+order: 12
+description: "Uso del script de Python y Firmware oficial."
+---
+import DownloadButton from '../../../components/DownloadButton.astro';
+
+# Herramientas de Captura
+
+Para recibir los datos en tu computadora y procesarlos, utilizaremos un script de Python optimizado que se encarga de la conexión BLE/Bluetooth y el desempaquetado de los datos.
+
+## Paso 1: Cargar el Firmware
+Descarga el código oficial e instálalo en tu Arduino Nano. Este código ya incluye las estructuras binarias y la lógica de envío.
+
+<DownloadButton file="/downloads/LFR-Telemetry.ino" label="Firmware LFR-Telemetry" />
+
+## Paso 2: Ejecutar el Plotter
+El script `Potter.py` te permitirá visualizar las gráficas en tiempo real y guardar un registro CSV de cada carrera.
+
+<DownloadButton file="/downloads/Potter.py" label="Script Potter.py" />
+
+### Requisitos
+Asegúrate de tener instaladas las librerías necesarias ejecutando:
+`pip install pyqtgraph pyserial` (o las dependencias indicadas en el archivo).

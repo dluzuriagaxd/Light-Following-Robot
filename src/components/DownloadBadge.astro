@@ -1,0 +1,54 @@
+---
+interface Props {
+  fileName: string;
+  filePath: string;
+  fileType: 'arduino' | 'python' | 'text';
+}
+
+const { fileName, filePath, fileType } = Astro.props;
+
+const icons = {
+  arduino: {
+    color: 'text-[#00979D]',
+    bg: 'bg-[#00979D]/10',
+    path: 'M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-5-9h10v2H7z'
+  },
+  python: {
+    color: 'text-[#3776AB]',
+    bg: 'bg-[#3776AB]/10',
+    path: 'M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14.5v-1.5h-2.5v-2h2.5v-1.5l2.5 2.5-2.5 2.5zm5-4.5h-2.5v-2h2.5v-1.5l2.5 2.5-2.5 2.5v-1.5z'
+  },
+  text: {
+    color: 'text-white/40',
+    bg: 'bg-white/5',
+    path: 'M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z'
+  }
+};
+
+const activeIcon = icons[fileType] || icons.text;
+---
+
+<div class="group flex items-center justify-between p-4 rounded-2xl bg-[#1a1a1a] border border-white/5 transition-all hover:border-brand-orange/30 hover:bg-white/[0.02]">
+  <div class="flex items-center gap-4">
+    <div class={`w-10 h-10 rounded-xl ${activeIcon.bg} ${activeIcon.color} flex items-center justify-center`}>
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" viewBox="0 0 24 24" fill="currentColor">
+        <path d={activeIcon.path} />
+      </svg>
+    </div>
+    <div>
+      <h4 class="text-sm font-bold text-white group-hover:text-brand-orange transition-colors">{fileName}</h4>
+      <p class="text-[10px] text-white/30 uppercase tracking-widest font-black">{fileType}</p>
+    </div>
+  </div>
+  
+  <a 
+    href={filePath} 
+    download 
+    class="flex items-center gap-2 px-4 py-2 rounded-lg bg-white/5 text-[10px] font-black uppercase tracking-widest text-white/40 hover:bg-brand-orange hover:text-black transition-all active:scale-95"
+  >
+    <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a2 2 0 002 2h12a2 2 0 002 -2v-1M7 10l5 5 5 -5M12 15V3" />
+    </svg>
+    Bajar
+  </a>
+</div>

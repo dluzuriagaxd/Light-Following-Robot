@@ -1,0 +1,23 @@
+---
+title: "Fase 2: Sensores"
+order: 5
+description: "Montaje técnico y calibración del QTR-8RC."
+---
+
+# Sensores de Alta Precisión
+
+El sensor QTR es el ojo de tu robot. Un montaje descuidado aquí arruinará cualquier código PID por bueno que sea.
+
+## Montaje Mecánico
+*   Usa los **tornillos de 2mm** para fijar el sensor al chasis. No lo pegues; necesitas poder ajustarlo.
+*   **La Regla de Oro**: La distancia óptima al suelo es de **3mm a 5mm**. Si está muy alto, no detectará la línea; si está muy bajo, chocará con las imperfecciones de la pista.
+
+## Seguridad en Conexiones
+Las vibraciones en carrera son fuertes. **Tip Pro**: Una vez conectados los cables jumper hembra al sensor, asegúralos con una vuelta de **cinta aislante**. Esto evita que se suelten en plena competencia.
+
+## Software y Calibración
+1.  Carga el ejemplo `QTRRCExample` de la librería oficial.
+2.  **Proceso de Calibración**: Prepara una hoja blanca con una línea de cinta negra. Mueve el robot de lado a lado sobre la línea mientras los LEDs del Nano parpadean.
+
+> [!DEBUG]
+> **¿Valores erraticos?** Revisa si la luz del ambiente le afecta directamente. En competencias bajo sol extremo, es posible que necesites una "visera" o escudo de sombras sobre los sensores.

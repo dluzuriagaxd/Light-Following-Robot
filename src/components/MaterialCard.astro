@@ -1,0 +1,71 @@
+---
+interface Props {
+  name: string;
+  description: string;
+  imageFileName: string;
+  id: string;
+  buyUrl?: string;
+}
+
+const { name, description, imageFileName, id, buyUrl = "#" } = Astro.props;
+const imagePath = `/images/materials/${imageFileName}`;
+const docUrl = `/materiales/${id}`;
+---
+
+<div class="group relative bg-white border border-gray-200 rounded-2xl overflow-hidden transition-all duration-300 hover:border-brand-orange hover:shadow-[0_4px_20px_rgba(249,115,22,0.1)] flex flex-col h-full">
+  <!-- Link wrapper for the whole card area (hierarchical shortcut) -->
+  <a href={docUrl} class="absolute inset-0 z-10" aria-label={`Ver documentación de ${name}`}></a>
+
+  <!-- Image Container -->
+  <div class="relative aspect-video bg-gray-50 overflow-hidden border-b border-gray-100">
+    <img 
+      src={imagePath} 
+      alt={name}
+      class="w-full h-full object-cover grayscale-[0.2] transition-all duration-500 group-hover:grayscale-0 group-hover:scale-105"
+      onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
+    />
+    <!-- Fallback Placeholder -->
+    <div class="hidden absolute inset-0 flex-col items-center justify-center bg-gray-100 text-gray-300 p-4 text-center">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-10 h-10 mb-2 opacity-50" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+      </svg>
+      <span class="text-[9px] uppercase tracking-[0.2em] font-bold">Image Pending</span>
+    </div>
+  </div>
+
+  <!-- Content -->
+  <div class="p-8 flex-1 flex flex-col space-y-4">
+    <div class="space-y-2">
+      <div class="flex items-start justify-between gap-4">
+        <h3 class="text-xl font-bold tracking-tight text-gray-900 group-hover:text-brand-orange transition-colors">
+          {name}
+        </h3>
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-gray-300 group-hover:text-brand-orange group-hover:translate-x-1 transition-all" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+        </svg>
+      </div>
+      <p class="text-sm text-gray-500 leading-relaxed">
+        {description}
+      </p>
+    </div>
+
+    <div class="mt-auto pt-6 flex items-center justify-between border-t border-gray-50">
+      <span class="text-[10px] font-bold text-brand-orange uppercase tracking-widest">
+        Documentación Técnica
+      </span>
+      
+      <!-- Discrete Buy Link -->
+      <a 
+        href={buyUrl} 
+        class="relative z-20 flex items-center gap-1.5 text-[11px] font-medium text-gray-400 hover:text-gray-900 transition-colors"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+        </svg>
+        Disponibilidad en tienda
+      </a>
+    </div>
+  </div>
+</div>

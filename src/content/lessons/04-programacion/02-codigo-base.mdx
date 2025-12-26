@@ -1,0 +1,43 @@
+---
+title: "Código Base PID"
+order: 9
+description: "Implementación limpia del algoritmo PID en Arduino."
+---
+
+# Implementación del Código
+
+En esta lección, ensamblaremos todas las piezas de software para que el robot pueda seguir la línea de forma independiente.
+
+## Estructura del Código
+
+```cpp
+void loop() {
+  uint16_t position = qtr.readLineBlack(sensorValues);
+  int error = position - 3500;
+
+  int motorSpeed = kp * error + kd * (error - lastError);
+  lastError = error;
+
+  int leftMotorSpeed = baseSpeed + motorSpeed;
+  int rightMotorSpeed = baseSpeed - motorSpeed;
+
+  setMotors(leftMotorSpeed, rightMotorSpeed);
+}
+```
+
+## Ajuste de Parámetros
+
+El código base es robusto, pero el éxito dependerá de los valores que asignes a `kp`, `ki` y `kd`. 
+
+---
+
+<div class="p-8 rounded-[2.5rem] bg-gradient-to-br from-brand-orange/20 to-black border border-brand-orange/20 my-12 text-center">
+    <h3 class="text-2xl font-black text-white mb-4">¿Quieres ver cómo afectan las constantes antes de cargar el código?</h3>
+    <p class="text-white/60 mb-8 max-w-lg mx-auto">Nuestro simulador interactivo te permite experimentar en tiempo real con diferentes configuraciones de pista y valores PID.</p>
+    <a href="/simulador" class="inline-flex items-center gap-3 px-8 py-4 bg-brand-orange text-black font-black rounded-2xl hover:scale-105 transition-transform active:scale-95">
+        PROBAR LÓGICA EN EL SIMULADOR
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+        </svg>
+    </a>
+</div>

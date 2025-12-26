@@ -1,0 +1,92 @@
+---
+import { materials } from "../data/materials";
+
+interface Props {
+    id: string;
+}
+
+const { id } = Astro.props;
+const material = materials.find((m) => m.id === id);
+
+if (!material) {
+    console.error(`MaterialLink: Material with id "${id}" not found.`);
+}
+
+const imagePath = material?.imageFileName
+    ? `/images/materials/${material.imageFileName}`
+    : null;
+const docUrl = `/materiales/${id}`;
+---
+
+{
+    material ? (
+        <a
+            href={docUrl}
+            class="not-prose group relative flex items-center gap-4 p-4 bg-[#1a1a1a] border border-white/5 rounded-2xl transition-all hover:border-brand-orange/30 hover:bg-white/[0.02] max-w-sm my-6"
+        >
+            <div class="relative w-16 h-16 shrink-0 bg-white/5 rounded-xl overflow-hidden border border-white/5">
+                {imagePath ? (
+                    <img
+                        src={imagePath}
+                        alt={material.name}
+                        class="w-full h-full object-cover grayscale-[0.2] transition-all duration-500 group-hover:grayscale-0 group-hover:scale-110"
+                        onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
+                    />
+                ) : null}
+                <div
+                    class={`${imagePath ? "hidden" : "flex"} absolute inset-0 flex-col items-center justify-center bg-[#222] text-white/10 text-center p-1`}
+                >
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        class="w-6 h-6 mb-1 opacity-20"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                    >
+                        <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="1.5"
+                            d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"
+                        />
+                    </svg>
+                    <span class="text-[6px] uppercase font-black tracking-widest">
+                        Blueprint
+                    </span>
+                </div>
+            </div>
+
+            <div class="flex-1 min-w-0">
+                <h4 class="text-sm font-black text-white group-hover:text-brand-orange transition-colors truncate">
+                    {material.name}
+                </h4>
+                <p class="text-[10px] text-white/40 line-clamp-1 mt-0.5">
+                    {material.description}
+                </p>
+                <div class="flex items-center gap-1.5 mt-2">
+                    <span class="text-[8px] font-bold text-brand-orange uppercase tracking-widest">
+                        Ver Wiki
+                    </span>
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        class="w-2.5 h-2.5 text-brand-orange/40 group-hover:translate-x-0.5 transition-transform"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                    >
+                        <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="3"
+                            d="M9 5l7 7-7 7"
+                        />
+                    </svg>
+                </div>
+            </div>
+        </a>
+    ) : (
+        <div class="p-4 border border-red-500/20 bg-red-500/5 rounded-xl text-xs text-red-400 my-4">
+            Error: Material "{id}" no encontrado en la base de datos.
+        </div>
+    )
+}

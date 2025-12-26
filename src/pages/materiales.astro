@@ -1,0 +1,25 @@
+---
+import MainLayout from '../layouts/MainLayout.astro';
+import MaterialCard from '../components/MaterialCard.astro';
+import { materials } from '../data/materials';
+---
+
+<MainLayout title="Materiales">
+  <div class="space-y-16">
+    <header class="space-y-6">
+      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-brand-orange/10 border border-brand-orange/20 text-brand-orange text-[10px] font-bold uppercase tracking-widest">
+        Documentación de Hardware
+      </div>
+      <h1 class="text-4xl lg:text-7xl font-black tracking-tight">Materiales y <span class="text-white/40">Componentes.</span></h1>
+      <p class="text-xl text-white/50 max-w-2xl font-medium leading-relaxed">
+        Especificaciones técnicas y guías de uso para cada componente del sistema LFR Pro. Haz clic en cualquier tarjeta para ver el datasheet y ejemplos de implementación.
+      </p>
+    </header>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 pb-32">
+      {materials.map((item) => (
+        <MaterialCard {...item} />
+      ))}
+    </div>
+  </div>
+</MainLayout>

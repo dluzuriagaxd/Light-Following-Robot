@@ -1,0 +1,279 @@
+---
+import MainLayout from "../layouts/MainLayout.astro";
+---
+
+<MainLayout
+	title="LFR Telemetry - Plataforma definitiva para seguidores de línea"
+	fullWidth={true}
+	sidebarHidden={true}
+>
+	<main>
+		<!-- Sección 1: HERO (Impacto) -->
+		<section
+			class="min-h-[70vh] flex items-center justify-center bg-gradient-to-r from-slate-950 to-slate-800 text-white relative overflow-hidden py-32 px-6"
+		>
+			<div
+				class="absolute inset-0 bg-[radial-gradient(circle_at_30%_50%,rgba(249,115,22,0.1),transparent_50%)]"
+			>
+			</div>
+			<div class="max-w-6xl mx-auto text-center relative z-10">
+				<h1
+					class="text-7xl md:text-9xl font-black mb-8 tracking-tighter leading-none"
+				>
+					LFR <span
+						class="bg-clip-text text-transparent bg-gradient-to-b from-orange-400 to-orange-600"
+						>TELEMETRY</span
+					>
+				</h1>
+				<p
+					class="text-2xl md:text-3xl text-slate-300 max-w-3xl mx-auto mb-16 font-medium leading-relaxed"
+				>
+					De la intuición a la ingeniería. La plataforma avanzada para
+					el desarrollo de robots de competición.
+				</p>
+				<div
+					class="flex flex-col sm:flex-row gap-4 justify-center items-center"
+				>
+					<a
+						href="/simulador"
+						class="group relative px-8 py-5 bg-white text-slate-950 font-black rounded-2xl transition-all hover:bg-brand-orange hover:text-white active:scale-95 text-lg shadow-2xl shadow-white/10 flex items-center gap-3"
+					>
+						<svg
+							xmlns="http://www.w3.org/2000/svg"
+							class="w-6 h-6 text-brand-orange group-hover:text-white"
+							fill="none"
+							viewBox="0 0 24 24"
+							stroke="currentColor"
+						>
+							<path
+								stroke-linecap="round"
+								stroke-linejoin="round"
+								stroke-width="2.5"
+								d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+							></path>
+						</svg>
+						Simulador PID
+					</a>
+					<a
+						href="/telemetria"
+						class="group relative px-8 py-5 bg-slate-800 text-brand-blue font-black rounded-2xl transition-all hover:bg-brand-blue hover:text-black active:scale-95 text-lg shadow-2xl border border-brand-blue/20 flex items-center gap-3"
+					>
+						<svg
+							xmlns="http://www.w3.org/2000/svg"
+							class="w-6 h-6"
+							fill="none"
+							viewBox="0 0 24 24"
+							stroke="currentColor"
+						>
+							<path
+								stroke-linecap="round"
+								stroke-linejoin="round"
+								stroke-width="2.5"
+								d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z"
+							></path>
+						</svg>
+						Dashboard Pro
+					</a>
+					<a
+						href="/curso/01-introduccion"
+						class="px-8 py-5 bg-white/5 hover:bg-white/10 border border-white/10 text-white/60 hover:text-white font-bold rounded-2xl transition-all backdrop-blur-md active:scale-95 text-lg"
+					>
+						Ver Curso →
+					</a>
+				</div>
+			</div>
+		</section>
+
+		<!-- Sección 2: CARACTERÍSTICAS (Grid) -->
+		<section class="py-32 bg-slate-50 border-y border-slate-200">
+			<div class="max-w-7xl mx-auto px-6">
+				<div class="flex flex-col md:flex-row gap-8">
+					<div
+						class="flex-1 p-10 rounded-[2.5rem] bg-white border border-slate-200 shadow-xl shadow-slate-200/50 hover:-translate-y-2 transition-all duration-300"
+					>
+						<div
+							class="w-16 h-16 bg-orange-100 rounded-2xl flex items-center justify-center mb-8"
+						>
+							<svg
+								class="w-10 h-10 text-orange-600"
+								fill="none"
+								stroke="currentColor"
+								viewBox="0 0 24 24"
+							>
+								<path
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									stroke-width="2"
+									d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+							</svg>
+						</div>
+						<h3 class="text-3xl font-black text-slate-900 mb-6">
+							Telemetría
+						</h3>
+						<p
+							class="text-slate-500 text-lg leading-relaxed font-medium"
+						>
+							Visualización de datos en tiempo real mediante
+							Bluetooth. Analiza PID y sensores con precisión
+							profesional.
+						</p>
+					</div>
+
+					<div
+						class="flex-1 p-10 rounded-[2.5rem] bg-white border border-slate-200 shadow-xl shadow-slate-200/50 hover:-translate-y-2 transition-all duration-300"
+					>
+						<div
+							class="w-16 h-16 bg-blue-100 rounded-2xl flex items-center justify-center mb-8"
+						>
+							<svg
+								class="w-10 h-10 text-blue-600"
+								fill="none"
+								stroke="currentColor"
+								viewBox="0 0 24 24"
+							>
+								<path
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									stroke-width="2"
+									d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+								></path>
+							</svg>
+						</div>
+						<h3 class="text-3xl font-black text-slate-900 mb-6">
+							Simulador
+						</h3>
+						<p
+							class="text-slate-500 text-lg leading-relaxed font-medium"
+						>
+							Entorno físico 2D para prototipar algoritmos. Reduce
+							el tiempo de desarrollo sin riesgo para el hardware.
+						</p>
+					</div>
+
+					<div
+						class="flex-1 p-10 rounded-[2.5rem] bg-white border border-slate-200 shadow-xl shadow-slate-200/50 hover:-translate-y-2 transition-all duration-300"
+					>
+						<div
+							class="w-16 h-16 bg-emerald-100 rounded-2xl flex items-center justify-center mb-8"
+						>
+							<svg
+								class="w-10 h-10 text-emerald-600"
+								fill="none"
+								stroke="currentColor"
+								viewBox="0 0 24 24"
+							>
+								<path
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									stroke-width="2"
+									d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.168.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.168.477-4.5 1.253"
+								></path>
+							</svg>
+						</div>
+						<h3 class="text-3xl font-black text-slate-900 mb-6">
+							Academy
+						</h3>
+						<p
+							class="text-slate-500 text-lg leading-relaxed font-medium"
+						>
+							Guía paso a paso desde el montaje electrónico hasta
+							el tuning avanzado de control de motores.
+						</p>
+					</div>
+				</div>
+			</div>
+		</section>
+
+		<!-- Sección 3: PATROCINADORES (Trust Bar) -->
+		<section class="py-16 bg-gray-200 overflow-hidden">
+			<div class="max-w-7xl mx-auto px-6">
+				<div
+					class="flex flex-wrap justify-center items-center gap-12 md:gap-24 opacity-30 grayscale contrast-125"
+				>
+					<div class="flex items-center gap-2">
+						<div class="w-10 h-10 bg-slate-400 rounded-full"></div>
+						<span
+							class="text-2xl font-black tracking-tighter text-slate-500"
+							>IEEE RAC</span
+						>
+					</div>
+					<div class="flex items-center gap-2">
+						<div class="w-10 h-10 bg-slate-400 rounded-md"></div>
+						<span
+							class="text-2xl font-black tracking-tighter text-slate-500"
+							>LFR PRO</span
+						>
+					</div>
+					<div class="flex items-center gap-2">
+						<div class="w-10 h-10 bg-slate-400 transform rotate-45">
+						</div>
+						<span
+							class="text-2xl font-black tracking-tighter text-slate-500"
+							>ROBOTICS</span
+						>
+					</div>
+					<div class="flex items-center gap-2">
+						<div
+							class="w-10 h-10 border-4 border-slate-400 rounded-lg"
+						>
+						</div>
+						<span
+							class="text-2xl font-black tracking-tighter text-slate-500"
+							>TECH LAB</span
+						>
+					</div>
+				</div>
+			</div>
+		</section>
+
+		<!-- Call to Action Final -->
+		<section class="py-32 bg-white text-center">
+			<div class="max-w-4xl mx-auto px-6">
+				<h2
+					class="text-4xl md:text-6xl font-black text-slate-950 mb-10 tracking-tight"
+				>
+					Potencia tu ingeniería hoy mismo
+				</h2>
+				<p class="text-xl text-slate-500 mb-12 font-medium">
+					Únete a la comunidad de desarrolladores de alto rendimiento.
+				</p>
+				<a
+					href="/curso/01-introduccion"
+					class="inline-block px-12 py-6 bg-orange-600 text-white font-black rounded-3xl hover:bg-orange-500 transition-all transform hover:scale-105 active:scale-95 text-2xl shadow-2xl shadow-orange-600/30"
+				>
+					Empezar Gratis
+				</a>
+			</div>
+		</section>
+		<!-- Floating Menu Button (Home Page only) -->
+		<button
+			id="menu-toggle-float"
+			class="fixed top-8 left-8 z-50 p-4 bg-slate-900/50 hover:bg-orange-600 text-white rounded-2xl backdrop-blur-md border border-white/10 transition-all active:scale-95 group shadow-2xl"
+			aria-label="Abrir menú"
+		>
+			<svg
+				xmlns="http://www.w3.org/2000/svg"
+				class="w-6 h-6 group-hover:rotate-90 transition-transform duration-300"
+				fill="none"
+				viewBox="0 0 24 24"
+				stroke="currentColor"
+			>
+				<path
+					stroke-linecap="round"
+					stroke-linejoin="round"
+					stroke-width="2"
+					d="M4 6h16M4 12h16m-7 6h7"></path>
+			</svg>
+		</button>
+
+		<script>
+			// Re-bind the click to the existing toggle function if needed
+			// Since MainLayout already has a script for 'menu-toggle', we can just trigger it
+			document
+				.getElementById("menu-toggle-float")
+				?.addEventListener("click", () => {
+					document.getElementById("menu-toggle")?.click();
+				});
+		</script>
+	</main>
+</MainLayout>

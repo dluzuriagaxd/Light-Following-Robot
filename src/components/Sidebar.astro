@@ -1,0 +1,225 @@
+---
+import { getCollection } from "astro:content";
+import SponsorBadge from "./SponsorBadge.astro";
+
+interface Props {
+    hiddenInitially?: boolean;
+}
+
+const { hiddenInitially = false } = Astro.props;
+const currentPath = Astro.url.pathname;
+
+const mainNav = [
+    { label: "Inicio", href: "/", icon: "home" },
+    { label: "Materiales", href: "/materiales", icon: "box" },
+];
+
+const toolNav = [
+    {
+        label: "Simulador PID",
+        href: "/simulador",
+        color: "text-brand-orange",
+        bg: "bg-brand-orange/10",
+    },
+    {
+        label: "Telemetría",
+        href: "/telemetria",
+        color: "text-brand-blue",
+        bg: "bg-brand-blue/10",
+    },
+];
+
+// Fetch and group lessons
+const allLessons = await getCollection("lessons");
+
+const modulesMap = allLessons.reduce(
+    (acc, lesson) => {
+        const slugParts = lesson.slug.split("/");
+        const moduleKey = slugParts.length > 1 ? slugParts[0] : "00-general";
+        if (!acc[moduleKey]) acc[moduleKey] = [];
+        acc[moduleKey].push(lesson);
+        return acc;
+    },
+    {} as Record<string, any[]>,
+);
+
+// Sort modules and lessons within them
+const sortedModuleKeys = Object.keys(modulesMap).sort();
+const modules = sortedModuleKeys.map((key) => ({
+    key,
+    label: key
+        .replace(/^\d+-/, "")
+        .replace(/-/g, " ")
+        .replace(/\b\w/g, (l) => l.toUpperCase()),
+    lessons: modulesMap[key].sort((a, b) => a.data.order - b.data.order),
+}));
+
+function isModuleActive(moduleKey: string) {
+    return currentPath.includes(`/curso/${moduleKey}`);
+}
+---
+
+<!-- Sidebar -->
+<aside
+    id="sidebar"
+    class:list={[
+        "fixed inset-y-0 left-0 z-50 w-72 bg-[#121212] border-r border-border-dark transform -translate-x-full transition-all duration-300 ease-in-out shrink-0 shadow-2xl",
+        {
+            "lg:static lg:translate-x-0 lg:h-screen lg:flex lg:flex-col lg:shadow-none":
+                !hiddenInitially,
+        },
+        { "lg:fixed lg:h-full": hiddenInitially },
+    ]}
+>
+    <div class="flex flex-col h-full p-8">
+        <!-- Logo -->
+        <div class="hidden lg:flex items-center gap-4 mb-12">
+            <div
+                class="w-12 h-12 bg-brand-orange rounded-xl shadow-[0_0_20px_rgba(249,115,22,0.3)] flex items-center justify-center font-black text-black text-2xl"
+            >
+                L
+            </div>
+            <div>
+                <h1
+                    class="font-black tracking-tighter text-xl leading-tight text-white"
+                >
+                    LFR Telemetry
+                </h1>
+                <p
+                    class="text-[10px] text-white/30 uppercase tracking-[0.2em] font-black"
+                >
+                    System Engineering
+                </p>
+            </div>
+        </div>
+
+        <!-- Navigation -->
+        <nav class="flex-1 space-y-8 overflow-y-auto pr-2 custom-scrollbar">
+            <div>
+                <p
+                    class="text-[10px] uppercase tracking-widest text-white/20 font-bold mb-4 px-4"
+                >
+                    Herramientas Pro
+                </p>
+                <div class="space-y-2">
+                    {
+                        toolNav.map((item) => (
+                            <a
+                                href={item.href}
+                                class:list={[
+                                    `flex items-center justify-between px-4 py-3.5 text-sm font-black rounded-xl transition-all duration-300 border group relative overflow-hidden ${item.bg} ${item.color}`,
+                                    currentPath === item.href
+                                        ? "border-white/20 ring-1 ring-white/10"
+                                        : "border-white/5 hover:border-white/20",
+                                ]}
+                            >
+                                <span class="relative z-10 uppercase tracking-tight">
+                                    {item.label}
+                                </span>
+                                <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    class="w-4 h-4 opacity-40 group-hover:opacity-100 group-hover:translate-x-1 transition-all"
+                                    fill="none"
+                                    viewBox="0 0 24 24"
+                                    stroke="currentColor"
+                                >
+                                    <path
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        stroke-width="3"
+                                        d="M13 7l5 5m0 0l-5 5m5-5H6"
+                                    />
+                                </svg>
+                            </a>
+                        ))
+                    }
+                </div>
+            </div>
+
+            <div>
+                <p
+                    class="text-[10px] uppercase tracking-widest text-white/20 font-bold mb-4 px-4"
+                >
+                    Plataforma
+                </p>
+                <div class="space-y-1">
+                    {
+                        mainNav.map((item) => (
+                            <a
+                                href={item.href}
+                                class:list={[
+                                    "flex items-center px-4 py-2.5 text-sm font-semibold rounded-xl transition-all duration-200 group relative overflow-hidden",
+                                    currentPath === item.href
+                                        ? "text-white bg-white/[0.05]"
+                                        : "text-white/40 hover:text-white hover:bg-white/[0.03]",
+                                ]}
+                            >
+                                <span class="relative z-10">{item.label}</span>
+                            </a>
+                        ))
+                    }
+                </div>
+            </div>
+
+            <div>
+                <p
+                    class="text-[10px] uppercase tracking-widest text-white/20 font-bold mb-4 px-4"
+                >
+                    Curso Seguidor de Línea
+                </p>
+                <div class="space-y-6">
+                    {
+                        modules.map((mod) => (
+                            <div class="space-y-2">
+                                <button
+                                    class:list={[
+                                        "w-full flex items-center justify-between px-4 py-1 text-[10px] font-black uppercase tracking-[0.2em] transition-colors",
+                                        isModuleActive(mod.key)
+                                            ? "text-brand-orange"
+                                            : "text-white/20",
+                                    ]}
+                                >
+                                    <span>{mod.label}</span>
+                                </button>
+                                <div class="space-y-1 ml-2 border-l border-white/5 pl-2">
+                                    {mod.lessons.map((lesson) => (
+                                        <a
+                                            href={`/curso/${lesson.slug}`}
+                                            class:list={[
+                                                "flex items-center px-4 py-2 text-[11px] font-bold rounded-lg transition-all duration-200 group relative",
+                                                currentPath.includes(
+                                                    lesson.slug,
+                                                )
+                                                    ? "text-brand-orange bg-brand-orange/5"
+                                                    : "text-white/30 hover:text-white hover:bg-white/[0.02]",
+                                            ]}
+                                        >
+                                            <span class="relative z-10">
+                                                {lesson.data.title}
+                                            </span>
+                                        </a>
+                                    ))}
+                                </div>
+                            </div>
+                        ))
+                    }
+                </div>
+            </div>
+        </nav>
+
+        <!-- Sponsor Slot -->
+        <div class="mt-auto pt-8 border-t border-white/5">
+            <SponsorBadge />
+        </div>
+    </div>
+</aside>
+
+<!-- Sidebar Overlay (Mobile & Forced Desktop Hide) -->
+<div
+    id="sidebar-overlay"
+    class:list={[
+        "fixed inset-0 bg-black/80 backdrop-blur-sm z-40 hidden transition-opacity duration-300 opacity-0",
+        { "lg:hidden": !hiddenInitially },
+    ]}
+>
+</div>

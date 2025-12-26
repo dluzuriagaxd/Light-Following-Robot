@@ -1,0 +1,30 @@
+---
+title: "Fase 4: Interfaz"
+order: 7
+description: "Lógica de arranque seguro con pulsador."
+---
+
+# El Botón de Inicio
+
+Un robot que arranca solo es peligroso y difícil de calibrar. Usaremos un **módulo pulsador** conectado al **Pin 11**.
+
+## Lógica de Control "Esperar y Arrancar"
+Implementaremos una función llamada `Iniciar()` que gestione el flujo de seguridad. El robot debe esperar a que el usuario interactúe antes de encender los motores.
+
+### El Algoritmo Correcto
+1.  **Esperar**: Ciclo infinito hasta detectar el botón presionado.
+2.  **Antirrebote**: Un pequeño delay para confirmar que es una pulsación real.
+3.  **Soltar**: Esperar a que el usuario retire el dedo. **¡Esto es clave!** Si arranca mientras presionas, moverás el robot de su posición ideal.
+4.  **Confirmación**: Emitir un sonido (si tienes buzzer) o parpadear el LED y arrancar.
+
+```cpp
+void Iniciar() {
+  while(digitalRead(11) == HIGH); // Espera presión (asumiendo Pull-up)
+  delay(200);                    // Antirrebote
+  while(digitalRead(11) == LOW);  // Espera a que sueltes
+  delay(500);                    // Tiempo de gracia para retirar la mano
+}
+```
+
+> [!DEBUG]
+> **¿Arranca solo?** Revisa si tu pulsador es normalmente abierto o cerrado. Si el robot sale disparado sin tocar nada, invierte la lógica de `HIGH` y `LOW` en el código.

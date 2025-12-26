@@ -1,51 +1,64 @@
-# LFR Telemetry System 🏎️💨
+# LFR Telemetry Academy 🏎️💨
 
-Este proyecto proporciona un ecosistema completo para el desarrollo, telemetría y análisis de robots Seguidores de Línea (LFR). Incluye firmware para Arduino, un graficador en tiempo real por Bluetooth, un dashboard de análisis post-carrera y un simulador físico de PID.
+Plataforma educativa de nivel ingeniería diseñada para el desarrollo, simulación y optimización de robots seguidores de línea de alto rendimiento.
 
-## 🚀 Características Principales
+## 🚀 Visión General
 
--   **Telemetría Binaria de Alta Velocidad:** Protocolo optimizado para enviar datos (posición, PID, PWM, timestamp) vía Bluetooth (HM-10/HC-05) sin afectar el bucle de control.
--   **Real-Time Python Plotter:** Visualización instantánea de los términos del PID y la posición del robot mientras corre.
--   **Análisis Pro Dashboard:** Herramienta web para cargar archivos CSV de sesiones y realizar un análisis detallado con zoom sincronizado.
--   **Simulador Físico PID:** Prueba tus constantes de control en un entorno virtual basado en el modelo físico real de tu robot (incluye inercia y sensibilidad de giro).
+Este proyecto combina la educación en robótica clásica con herramientas modernas de análisis de datos (telemetría). El objetivo es que los estudiantes dejen de "adivinar" las constantes PID y comiencen a optimizar basadas en evidencia científica y visualización de datos en tiempo real.
+
+## 🛠️ Stack Tecnológico
+
+La plataforma está construida utilizando las tecnologías más modernas para asegurar velocidad, escalabilidad y una experiencia de usuario premium:
+
+*   **Core Framework**: [Astro 5](https://astro.build/) (Arquitectura de Islas, Zero JS por defecto).
+*   **Contenido Dinámico**: [MDX](https://mdxjs.com/) para lecciones interactivas.
+*   **Interactividad**: [React 19](https://react.dev/) para el simulador y dashboard de análisis.
+*   **Estilos**: [Tailwind CSS 4](https://tailwindcss.com/) para una estética "Dark Mode" de alto contraste.
+*   **Gráficas**: [Chart.js](https://www.chartjs.org/) para visualización de telemetría.
+*   **Matemáticas**: Remark-math y KaTeX para renderizar fundamentos teóricos.
 
 ## 📂 Estructura del Proyecto
 
--   `LFR-Telemetry.ino`: Firmware principal para Arduino (basado en Sensores QTR y PID).
--   `plotter.py`: Aplicación Python para recibir y graficar datos por BLE en tiempo real.
--   `telemetry_dashboard.html`: Interfaz web de análisis de datos post-procesados.
--   `simulator.html`: Simulador interactivo de PID con integración de modelos SVG.
--   `diagnostic_tool.py` & `scan_ports.py`: Herramientas auxiliares para depuración de Bluetooth y puertos.
-
-## 🛠️ Instalación
-
-### Arduino
-1. Instala la librería `QTRSensors` desde el Gestor de Librerías de Arduino.
-2. Carga `LFR-Telemetry.ino` en tu robot.
-
-### Python
-Instala las dependencias necesarias para el graficador:
-```bash
-pip install -r requirements.txt
+```text
+├── src/
+│   ├── components/       # Componentes Astro y React
+│   │   ├── tools/        # Simulador y Dashboard (React)
+│   │   └── ui/           # Componentes de interfaz (Astro)
+│   ├── content/
+│   │   ├── lessons/      # Sílabo modular (01-05) en .mdx
+│   │   └── materials.ts  # Base de datos de componentes oficiales
+│   ├── data/             # Definiciones de tipos y constantes
+│   ├── layouts/          # Plantillas base (Main y Lesson)
+│   └── pages/            # Sistema de rutas (Index, Curso, Herramientas)
+├── public/
+│   ├── downloads/        # Firmware (.ino) y Scripts (.py)
+│   └── images/           # Activos visuales y esquemáticos
+└── _referencia/          # Código fuente legacy y prototipos
 ```
-*Dependencias principales: `bleak`, `matplotlib`, `asyncio`.*
 
-## 📖 Guía de Uso
+## 🏗️ Módulos del Curso
 
-### 1. Telemetría en Tiempo Real
-Conecta tu módulo Bluetooth (ej. HM-10) al puerto Serial del Arduino. Ejecuta:
-```bash
-python plotter.py
-```
-Ingresa el nombre de la sesión y el script buscará automáticamente el dispositivo para empezar a loguear datos en la carpeta `logs/`.
+1.  **Introducción**: Objetivos y selección de materiales de nivel ingeniería.
+2.  **Diseño**: Enfoque en dibujo técnico y Tinkercad para fabricación digital.
+3.  **Montaje**: Proceso paso a paso con énfasis en filtrado de ruido (Caps 104) y electrónica eficiente (TB6612FNG).
+4.  **Programación**: Fundamentos del control PID y lógica de interfaces seguras.
+5.  **Telemetría**: Optimización basada en datos usando el script `Potter.py` y el Dashboard web.
 
-### 2. Análisis de Sesiones
-Abre `telemetry_dashboard.html` en cualquier navegador moderno. Haz clic en **LOAD CSV** y selecciona un archivo generado por el `plotter.py`. Podrás analizar el comportamiento del robot en cada punto de la pista.
+## 🛠️ Herramientas Pro Incluidas
 
-### 3. Simulación de PID
-Para ajustar tus constantes sin riesgo de colisiones, usa `simulator.html`. 
-- Arrastra un archivo CSV para "calibrar" la física del simulador basada en datos reales.
-- Ajusta Kp, Ki y Kd y observa el comportamiento del modelo SVG en la pista virtual.
+### [Simulador PID](/simulador)
+Permite a los estudiantes experimentar con valores de Kp, Ki y Kd en una pista virtual antes de cargar el código al hardware real. Ayuda a entender visualmente el efecto de las oscilaciones y el amortiguamiento.
 
-## ⚖️ Licencia
-Este proyecto es de código abierto. ¡Siéntete libre de contribuir!
+### [Dashboard de Telemetría](/telemetria)
+Herramienta de nivel profesional que procesa archivos CSV generados por el robot en pista. Permite analizar el error, las contribuciones de cada término PID y el consumo de los motores.
+
+## 💻 Desarrollo
+
+Para correr el proyecto localmente:
+
+1.  Instalar dependencias: `npm install`
+2.  Iniciar servidor de desarrollo: `npm run dev`
+3.  Abrir: `http://localhost:4321`
+
+---
+© 2025 LFR Telemetry System - Proyecto Educativo Open Source

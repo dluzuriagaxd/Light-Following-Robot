@@ -1,0 +1,118 @@
+---
+import MainLayout from '../../layouts/MainLayout.astro';
+import { materials } from '../../data/materials';
+
+export async function getStaticPaths() {
+  return materials.map((item) => ({
+    params: { id: item.id },
+    props: { material: item },
+  }));
+}
+
+const { material } = Astro.props;
+const imagePath = `/images/materials/${material.imageFileName}`;
+---
+
+<MainLayout title={material.name}>
+  <div class="space-y-12">
+    <!-- Breadcrumb -->
+    <nav class="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-white/30">
+      <a href="/materiales" class="hover:text-brand-orange transition-colors">Materiales</a>
+      <span>/</span>
+      <span class="text-brand-orange">{material.name}</span>
+    </nav>
+
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-12">
+      <!-- Left Column: Visuals & Data -->
+      <div class="lg:col-span-5 space-y-8">
+        <div class="aspect-square bg-white rounded-3xl overflow-hidden border border-white/10 shadow-2xl group relative">
+          <img 
+            src={imagePath} 
+            alt={material.name}
+            class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+            onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
+          />
+          <div class="hidden absolute inset-0 flex-col items-center justify-center bg-[#1a1a1a] text-white/10 p-8 text-center">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-16 h-16 mb-4 opacity-20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+            </svg>
+            <span class="text-xs uppercase tracking-[0.3em] font-black">Asset Missing</span>
+          </div>
+        </div>
+
+        <!-- Specifications Table -->
+        <div class="bg-[#1a1a1a] border border-white/5 rounded-2xl overflow-hidden">
+          <div class="px-6 py-4 border-b border-white/5 bg-white/[0.02]">
+            <h3 class="text-xs font-black uppercase tracking-widest text-white/40">Especificaciones Técnicas</h3>
+          </div>
+          <div class="divide-y divide-white/5">
+            {material.specs.map(spec => (
+              <div class="px-6 py-4 flex justify-between gap-4 text-sm">
+                <span class="text-white/40 font-medium">{spec.label}</span>
+                <span class="text-white font-bold text-right">{spec.value}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <!-- Discrete Buy Link -->
+        <div class="pt-6 flex justify-center">
+          <a 
+            href={material.buyUrl} 
+            target="_blank" 
+            rel="noopener noreferrer"
+            class="flex items-center gap-2 text-[10px] font-bold text-white/20 hover:text-brand-orange transition-all uppercase tracking-widest group"
+          >
+            <svg 
+              xmlns="http://www.w3.org/2000/svg" 
+              class="w-4 h-4 flex-none transition-all group-hover:scale-110" 
+              fill="none" 
+              viewBox="0 0 24 24" 
+              stroke="currentColor" 
+              stroke-width="2"
+            >
+              <path stroke-linecap="round" stroke-linejoin="round" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+            </svg>
+            <span>Consultar disponibilidad en tienda</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- Right Column: Theory & Content -->
+      <div class="lg:col-span-7 space-y-12">
+        <header class="space-y-4">
+          <h1 class="text-5xl lg:text-7xl font-black tracking-tighter">{material.name}</h1>
+          <p class="text-xl text-brand-orange font-bold tracking-tight opacity-80">{material.description}</p>
+        </header>
+
+        <div class="prose prose-invert max-w-none">
+          <h2 class="text-xl font-bold text-white mb-4 flex items-center gap-3">
+            <span class="w-8 h-1 bg-brand-orange rounded-full"></span>
+            Fundamentos Teóricos
+          </h2>
+          <p class="text-white/60 leading-relaxed text-lg">
+            {material.descriptionLong}
+          </p>
+        </div>
+
+        <!-- Simulator Placeholder -->
+        <div class="p-8 rounded-3xl border-2 border-dashed border-white/5 bg-white/[0.01] flex flex-col items-center justify-center text-center space-y-6">
+          <div class="w-16 h-16 rounded-2xl bg-brand-blue/10 flex items-center justify-center text-brand-blue">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+            </svg>
+          </div>
+          <div class="space-y-2">
+            <h3 class="text-lg font-bold text-white">Simulador Interactivo</h3>
+            <p class="text-sm text-white/30 max-w-xs">
+              Módulo de simulación y recursos adicionales próximamente disponibles para este componente.
+            </p>
+          </div>
+          <div class="px-6 py-2 rounded-full border border-white/10 text-[10px] font-black uppercase tracking-widest text-white/20">
+            Work in Progress
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</MainLayout>
