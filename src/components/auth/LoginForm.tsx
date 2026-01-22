@@ -22,7 +22,16 @@ export default function LoginForm({ hideRegisterLink = false }: LoginFormProps) 
             callbackURL: "/", // Redirigir al inicio (index.astro maneja la lógica)
         }, {
             onError: (ctx) => {
-                setError(ctx.error.message);
+                const err = ctx.error;
+                console.error("Login error details:", err);
+                // Extract detailed error message
+                let detailedMsg = err.message || err.statusText;
+                // @ts-ignore
+                if (err.body?.message) detailedMsg = err.body.message;
+                // @ts-ignore
+                if (err.error) detailedMsg = err.error;
+
+                setError(detailedMsg || "Invalid credentials or server error");
                 setLoading(false);
             },
             onSuccess: () => {
