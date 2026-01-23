@@ -1,3 +1,12 @@
+// CRITICAL: Must be first - Polyfill MessageChannel for React 19 and better-auth
+if (typeof MessageChannel === 'undefined') {
+    // @ts-ignore
+    globalThis.MessageChannel = class MessageChannel {
+        port1 = { postMessage: () => { }, onmessage: null };
+        port2 = { postMessage: () => { }, onmessage: null };
+    };
+}
+
 import { defineMiddleware } from "astro:middleware";
 import { drizzle } from "drizzle-orm/d1";
 import { eq } from "drizzle-orm";

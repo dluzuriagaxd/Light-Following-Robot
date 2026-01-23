@@ -13,15 +13,15 @@ export default defineConfig({
     platformProxy: {
       enabled: true,
     },
+    runtime: {
+      mode: 'local',
+      type: 'pages',
+      bindings: {},
+    },
+    wasmModuleImports: true,
   }),
   vite: {
-    plugins: [tailwindcss()],
-    resolve: {
-      alias: {
-        // Alias node:worker_threads to our polyfill for browser compatibility
-        'node:worker_threads': '/src/polyfill/worker-threads.ts'
-      }
-    }
+    plugins: [tailwindcss()]
   },
 
   integrations: [react(), mdx()],
