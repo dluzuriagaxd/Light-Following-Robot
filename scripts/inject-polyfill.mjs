@@ -1,8 +1,7 @@
-import { readFileSync, writeFileSync, readdirSync, statSync } from 'fs';
+import { readFileSync, writeFileSync, existsSync } from 'fs';
 import { join } from 'path';
 
-// Polyfill to inject at the top of worker files
-const polyfill = `// MessageChannel polyfill for Cloudflare Workers
+const polyfillContent = `// MessageChannel polyfill for Cloudflare Workers
 if (typeof MessageChannel === 'undefined') {
   globalThis.MessageChannel = class MessageChannel {
     constructor() {
@@ -27,55 +26,38 @@ if (typeof MessageChannel === 'undefined') {
     }
   };
 }
-
 `;
-
-function injectPolyfillIntoFile(filePath) {
-  try {
-    const content = readFileSync(filePath, 'utf-8');
-
-    // Skip if already has polyfill
-    if (content.includes('MessageChannel polyfill')) {
-      return false;
-    }
-
-    const modifiedContent = polyfill + content;
-    writeFileSync(filePath, modifiedContent, 'utf-8');
-    return true;
-  } catch (error) {
-    console.error(`  ❌ Error processing ${filePath}:`, error.message);
-    return false;
-  }
-}
-
-function processDirectory(dirPath) {
-  const entries = readdirSync(dirPath);
-  let count = 0;
-
-  for (const entry of entries) {
-    const fullPath = join(dirPath, entry);
-    const stat = statSync(fullPath);
-
-    if (stat.isDirectory()) {
-      count += processDirectory(fullPath);
-    } else if (entry.endsWith('.mjs') || entry.endsWith('.js')) {
-      if (injectPolyfillIntoFile(fullPath)) {
-        console.log(`  ✅ Injected into: ${fullPath.replace(process.cwd(), '')}`);
-        count++;
-      }
-    }
-  }
-
-  return count;
-}
 
 try {
   const workerDir = join(process.cwd(), 'dist', '_worker.js');
-  console.log('📝 Injecting MessageChannel polyfill into all worker files...\n');
+  const indexFile = join(workerDir, 'index.js');
+  const polyfillFile = join(workerDir, 'polyfill.mjs');
 
-  const count = processDirectory(workerDir);
+  console.log('📝 Creating MessageChannel polyfill module...');
 
-  console.log(`\n✅ Successfully injected polyfill into ${count} file(s)!`);
+  // Ensure worker directory exists before writing (though build should have created it)
+  if (existsSync(workerDir)) {
+    writeFileSync(polyfillFile, polyfillContent, 'utf-8');
+    console.log('✅ Created dist/_worker.js/polyfill.mjs');
+
+    if (existsSync(indexFile)) {
+      console.log('📝 Injecting import into index.js...');
+      let content = readFileSync(indexFile, 'utf-8');
+
+      if (!content.includes('import "./polyfill.mjs";')) {
+        content = 'import "./polyfill.mjs";\n' + content;
+        writeFileSync(indexFile, content, 'utf-8');
+        console.log('✅ Injected import into dist/_worker.js/index.js');
+      } else {
+        console.log('ℹ️ Import already present in index.js');
+      }
+    } else {
+      console.warn('⚠️ dist/_worker.js/index.js not found. Skipping injection. Entry point might be named differently.');
+    }
+  } else {
+    console.warn('⚠️ dist/_worker.js directory not found. Skipping polyfill injection.');
+  }
+
 } catch (error) {
   console.error('❌ Error injecting polyfill:', error.message);
   process.exit(1);
