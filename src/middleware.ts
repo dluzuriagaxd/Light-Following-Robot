@@ -11,51 +11,35 @@ export const onRequest = defineMiddleware(async (context, next) => {
 
     const supabase = getServerClient(context);
 
-    // Obtener la sesión actual de Supabase
-    const {
-        data: { session },
-    } = await supabase.auth.getSession();
+    // Para validación de seguridad en el servidor usamos getUser()
+    const { data: { user }, error: userError } = await supabase.auth.getUser();
 
-    // Inyectar supabase y session en locals para que otras páginas los usen fácilmente
+    // Inyectar supabase y user en locals para que otras páginas los usen fácilmente
     context.locals.supabase = supabase;
+    // (Opcional) si otras páginas aún usan locals.session, podemos obtenerlo
+    const { data: { session } } = await supabase.auth.getSession();
     context.locals.session = session;
 
-    // 2. Si es una ruta protegida, verificamos la sesión
+    // 2. Si es una ruta protegida, verificamos el usuario
     if (isProtectedRoute) {
         console.log(`[Middleware] Checking access to ${context.url.pathname}`);
-        console.log(`[Middleware] Session present: ${!!session}`);
+        console.log(`[Middleware] User present: ${!!user}`);
 
-        // Si no existe la sesión, lo mandamos al login
-        if (!session) {
+        // Si no existe el usuario (o el token es inválido), lo mandamos al login
+        if (!user || userError) {
             console.log(`[Middleware] Access denied - redirecting to /login`);
             return context.redirect("/login");
         }
 
-        // Si estamos en modo mantenimiento, verificar rol de admin
+        // Si estamos en modo mantenimiento, verificar rol de admin desde app_metadata
         if (maintenance) {
-            try {
-                // Fetch the user's role from user_profile table
-                const { data: profile, error } = await supabase
-                    .from('user_profile')
-                    .select('role')
-                    .eq('user_id', session.user.id)
-                    .single();
+            const role = user.app_metadata?.role;
+            console.log(`[Middleware] User role from claims: ${role}`);
 
-                if (error) {
-                    console.error("[Middleware] Error fetching profile:", error);
-                    return context.redirect("/login");
-                }
-
-                console.log(`[Middleware] User role: ${profile?.role}`);
-
-                // Si no es admin, denegar acceso
-                if (profile?.role !== 'admin') {
-                    console.log(`[Middleware] Maintenance mode: Access denied for non-admin`);
-                    return context.redirect("/");
-                }
-            } catch (error) {
-                console.error("[Middleware] Error checking user role:", error);
-                return context.redirect("/login");
+            // Si no es admin, denegar acceso sin hacer consultas a la BD
+            if (role !== 'admin') {
+                console.log(`[Middleware] Maintenance mode: Access denied for non-admin`);
+                return context.redirect("/");
             }
         }
     }

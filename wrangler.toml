@@ -3,8 +3,3 @@ name = "lfr-pro"
 compatibility_date = "2024-09-23"
 compatibility_flags = ["nodejs_compat"]
 pages_build_output_dir = "dist"
-
-[[d1_databases]]
-binding = "DB"
-database_name = "lfr-academy-db"
-database_id = "9b818ea1-a539-47d4-bc9c-0545db48e8fa"

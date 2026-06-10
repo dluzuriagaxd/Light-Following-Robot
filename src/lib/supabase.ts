@@ -1,5 +1,5 @@
 import { createServerClient, parseCookieHeader, createBrowserClient } from '@supabase/ssr'
-import type { AstroGlobal } from 'astro'
+import type { APIContext } from 'astro'
 
 // Client used in React components (Browser)
 export const getBrowserClient = () => {
@@ -10,7 +10,7 @@ export const getBrowserClient = () => {
 }
 
 // Client used in Astro components and API endpoints (SSR)
-export const getServerClient = (context: AstroGlobal | any) => {
+export const getServerClient = (context: APIContext) => {
     return createServerClient(
         import.meta.env.PUBLIC_SUPABASE_URL,
         import.meta.env.PUBLIC_SUPABASE_ANON_KEY,

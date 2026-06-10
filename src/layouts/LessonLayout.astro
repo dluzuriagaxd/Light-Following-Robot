@@ -2,6 +2,7 @@
 import '../styles/global.css';
 import Sidebar from '../components/Sidebar.astro';
 import LessonCheckbox from '../components/progress/LessonCheckbox';
+import LanguageSwitcher from '../components/LanguageSwitcher';
 import { registerVisit, getUserActivityProgress } from "@/lib/progress/utils";
 
 interface Props {
@@ -63,12 +64,11 @@ if (session?.user) {
                 <!-- Desktop Quick Tools -->
                 <nav class="hidden lg:flex items-center gap-1 p-1 bg-white/[0.03] rounded-2xl border border-white/5">
                     <a href="/simulador" class="px-4 py-2 text-[10px] font-black uppercase tracking-widest text-white/40 hover:text-brand-orange hover:bg-brand-orange/10 rounded-xl transition-all">Simulador</a>
-                    <div class="w-1 h-1 rounded-full bg-white/10"></div>
-                    <a href="/telemetria" class="px-4 py-2 text-[10px] font-black uppercase tracking-widest text-white/40 hover:text-brand-blue hover:bg-brand-blue/10 rounded-xl transition-all">Telemetría</a>
                 </nav>
             </div>
 
 			<div class="flex items-center gap-4">
+                <LanguageSwitcher client:load />
                 <button id="menu-toggle" class="lg:hidden p-2 text-white/70 hover:text-brand-orange active:scale-95 transition-all" aria-label="Abrir menú">
                     <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7" />

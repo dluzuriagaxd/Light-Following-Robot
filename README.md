@@ -14,7 +14,7 @@ La plataforma está construida utilizando las tecnologías más modernas para as
 *   **Contenido Dinámico**: [MDX](https://mdxjs.com/) para lecciones interactivas.
 *   **Interactividad**: [React 19](https://react.dev/) para el simulador y dashboard de análisis.
 *   **Estilos**: [Tailwind CSS 4](https://tailwindcss.com/) para una estética "Dark Mode" de alto contraste.
-*   **Autenticación**: [Better Auth](https://www.better-auth.com/) sobre Cloudflare D1 (SQLite distribuido) para gestión de usuarios segura.
+*   **Autenticación**: [Supabase Auth](https://supabase.com/auth) para gestión de usuarios segura y roles, integrado con la base de datos PostgreSQL de Supabase.
 *   **Gráficas**: [Chart.js](https://www.chartjs.org/) para visualización de telemetría.
 *   **Matemáticas**: Remark-math y KaTeX para renderizar fundamentos teóricos.
 
@@ -67,11 +67,11 @@ Herramienta de nivel profesional que procesa archivos CSV generados por el robot
 Para correr el proyecto localmente:
 
 1.  Instalar dependencias: `npm install`
-2.  Preparar Base de Datos (Local): `npx wrangler d1 execute lfr-academy-db --local --file=./schema.sql`
+2.  Configurar las credenciales en `.env` (copiar de `.env.example` si existe, o pedir a un admin las credenciales de Supabase).
 3.  Iniciar servidor de desarrollo: `npm run dev`
 4.  Abrir: `http://localhost:4321`
 
-> **Nota**: El sistema de autenticación usa la base de datos local en `.wrangler/state`. Si borras esta carpeta, los usuarios registrados se perderán.
+> **Nota**: El sistema de autenticación usa Supabase. Asegúrate de tener las variables de entorno `PUBLIC_SUPABASE_URL` y `PUBLIC_SUPABASE_ANON_KEY` configuradas correctamente.
 
 ---
 © 2025 LFR Telemetry System - Proyecto Educativo Open Source

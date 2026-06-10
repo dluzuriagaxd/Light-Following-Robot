@@ -22,8 +22,7 @@ export default defineConfig({
   vite: {
     plugins: [tailwindcss()],
     ssr: {
-      external: ['node:async_hooks'],
-      noExternal: ['better-auth', '@better-auth/core']
+      external: ['node:async_hooks']
     }
   },
 
