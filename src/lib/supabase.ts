@@ -11,9 +11,19 @@ export const getBrowserClient = () => {
 
 // Client used in Astro components and API endpoints (SSR)
 export const getServerClient = (context: APIContext) => {
+    // En Cloudflare, las variables de entorno pueden inyectarse en runtime
+    const cfEnv = context.locals?.runtime?.env || {};
+    
+    const supabaseUrl = import.meta.env.PUBLIC_SUPABASE_URL || cfEnv.PUBLIC_SUPABASE_URL;
+    const supabaseAnonKey = import.meta.env.PUBLIC_SUPABASE_ANON_KEY || cfEnv.PUBLIC_SUPABASE_ANON_KEY;
+
+    if (!supabaseUrl || !supabaseAnonKey) {
+        console.warn("Supabase URL or Anon Key is missing in environment variables");
+    }
+
     return createServerClient(
-        import.meta.env.PUBLIC_SUPABASE_URL,
-        import.meta.env.PUBLIC_SUPABASE_ANON_KEY,
+        supabaseUrl,
+        supabaseAnonKey,
         {
             cookies: {
                 getAll() {
