@@ -11,8 +11,8 @@ export default defineConfig({
   output: 'server',
   env: {
     schema: {
-      PUBLIC_SUPABASE_URL: envField.string({ context: 'client', access: 'public' }),
-      PUBLIC_SUPABASE_ANON_KEY: envField.string({ context: 'client', access: 'public' }),
+      PUBLIC_SUPABASE_URL: envField.string({ context: 'client', access: 'public', default: 'https://nbhvyqdcijfgtzdfqzyd.supabase.co' }),
+      PUBLIC_SUPABASE_ANON_KEY: envField.string({ context: 'client', access: 'public', default: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5iaHZ5cWRjaWpmZ3R6ZGZxenlkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODEwNDIxNzgsImV4cCI6MjA5NjYxODE3OH0.96n27brL8OG5nA2SgOHbYPwU0PEd1WnKfhe9hfxVorc' }),
       PUBLIC_MAINTENANCE_MODE: envField.boolean({ context: 'client', access: 'public', default: false }),
     }
   },
