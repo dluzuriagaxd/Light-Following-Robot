@@ -66,6 +66,9 @@ const SoccerSimulator = () => {
   const [activeTab, setActiveTab] = useState('simulator'); // 'simulator' | 'theory'
   const [fullscreenWidget, setFullscreenWidget] = useState(null); // 'chassis' | 'kinematics' | 'collision' | 'transistor' | 'battery' | null
   const [locale, setLocale] = useState('es');
+  const [leftPanelOpen, setLeftPanelOpen] = useState(true);
+  const [rightPanelOpen, setRightPanelOpen] = useState(true);
+
 
   useEffect(() => {
     const cookies = document.cookie.split(';');
@@ -312,7 +315,7 @@ const SoccerSimulator = () => {
     const drv = DRIVERS[driver];
     ctx.fillStyle = '#1e293b';
     ctx.beginPath();
-    ctx.roundRect(-ROBOT_R, -ROBOT_R, ROBOT_R * 2, ROBOT_R * 2, 6);
+    ctx.rect(-ROBOT_R, -ROBOT_R, ROBOT_R * 2, ROBOT_R * 2);
     ctx.fill();
 
     ctx.strokeStyle = drv.color;
@@ -435,13 +438,13 @@ const SoccerSimulator = () => {
     <div className="w-screen h-screen bg-[#0a0f1e] text-white font-mono overflow-hidden select-none flex flex-col">
 
       {/* Header */}
-      <header className="flex items-center justify-between px-6 py-3 border-b border-slate-500 border-2 bg-black/40 shrink-0">
-        <div className="flex items-center gap-3">
-          <a href="/" className="text-lg md:text-xl font-bold font-black uppercase tracking-widest text-slate-200 font-bold hover:text-white transition-colors">
+      <header className="flex items-center justify-between px-4 py-2 md:px-6 md:py-3 border-b border-slate-500 border-2 bg-black/40 shrink-0">
+        <div className="flex items-center gap-2 md:gap-3">
+          <a href="/" className="text-base md:text-lg lg:text-xl font-bold font-black uppercase tracking-widest text-slate-200 hover:text-white transition-colors">
             {locale === 'es' ? '← Volver' : '← Back'}
           </a>
           <span className="w-px h-4 bg-white/10" />
-          <h1 className="text-lg md:text-xl font-bold font-black uppercase tracking-[0.2em] text-white">
+          <h1 className="text-base md:text-lg lg:text-xl font-bold font-black uppercase tracking-[0.15em] text-white truncate max-w-[200px] md:max-w-none">
             {locale === 'es' ? '⚽ Soccer Jr. Simulador' : '⚽ Soccer Jr. Simulator'}
           </h1>
         </div>
@@ -450,148 +453,148 @@ const SoccerSimulator = () => {
         <div className="flex items-center gap-1 bg-slate-800 border border-slate-500 border-2 p-0.5 rounded-xl">
           <button 
             onClick={() => setActiveTab('simulator')} 
-            className={`px-3 py-1.5 rounded-lg text-base md:text-lg font-bold font-black uppercase tracking-wider transition-all ${activeTab === 'simulator' ? 'bg-orange-600 text-white' : 'text-white font-bold hover:text-white'}`}
+            className={`px-2 py-1 md:px-3 md:py-1.5 rounded-lg text-xs md:text-sm lg:text-base font-bold font-black uppercase tracking-wider transition-all ${activeTab === 'simulator' ? 'bg-orange-600 text-white' : 'text-white hover:text-white'}`}
           >
             {locale === 'es' ? '🎮 Simulador' : '🎮 Simulator'}
           </button>
           <button 
             onClick={() => setActiveTab('theory')} 
-            className={`px-3 py-1.5 rounded-lg text-base md:text-lg font-bold font-black uppercase tracking-wider transition-all ${activeTab === 'theory' ? 'bg-orange-600 text-white' : 'text-white font-bold hover:text-white'}`}
+            className={`px-2 py-1 md:px-3 md:py-1.5 rounded-lg text-xs md:text-sm lg:text-base font-bold font-black uppercase tracking-wider transition-all ${activeTab === 'theory' ? 'bg-orange-600 text-white' : 'text-white hover:text-white'}`}
           >
             {locale === 'es' ? '📖 Teoría y Código' : '📖 Theory & Code'}
           </button>
         </div>
 
-        <div className="flex items-center gap-4 text-lg md:text-xl font-bold font-black uppercase tracking-widest text-slate-100 font-bold">
+        <div className="flex items-center gap-4 text-xs md:text-sm lg:text-base font-bold uppercase tracking-widest text-slate-300">
           <LanguageSwitcher client:load />
-          <span>WASD / ↑↓←→ — Q/E: Giro brusco</span>
+          <span className="hidden xl:inline">WASD / ↑↓←→ — Q/E: Giro brusco</span>
         </div>
       </header>
 
       {activeTab === 'simulator' ? (
-        <div className="flex flex-1 overflow-hidden">
+        <div className="flex flex-1 overflow-hidden relative">
 
           {/* LEFT PANEL — Controls */}
-          <aside className="w-[450px] bg-black/40 backdrop-blur-xl border-r border-slate-600 border-2 flex flex-col gap-4 p-5 overflow-y-auto shrink-0">
+          <aside className={`bg-black/40 backdrop-blur-xl border-r border-slate-600 border-2 flex flex-col gap-3 p-3 xl:p-4 overflow-y-auto shrink-0 transition-all duration-300 relative ${leftPanelOpen ? 'w-[300px] lg:w-[340px]' : 'w-0 p-0 border-r-0 overflow-hidden'}`}>
 
             {/* Driver Selector */}
-            <section className="space-y-2">
-              <p className="text-base md:text-lg font-bold font-black uppercase tracking-[0.2em] text-slate-200 font-bold">
+            <section className="space-y-1.5">
+              <p className="text-xs xl:text-sm font-bold font-black uppercase tracking-[0.2em] text-slate-200">
                 {locale === 'es' ? '🔌 Seleccionar Driver' : '🔌 Select Driver'}
               </p>
               {Object.entries(DRIVERS).map(([key, drv]) => (
                 <button
                   key={key}
                   onClick={() => setDriver(key)}
-                  className={`w-full p-4 md:p-5 rounded-xl border text-left transition-all ${driver === key ? 'border-white/30 bg-white/10' : 'border-slate-600 border-2 bg-white/[0.02] hover:bg-white/[0.05]'}`}
+                  className={`w-full p-2.5 xl:p-3.5 rounded-xl border text-left transition-all ${driver === key ? 'border-white/30 bg-white/10' : 'border-slate-600 border-2 bg-white/[0.02] hover:bg-white/[0.05]'}`}
                 >
                   <div className="flex items-center justify-between">
-                    <span className="text-base md:text-lg font-black" style={{ color: drv.color }}>{drv.icon} {drv.name}</span>
-                    {driver === key && <span className="text-sm md:text-base font-bold bg-white/10 px-1.5 py-0.5 rounded-full text-white font-bold">ACTIVO</span>}
+                    <span className="text-xs xl:text-sm font-black" style={{ color: drv.color }}>{drv.icon} {drv.name}</span>
+                    {driver === key && <span className="text-[10px] xl:text-xs font-bold bg-white/10 px-1.5 py-0.5 rounded-full text-white">ACTIVO</span>}
                   </div>
-                  <div className="mt-1 text-base md:text-lg font-bold text-slate-100 font-bold space-y-0.5">
+                  <div className="mt-1 text-xs xl:text-sm font-bold text-slate-100 space-y-0.5">
                     <div>Eficiencia: <span style={{ color: drv.color }}>{(drv.efficiency * 100).toFixed(0)}%</span></div>
-                    <div>Caída de voltaje: <span className="text-white font-bold">{drv.voltDrop}</span></div>
+                    <div>Caída de voltaje: <span className="text-white">{drv.voltDrop}</span></div>
                     <div>Velocidad máx: <span style={{ color: drv.color }}>{drv.maxSpeed}</span></div>
                   </div>
                 </button>
               ))}
-              <p className="text-sm md:text-base font-bold text-slate-300 font-medium italic leading-relaxed">
+              <p className="text-[10px] xl:text-xs text-slate-300 font-medium italic leading-relaxed">
                 El L298N usa transistores bipolares Darlington que generan ~2V de caída interna. Con batería de 7.4V, los motores solo reciben ~5.4V efectivos.
               </p>
             </section>
 
-            <hr className="border-slate-600 border-2" />
+            <hr className="border-slate-700/50" />
 
             {/* Battery */}
-            <section className="space-y-2">
-              <p className="text-base md:text-lg font-bold font-black uppercase tracking-[0.2em] text-slate-200 font-bold">🔋 Batería 18650 2S</p>
-              <div className="p-4 md:p-5 rounded-xl bg-slate-800 border border-slate-600 border-2 space-y-2">
+            <section className="space-y-1.5">
+              <p className="text-xs xl:text-sm font-bold font-black uppercase tracking-[0.2em] text-slate-200">🔋 Batería 18650 2S</p>
+              <div className="p-2.5 xl:p-3.5 rounded-xl bg-slate-800/80 border border-slate-600 border-2 space-y-1.5">
                 <div className="flex justify-between items-center">
-                  <span className="text-lg md:text-xl font-bold text-white font-bold">Voltaje:</span>
-                  <span className="font-black text-lg md:text-xl" style={{ color: getBatColor() }}>{batV} V</span>
+                  <span className="text-xs xl:text-sm font-bold text-white">Voltaje:</span>
+                  <span className="font-black text-xs xl:text-sm" style={{ color: getBatColor() }}>{batV} V</span>
                 </div>
-                <div className="w-full h-3 bg-black/40 rounded-full overflow-hidden">
+                <div className="w-full h-2 bg-black/40 rounded-full overflow-hidden">
                   <div
                     className="h-full rounded-full transition-all duration-200"
                     style={{ width: `${batteryPct}%`, background: getBatColor() }}
                   />
                 </div>
-                <div className="flex justify-between text-base md:text-lg font-bold text-slate-200 font-bold">
+                <div className="flex justify-between text-[10px] xl:text-xs font-bold text-slate-200">
                   <span>6.4V Crítico</span>
                   <span className="font-black" style={{ color: getBatColor() }}>{batteryPct}%</span>
                   <span>8.4V Máx</span>
                 </div>
                 {batteryLow && (
-                  <div className="text-base md:text-lg font-bold text-amber-400 font-black animate-pulse">
+                  <div className="text-xs font-bold text-amber-400 font-black animate-pulse">
                     ⚠️ Batería baja — cargar pronto
                   </div>
                 )}
                 {batteryMv < BATTERY_CRIT_MV && (
-                  <div className="text-base md:text-lg font-bold text-red-400 font-black animate-pulse">
+                  <div className="text-xs font-bold text-red-400 font-black animate-pulse">
                     🛑 ¡CRÍTICO! Motores desactivados
                   </div>
                 )}
               </div>
             </section>
 
-            <hr className="border-slate-600 border-2" />
+            <hr className="border-slate-700/50" />
 
             {/* Motor PWM */}
-            <section className="space-y-2">
-              <p className="text-base md:text-lg font-bold font-black uppercase tracking-[0.2em] text-slate-200 font-bold">⚙️ Salida Motores (PWM)</p>
-              <div className="grid grid-cols-2 gap-3">
-                {[{ label: 'IZQUIERDO', val: motorStats.izq }, { label: 'DERECHO', val: motorStats.der }].map(m => {
+            <section className="space-y-1.5">
+              <p className="text-xs xl:text-sm font-bold font-black uppercase tracking-[0.2em] text-slate-200">⚙️ Salida Motores (PWM)</p>
+              <div className="grid grid-cols-2 gap-2">
+                {[{ label: 'IZQ', val: motorStats.izq }, { label: 'DER', val: motorStats.der }].map(m => {
                   const absVal = Math.abs(m.val);
                   const isForward = m.val > 0;
                   const isReverse = m.val < 0;
                   const dirText = isForward ? 'AVANZAR ⬆️' : isReverse ? 'RETROCEDER ⬇️' : 'DETENIDO 🛑';
-                  const dirColorClass = isForward ? 'text-emerald-400 font-bold' : isReverse ? 'text-amber-500 font-bold' : 'text-slate-400 font-medium';
+                  const dirColorClass = isForward ? 'text-emerald-400' : isReverse ? 'text-amber-500' : 'text-slate-400';
                   
                   return (
-                    <div key={m.label} className="p-3 bg-slate-800 rounded-xl border border-slate-600 border-2 text-center flex flex-col justify-between min-h-[120px]">
+                    <div key={m.label} className="p-2.5 bg-slate-800/80 rounded-xl border border-slate-600 border-2 text-center flex flex-col justify-between">
                       <div>
-                        <p className="text-sm md:text-base font-bold text-slate-100 font-bold uppercase tracking-widest">{m.label}</p>
-                        <p className="text-xl font-black mt-1" style={{ color: DRIVERS[driver].color }}>
-                          {absVal} <span className="text-sm md:text-base font-bold text-slate-300 font-medium">/ 255</span>
+                        <p className="text-[10px] xl:text-xs font-bold text-slate-100 uppercase tracking-widest">{m.label}</p>
+                        <p className="text-base xl:text-lg font-black mt-0.5" style={{ color: DRIVERS[driver].color }}>
+                          {absVal} <span className="text-[10px] xl:text-xs font-bold text-slate-300">/ 255</span>
                         </p>
                       </div>
-                      <div className="w-full h-2 bg-black/40 rounded-full my-2 overflow-hidden">
+                      <div className="w-full h-1.5 bg-black/40 rounded-full my-1.5 overflow-hidden">
                         <div className="h-full rounded-full transition-all" style={{ width: `${(absVal / 255) * 100}%`, background: DRIVERS[driver].color }} />
                       </div>
-                      <p className={`text-base md:text-lg font-black tracking-wide ${dirColorClass}`}>{dirText}</p>
+                      <p className={`text-[10px] xl:text-xs font-black tracking-wide ${dirColorClass}`}>{dirText}</p>
                     </div>
                   );
                 })}
               </div>
             </section>
 
-            <hr className="border-slate-600 border-2" />
+            <hr className="border-slate-700/50" />
 
             {/* BT Console */}
-            <section className="space-y-2 flex-1">
-              <p className="text-base md:text-lg font-bold font-black uppercase tracking-[0.2em] text-slate-200 font-bold">📡 Consola Bluetooth HC-05</p>
-              <div className="p-4 md:p-5 rounded-xl bg-black/60 border border-blue-500/20 font-mono text-base md:text-lg font-bold space-y-0.5 min-h-[120px]">
-                {btConsole.length === 0 && <p className="text-slate-300 font-medium italic">Esperando comandos...</p>}
+            <section className="space-y-1.5 flex-1 min-h-[90px] flex flex-col">
+              <p className="text-xs xl:text-sm font-bold font-black uppercase tracking-[0.2em] text-slate-200">📡 Consola Bluetooth HC-05</p>
+              <div className="p-2.5 xl:p-3.5 rounded-xl bg-black/60 border border-blue-500/20 font-mono text-[10px] xl:text-xs font-bold space-y-0.5 flex-1 overflow-y-auto">
+                {btConsole.length === 0 && <p className="text-slate-300 italic">Esperando comandos...</p>}
                 {btConsole.map((line, i) => (
-                  <div key={i} className={`transition-opacity ${i === 0 ? 'text-blue-300' : 'text-slate-300 font-medium'}`}>{line}</div>
+                  <div key={i} className={`transition-opacity ${i === 0 ? 'text-blue-300' : 'text-slate-400'}`}>{line}</div>
                 ))}
               </div>
             </section>
 
-            <hr className="border-slate-600 border-2" />
+            <hr className="border-slate-700/50" />
 
             {/* Controls */}
-            <div className="grid grid-cols-2 gap-2">
+            <div className="grid grid-cols-2 gap-2 mt-auto shrink-0">
               <button
                 onClick={() => setIsRunning(v => !v)}
-                className={`p-4 md:p-5 rounded-xl font-black text-lg md:text-xl font-bold uppercase tracking-widest transition-all ${isRunning ? 'bg-slate-800 text-slate-100 font-bold border border-slate-500 border-2 hover:bg-white/10' : 'bg-green-500 text-black shadow-lg shadow-green-500/20 hover:scale-105'}`}
+                className={`p-2.5 xl:p-3.5 rounded-xl font-black text-xs xl:text-sm uppercase tracking-widest transition-all ${isRunning ? 'bg-slate-800 text-slate-100 border border-slate-500 border-2 hover:bg-white/10' : 'bg-green-500 text-black shadow-lg shadow-green-500/20 hover:scale-105'}`}
               >
                 {isRunning ? (locale === 'es' ? 'Pausar' : 'Pause') : (locale === 'es' ? 'Reanudar' : 'Resume')}
               </button>
               <button
                 onClick={resetGame}
-                className="p-4 md:p-5 rounded-xl font-black text-lg md:text-xl font-bold uppercase tracking-widest bg-slate-800 text-slate-100 font-bold border border-slate-500 border-2 hover:bg-red-500 hover:text-white transition-all"
+                className="p-2.5 xl:p-3.5 rounded-xl font-black text-xs xl:text-sm uppercase tracking-widest bg-slate-800 text-slate-100 border border-slate-500 border-2 hover:bg-red-500 hover:text-white transition-all"
               >
                 Reset
               </button>
@@ -599,33 +602,49 @@ const SoccerSimulator = () => {
           </aside>
 
           {/* CENTER — Field */}
-          <main className="flex-1 flex flex-col items-center justify-center gap-4 p-4 relative">
+          <main className="flex-1 flex flex-col items-center justify-between p-4 relative min-w-0 min-h-0 overflow-hidden bg-[#0c1224]/30">
+
+            {/* Collapsible toggle buttons */}
+            <button
+              onClick={() => setLeftPanelOpen(o => !o)}
+              className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-slate-800/90 hover:bg-slate-700 border-y border-r border-slate-500 rounded-r-xl p-2 md:p-3 text-white shadow-lg transition-all focus:outline-none flex items-center justify-center cursor-pointer"
+              title={leftPanelOpen ? "Ocultar panel izquierdo" : "Mostrar panel izquierdo"}
+            >
+              {leftPanelOpen ? '◀' : '▶'}
+            </button>
+            <button
+              onClick={() => setRightPanelOpen(o => !o)}
+              className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-slate-800/90 hover:bg-slate-700 border-y border-l border-slate-500 rounded-l-xl p-2 md:p-3 text-white shadow-lg transition-all focus:outline-none flex items-center justify-center cursor-pointer"
+              title={rightPanelOpen ? "Ocultar panel derecho" : "Mostrar panel derecho"}
+            >
+              {rightPanelOpen ? '▶' : '◀'}
+            </button>
 
             {/* Scoreboard */}
-            <div className="flex items-center gap-8 bg-black/60 backdrop-blur-xl px-8 py-3 rounded-2xl border border-slate-500 border-2">
+            <div className="flex items-center gap-6 bg-black/60 backdrop-blur-xl px-6 py-2 rounded-2xl border border-slate-500 border-2 shrink-0">
               <div className="text-center">
-                <p className="text-sm md:text-base font-bold text-slate-200 font-bold uppercase tracking-widest">HOME</p>
-                <p className="text-4xl font-black text-white">{score.home}</p>
+                <p className="text-[10px] md:text-xs font-bold text-slate-200 uppercase tracking-widest">HOME</p>
+                <p className="text-xl md:text-2xl font-black text-white">{score.home}</p>
               </div>
-              <div className="text-slate-300 font-medium font-black text-2xl">VS</div>
+              <div className="text-slate-300 font-black text-sm md:text-base">VS</div>
               <div className="text-center">
-                <p className="text-sm md:text-base font-bold text-slate-200 font-bold uppercase tracking-widest">AWAY</p>
-                <p className="text-4xl font-black text-white">{score.away}</p>
+                <p className="text-[10px] md:text-xs font-bold text-slate-200 uppercase tracking-widest">AWAY</p>
+                <p className="text-xl md:text-2xl font-black text-white">{score.away}</p>
               </div>
             </div>
 
-            {/* Field Canvas */}
-            <div className="relative">
+            {/* Field Canvas Container */}
+            <div className="relative flex-1 w-full min-h-0 flex items-center justify-center max-w-[800px] max-h-[520px] my-auto">
               <canvas
                 ref={canvasRef}
                 width={FIELD_W}
                 height={FIELD_H}
-                className="rounded-2xl shadow-2xl shadow-black/60 border border-slate-500 border-2"
+                className="w-full h-full object-contain rounded-2xl shadow-2xl shadow-black/60 border border-slate-500 border-2"
               />
               {/* Goal overlay */}
               {goalMsg && (
                 <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                  <div className="text-5xl font-black text-white bg-black/60 backdrop-blur-md px-10 py-6 rounded-3xl border border-yellow-400/40 shadow-2xl shadow-yellow-400/20 animate-bounce">
+                  <div className="text-3xl md:text-4xl lg:text-5xl font-black text-white bg-black/60 backdrop-blur-md px-8 py-4 rounded-3xl border border-yellow-400/40 shadow-2xl shadow-yellow-400/20 animate-bounce">
                     {goalMsg}
                   </div>
                 </div>
@@ -633,7 +652,7 @@ const SoccerSimulator = () => {
               {/* Battery critical overlay */}
               {batteryMv < BATTERY_CRIT_MV && (
                 <div className="absolute inset-0 flex items-center justify-center pointer-events-none bg-red-900/20 rounded-2xl">
-                  <div className="text-2xl font-black text-red-400 bg-black/80 px-8 py-4 rounded-2xl border border-red-500/40 animate-pulse">
+                  <div className="text-lg md:text-xl font-black text-red-400 bg-black/80 px-6 py-3 rounded-2xl border border-red-500/40 animate-pulse">
                     🔋 BATERÍA CRÍTICA — RECARGA
                   </div>
                 </div>
@@ -641,10 +660,10 @@ const SoccerSimulator = () => {
             </div>
 
             {/* Keyboard guide */}
-            <div className="flex items-center gap-6 text-base md:text-lg font-bold text-slate-200 font-bold font-mono">
+            <div className="flex flex-wrap justify-center items-center gap-x-4 gap-y-2 text-[10px] md:text-xs text-slate-300 font-bold font-mono py-1 shrink-0">
               {[['W / ↑', 'Avanzar'], ['S / ↓', 'Retroceder'], ['A / ←', 'Giro Izq'], ['D / →', 'Giro Der'], ['Q', 'Giro Brusco Izq'], ['E', 'Giro Brusco Der']].map(([k, v]) => (
-                <div key={k} className="flex items-center gap-1.5">
-                  <kbd className="px-2 py-0.5 bg-white/10 rounded text-white font-bold border border-slate-500 border-2 font-black text-base md:text-lg font-bold">{k}</kbd>
+                <div key={k} className="flex items-center gap-1">
+                  <kbd className="px-1.5 py-0.5 bg-white/10 rounded text-white border border-slate-600 font-bold text-[10px] md:text-xs">{k}</kbd>
                   <span>{v}</span>
                 </div>
               ))}
@@ -652,48 +671,49 @@ const SoccerSimulator = () => {
           </main>
 
           {/* RIGHT PANEL — Info */}
-          <aside className="w-[400px] bg-black/40 backdrop-blur-xl border-l border-slate-600 border-2 flex flex-col gap-4 p-5 overflow-y-auto shrink-0">
-            <p className="text-base md:text-lg font-bold font-black uppercase tracking-[0.2em] text-slate-200 font-bold">📊 Info en Tiempo Real</p>
+          <aside className={`bg-black/40 backdrop-blur-xl border-l border-slate-600 border-2 flex flex-col gap-3 p-3 xl:p-4 overflow-y-auto shrink-0 transition-all duration-300 relative ${rightPanelOpen ? 'w-[260px] lg:w-[300px]' : 'w-0 p-0 border-l-0 overflow-hidden'}`}>
+            <p className="text-xs xl:text-sm font-bold font-black uppercase tracking-[0.2em] text-slate-200">📊 Info en Tiempo Real</p>
 
             {/* Current command */}
-            <div className="p-4 rounded-xl bg-slate-800 border border-slate-600 border-2 text-center">
-              <p className="text-sm md:text-base font-bold text-slate-200 font-bold uppercase tracking-widest mb-1">Comando Activo</p>
-              <p className="text-4xl font-black" style={{ color: DRIVERS[driver].color }}>{currentCmd}</p>
-              <p className="text-base md:text-lg font-bold text-slate-100 font-bold mt-1">{{ F: 'AVANZAR', B: 'RETROCEDER', L: 'GIRO IZQ', R: 'GIRO DER', S: 'STOP', I: 'G. BRUSCO IZQ', J: 'G. BRUSCO DER' }[currentCmd]}</p>
+            <div className="p-3 rounded-xl bg-slate-800/80 border border-slate-600 border-2 text-center">
+              <p className="text-[10px] xl:text-xs font-bold text-slate-200 uppercase tracking-widest mb-0.5">Comando Activo</p>
+              <p className="text-2xl xl:text-3xl font-black" style={{ color: DRIVERS[driver].color }}>{currentCmd}</p>
+              <p className="text-xs xl:text-sm font-bold text-slate-100 mt-0.5">{{ F: 'AVANZAR', B: 'RETROCEDER', L: 'GIRO IZQ', R: 'GIRO DER', S: 'STOP', I: 'G. BRUSCO IZQ', J: 'G. BRUSCO DER' }[currentCmd]}</p>
             </div>
 
             {/* Driver comparison */}
-            <div className="space-y-2">
-              <p className="text-base md:text-lg font-bold font-black uppercase tracking-[0.2em] text-slate-200 font-bold">⚡ Diferencia de Drivers</p>
-              <div className="p-4 md:p-5 rounded-xl bg-slate-800 border border-slate-600 border-2 space-y-3">
+            <div className="space-y-1.5">
+              <p className="text-xs xl:text-sm font-bold font-black uppercase tracking-[0.2em] text-slate-200">⚡ Diferencia de Drivers</p>
+              <div className="p-3 rounded-xl bg-slate-800/80 border border-slate-600 border-2 space-y-2.5">
                 {Object.entries(DRIVERS).map(([key, drv]) => (
                   <div key={key} className={`space-y-1 ${driver !== key ? 'opacity-40' : ''}`}>
-                    <div className="flex justify-between text-base md:text-lg font-bold">
+                    <div className="flex justify-between text-xs xl:text-sm font-bold">
                       <span style={{ color: drv.color }}>{drv.icon} {drv.name}</span>
-                      <span className="text-white font-bold">{(drv.efficiency * 100).toFixed(0)}%</span>
+                      <span className="text-white">{(drv.efficiency * 100).toFixed(0)}%</span>
                     </div>
-                    <div className="w-full h-2 bg-black/40 rounded-full overflow-hidden">
+                    <div className="w-full h-1.5 bg-black/40 rounded-full overflow-hidden">
                       <div className="h-full rounded-full" style={{ width: `${drv.efficiency * 100}%`, background: drv.color }} />
                     </div>
-                    <p className="text-sm md:text-base font-bold text-slate-200 font-bold">Veloc. real: {(MAX_ROBOT_SPEED * drv.efficiency).toFixed(0)} px/s</p>
+                    <p className="text-[10px] xl:text-xs text-slate-300">Veloc. real: {(MAX_ROBOT_SPEED * drv.efficiency).toFixed(0)} px/s</p>
                   </div>
                 ))}
               </div>
             </div>
 
             {/* Physics info */}
-            <div className="space-y-2">
-              <p className="text-base md:text-lg font-bold font-black uppercase tracking-[0.2em] text-slate-200 font-bold">🧠 Física del Robot</p>
-              <div className="p-4 md:p-5 rounded-xl bg-slate-800 border border-slate-600 border-2 text-base md:text-lg font-bold text-slate-100 font-bold space-y-2 leading-relaxed">
-                <p>🔄 <strong className="text-white font-bold">Tracción diferencial:</strong> Dos ruedas independientes controlan velocidad lineal y angular.</p>
-                <p>⏱️ <strong className="text-white font-bold">Inercia (slew rate):</strong> Los motores no aceleran instantáneamente — cuida los plásticos.</p>
-                <p>⚽ <strong className="text-white font-bold">Colisión elástica:</strong> La pelota recibe un impulso proporcional a la velocidad del robot.</p>
+            <div className="space-y-1.5">
+              <p className="text-xs xl:text-sm font-bold font-black uppercase tracking-[0.2em] text-slate-200">🧠 Física del Robot</p>
+              <div className="p-3 rounded-xl bg-slate-800/80 border border-slate-600 border-2 text-[11px] xl:text-xs text-slate-300 space-y-2 leading-relaxed">
+                <p>🔄 <strong className="text-white">Tracción diferencial:</strong> Dos ruedas independientes controlan velocidad lineal y angular.</p>
+                <p>⏱️ <strong className="text-white">Inercia (slew rate):</strong> Los motores no aceleran instantáneamente — cuida los plásticos.</p>
+                <p>⚽ <strong className="text-white">Colisión elástica:</strong> La pelota recibe un impulso proporcional a la velocidad del robot.</p>
               </div>
             </div>
 
           </aside>
         </div>
       ) : (
+
         <div className="flex-1 overflow-y-auto bg-[#070b15] p-6 md:p-12 font-sans select-text">
           <div className="max-w-4xl mx-auto space-y-12">
             
