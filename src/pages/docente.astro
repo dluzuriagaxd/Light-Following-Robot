@@ -2,6 +2,12 @@
 export const prerender = false;
 import TeacherPortal from '../components/docente/TeacherPortal.jsx';
 import '../styles/global.css';
+
+// Server-side role check
+const role = Astro.locals.role;
+if (role !== "teacher" && role !== "admin") {
+    return Astro.redirect("/login");
+}
 ---
 
 <!DOCTYPE html>

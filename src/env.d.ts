@@ -8,9 +8,10 @@ declare namespace App {
         runtime: import("@astrojs/cloudflare").Runtime<Env>;
         isAdmin?: boolean;
         supabase: import("@supabase/supabase-js").SupabaseClient;
-        session: import("@supabase/supabase-js").Session | null;
+        session: { user: import("@supabase/supabase-js").User } | null;
+        user: import("@supabase/supabase-js").User | null;
+        role: "student" | "teacher" | "admin" | "guest";
     }
 }
 
-interface Env {
-}
+interface Env {}

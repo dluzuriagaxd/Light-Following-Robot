@@ -18,7 +18,9 @@ export const getServerClient = (context: APIContext) => {
         {
             cookies: {
                 getAll() {
-                    return parseCookieHeader(context.request.headers.get('Cookie') ?? '')
+                    return parseCookieHeader(context.request.headers.get('Cookie') ?? '').map(
+                        ({ name, value }) => ({ name, value: value ?? '' })
+                    )
                 },
                 setAll(cookiesToSet) {
                     cookiesToSet.forEach(({ name, value, options }) => {
