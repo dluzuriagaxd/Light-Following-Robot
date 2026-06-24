@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lienzo de Bloques Interactivo</title>
+  <!-- Tailwind CSS para diseño moderno -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    /* Cuadrícula de fondo estilo MakeCode / Scratch */
+    .canvas-grid-light {
+      background-color: #F5F7F9;
+      background-image: radial-gradient(#D3D6DB 1.5px, transparent 1.5px);
+      background-size: 20px 20px;
+    }
+    .canvas-grid-dark {
+      background-color: #1E1E24;
+      background-image: radial-gradient(#3A3B45 1.5px, transparent 1.5px);
+      background-size: 20px 20px;
+    }
+    /* Estilo del cursor para elementos arrastrables */
+    .draggable {
+      cursor: grab;
+    }
+    .draggable:active {
+      cursor: grabbing;
+    }
+  </style>
+</head>
+<body class="h-screen w-screen flex flex-col overflow-hidden bg-slate-50 transition-colors duration-300">
+
+  <!-- Encabezado de la aplicación -->
+  <header class="bg-white border-b border-slate-200 px-6 py-4 flex flex-col sm:flex-row justify-between items-center gap-4 z-10 shadow-sm">
+    <div class="flex items-center gap-3">
+      <div class="w-10 h-10 rounded-lg bg-amber-500 flex items-center justify-center shadow-md">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+        </svg>
+      </div>
+      <div>
+        <h1 class="text-lg font-bold text-slate-800">Visualizador de Bloques Vectoriales</h1>
+        <p class="text-xs text-slate-500">Mueva, ensamble o exporte los bloques de forma independiente.</p>
+      </div>
+    </div>
+
+    <!-- Panel de control -->
+    <div class="flex flex-wrap items-center gap-2">
+      <!-- Alternar Tema -->
+      <button id="btn-theme" class="px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-sm font-medium transition flex items-center gap-2">
+        <span id="theme-icon">🌙</span> Oscuro
+      </button>
+      
+      <!-- Dispersar bloques -->
+      <button id="btn-explode" class="px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-sm font-medium transition flex items-center gap-2">
+        ⚡ Separar
+      </button>
+
+      <!-- Ensamblar automáticamente -->
+      <button id="btn-assemble" class="px-3 py-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-600 rounded-lg text-sm font-medium transition flex items-center gap-2">
+        🔗 Ensamblar
+      </button>
+
+      <!-- Descargar archivo SVG -->
+      <button id="btn-download" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-sm font-medium shadow-sm transition flex items-center gap-2">
+        📥 Descargar SVG
+      </button>
+    </div>
+  </header>
+
+  <!-- Área principal de visualización e interacción -->
+  <main class="flex-1 relative overflow-hidden">
+    
+    <!-- Notificación personalizada -->
+    <div id="notification" class="absolute top-4 left-1/2 transform -translate-x-1/2 bg-slate-900 text-white px-4 py-2 rounded-lg text-sm font-medium shadow-lg transition-all duration-300 opacity-0 pointer-events-none translate-y-[-10px] z-50">
+      Acción completada con éxito.
+    </div>
+
+    <!-- Lienzo SVG con cuadrícula -->
+    <div id="canvas-wrapper" class="w-full h-full canvas-grid-light transition-all duration-300">
+      <svg id="workspace-svg" xmlns="http://www.w3.org/2000/svg" class="w-full h-full" viewBox="0 0 1000 700">
+        <defs>
+          <!-- Filtro de sombra suave para emular Scratch/MakeCode -->
+          <filter id="block-shadow" x="-5%" y="-5%" width="115%" height="115%">
+            <feDropShadow dx="0" dy="2" stdDeviation="1.5" flood-color="#000000" flood-opacity="0.18" />
+          </filter>
+          
+          <!-- Estilos tipográficos dentro del SVG para asegurar fidelidad visual al exportar -->
+          <style>
+            .block-text { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 13.5px; font-weight: bold; fill: #FFFFFF; user-select: none; }
+            .dropdown-text { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 13px; font-weight: bold; fill: #FFFFFF; user-select: none; }
+            .input-text { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 13.5px; fill: #111111; text-anchor: middle; user-select: none; }
+          </style>
+        </defs>
+
+        <!-- ==================== GRUPOS INDEPENDIENTES Y ARRASTRABLES ==================== -->
+
+        <!-- 1. BLOQUE: on start -->
+        <g id="bloque-on-start" class="draggable" filter="url(#block-shadow)">
+          <!-- Silueta precisa tipo MakeCode -->
+          <path d="M 0,24 
+                   C 0,10 15,0 45,0 
+                   C 75,0 90,10 95,24 
+                   L 160,24 
+                   A 4,4 0 0 1 164,28 
+                   L 164,64 
+                   A 4,4 0 0 1 160,68 
+                   L 44,68 
+                   C 42,68 40,70 38,72 
+                   L 34,78 
+                   C 32,80 28,80 26,78 
+                   L 22,72 
+                   C 20,70 18,68 16,68 
+                   L 16,108 
+                   C 18,108 20,110 22,112
+                   L 26,118 
+                   C 28,120 32,120 34,118 
+                   L 38,112 
+                   C 40,110 42,108 44,108
+                   L 160,108 
+                   A 4,4 0 0 1 164,112 
+                   L 164,124 
+                   A 4,4 0 0 1 160,128 
+                   L 4,128 
+                   A 4,4 0 0 1 0,124 
+                   Z" 
+                fill="#FF9F1C" stroke="#E08600" stroke-width="1" />
+          <text x="16" y="52" class="block-text">on start</text>
+        </g>
+
+        <!-- 2. BLOQUE: forever (Con desfase horizontal corregido de 16px en conectores internos) -->
+        <g id="bloque-forever-contenedor" class="draggable" filter="url(#block-shadow)">
+          <!-- Contenedor exterior 'forever' alineado matemáticamente -->
+          <path d="M 0,24 
+                   C 0,10 15,0 45,0 
+                   C 75,0 90,10 95,24 
+                   L 160,24 
+                   A 4,4 0 0 1 164,28 
+                   L 164,64 
+                   A 4,4 0 0 1 160,68 
+                   L 60,68 
+                   C 58,68 56,70 54,72 
+                   L 50,78 
+                   C 48,80 44,80 42,78 
+                   L 38,72 
+                   C 36,70 34,68 32,68 
+                   L 16,68 
+                   L 16,252 
+                   L 32,252 
+                   C 34,252 36,254 38,256
+                   L 42,262 
+                   C 44,264 48,264 50,262 
+                   L 54,256 
+                   C 56,254 58,252 60,252
+                   L 160,252 
+                   A 4,4 0 0 1 164,256 
+                   L 164,268 
+                   A 4,4 0 0 1 160,272 
+                   L 4,272 
+                   A 4,4 0 0 1 0,268 
+                   Z" 
+                fill="#FF9F1C" stroke="#E08600" stroke-width="1" />
+          <text x="16" y="52" class="block-text">forever</text>
+        </g>
+
+        <!-- 3. SUB-BLOQUE INTERNO: set built-in LED to HIGH -->
+        <g id="bloque-led-high" class="draggable" filter="url(#block-shadow)">
+          <path d="M 0,0 
+                   L 16,0 
+                   C 18,0 20,2 22,4 
+                   L 26,10 
+                   C 28,12 32,12 34,10 
+                   L 38,4 
+                   C 40,2 42,0 44,0 
+                   L 246,0 
+                   A 4,4 0 0 1 250,4 
+                   L 250,42 
+                   A 4,4 0 0 1 246,46 
+                   L 44,46 
+                   C 42,46 40,48 38,50 
+                   L 34,56 
+                   C 32,58 28,58 26,56 
+                   L 22,50 
+                   C 20,48 18,46 16,46 
+                   L 4,46 
+                   A 4,4 0 0 1 0,42 
+                   Z" 
+                fill="#4C97FF" stroke="#3373CC" stroke-width="1" />
+          <text x="12" y="28" class="block-text">set built-in LED to</text>
+          <!-- Campo Dropdown HIGH -->
+          <g transform="translate(145, 8)">
+            <rect width="90" height="30" rx="4" fill="#2872E2" stroke="#1F5BB8" stroke-width="1" />
+            <text x="12" y="20" class="dropdown-text">HIGH</text>
+            <polygon points="70,12 78,12 74,18" fill="#FFFFFF" />
+          </g>
+        </g>
+
+        <!-- 4. SUB-BLOQUE INTERNO: wait 1 secs (Primero) -->
+        <g id="bloque-wait-1" class="draggable" filter="url(#block-shadow)">
+          <path d="M 0,0 
+                   L 16,0 
+                   C 18,0 20,2 22,4 
+                   L 26,10 
+                   C 28,12 32,12 34,10 
+                   L 38,4 
+                   C 40,2 42,0 44,0 
+                   L 186,0 
+                   A 4,4 0 0 1 190,4 
+                   L 190,42 
+                   A 4,4 0 0 1 186,46 
+                   L 44,46 
+                   C 42,46 40,48 38,50 
+                   L 34,56 
+                   C 32,58 28,58 26,56 
+                   L 22,50 
+                   C 20,48 18,46 16,46 
+                   L 4,46 
+                   A 4,4 0 0 1 0,42 
+                   Z" 
+                fill="#FF9F1C" stroke="#E08600" stroke-width="1" />
+          <text x="12" y="28" class="block-text">wait</text>
+          <!-- Entrada numérica -->
+          <g transform="translate(50, 8)">
+            <rect width="42" height="30" rx="15" fill="#FFFFFF" stroke="#D3D6DB" stroke-width="1" />
+            <text x="21" y="20" class="input-text">1</text>
+          </g>
+          <!-- Dropdown secs -->
+          <g transform="translate(100, 8)">
+            <rect width="80" height="30" rx="4" fill="#E08600" />
+            <text x="12" y="20" class="dropdown-text">secs</text>
+            <polygon points="60,12 68,12 64,18" fill="#FFFFFF" />
+          </g>
+        </g>
+
+        <!-- 5. SUB-BLOQUE INTERNO: set built-in LED to LOW -->
+        <g id="bloque-led-low" class="draggable" filter="url(#block-shadow)">
+          <path d="M 0,0 
+                   L 16,0 
+                   C 18,0 20,2 22,4 
+                   L 26,10 
+                   C 28,12 32,12 34,10 
+                   L 38,4 
+                   C 40,2 42,0 44,0 
+                   L 246,0 
+                   A 4,4 0 0 1 250,4 
+                   L 250,42 
+                   A 4,4 0 0 1 246,46 
+                   L 44,46 
+                   C 42,46 40,48 38,50 
+                   L 34,56 
+                   C 32,58 28,58 26,56 
+                   L 22,50 
+                   C 20,48 18,46 16,46 
+                   L 4,46 
+                   A 4,4 0 0 1 0,42 
+                   Z" 
+                fill="#4C97FF" stroke="#3373CC" stroke-width="1" />
+          <text x="12" y="28" class="block-text">set built-in LED to</text>
+          <!-- Campo Dropdown LOW -->
+          <g transform="translate(145, 8)">
+            <rect width="90" height="30" rx="4" fill="#2872E2" stroke="#1F5BB8" stroke-width="1" />
+            <text x="12" y="20" class="dropdown-text">LOW</text>
+            <polygon points="70,12 78,12 74,18" fill="#FFFFFF" />
+          </g>
+        </g>
+
+        <!-- 6. SUB-BLOQUE INTERNO: wait 1 secs (Segundo) -->
+        <g id="bloque-wait-2" class="draggable" filter="url(#block-shadow)">
+          <path d="M 0,0 
+                   L 16,0 
+                   C 18,0 20,2 22,4 
+                   L 26,10 
+                   C 28,12 32,12 34,10 
+                   L 38,4 
+                   C 40,2 42,0 44,0 
+                   L 186,0 
+                   A 4,4 0 0 1 190,4 
+                   L 190,42 
+                   A 4,4 0 0 1 186,46 
+                   L 44,46 
+                   C 42,46 40,48 38,50 
+                   L 34,56 
+                   C 32,58 28,58 26,56 
+                   L 22,50 
+                   C 20,48 18,46 16,46 
+                   L 4,46 
+                   A 4,4 0 0 1 0,42 
+                   Z" 
+                fill="#FF9F1C" stroke="#E08600" stroke-width="1" />
+          <text x="12" y="28" class="block-text">wait</text>
+          <!-- Entrada numérica -->
+          <g transform="translate(50, 8)">
+            <rect width="42" height="30" rx="15" fill="#FFFFFF" stroke="#D3D6DB" stroke-width="1" />
+            <text x="21" y="20" class="input-text">1</text>
+          </g>
+          <!-- Dropdown secs -->
+          <g transform="translate(100, 8)">
+            <rect width="80" height="30" rx="4" fill="#E08600" />
+            <text x="12" y="20" class="dropdown-text">secs</text>
+            <polygon points="60,12 68,12 64,18" fill="#FFFFFF" />
+          </g>
+        </g>
+
+      </svg>
+    </div>
+  </main>
+
+  <!-- Pie de página con instrucciones -->
+  <footer class="bg-white border-t border-slate-100 px-6 py-3 text-xs text-slate-500 flex justify-between items-center z-10">
+    <div>
+      <span>💡 <strong>Consejo:</strong> Puede arrastrar cualquiera de los bloques para reubicarlos en el espacio de trabajo.</span>
+    </div>
+    <div class="hidden sm:block">
+      <span>Renderizado Vectorial Perfecto</span>
+    </div>
+  </footer>
+
+  <script>
+    // Configuración de las posiciones por defecto (para alineación perfecta/ensamblado)
+    const originalPositions = {
+      'bloque-on-start':          { x: 50, y: 50 },
+      'bloque-forever-contenedor': { x: 50, y: 230 },
+      'bloque-led-high':          { x: 66, y: 298 },
+      'bloque-wait-1':            { x: 66, y: 344 },
+      'bloque-led-low':           { x: 66, y: 390 },
+      'bloque-wait-2':            { x: 66, y: 436 }
+    };
+
+    // Configuración de posiciones dispersas ("Exploded" para verlos separados)
+    const explodedPositions = {
+      'bloque-on-start':          { x: 50, y: 80 },
+      'bloque-forever-contenedor': { x: 340, y: 80 },
+      'bloque-led-high':          { x: 640, y: 50 },
+      'bloque-wait-1':            { x: 640, y: 130 },
+      'bloque-led-low':           { x: 640, y: 210 },
+      'bloque-wait-2':            { x: 640, y: 290 }
+    };
+
+    // Inicializar posiciones de los elementos SVG
+    function initPositions(positions) {
+      Object.keys(positions).forEach(id => {
+        const el = document.getElementById(id);
+        if (el) {
+          // Asignar traducción de posición inicial
+          el.setAttribute('transform', `translate(${positions[id].x}, ${positions[id].y})`);
+        }
+      });
+    }
+
+    // Inicializar la interfaz en modo ensamblado por defecto
+    window.onload = function() {
+      initPositions(originalPositions);
+      setupDragAndDrop();
+    };
+
+    // Implementación del Drag & Drop nativo y sensible a touch
+    function setupDragAndDrop() {
+      const svg = document.getElementById('workspace-svg');
+      let selectedElement = null;
+      let offset = { x: 0, y: 0 };
+
+      // Capturar eventos de mouse y touch
+      svg.addEventListener('mousedown', startDrag);
+      svg.addEventListener('mousemove', drag);
+      svg.addEventListener('mouseup', endDrag);
+      svg.addEventListener('mouseleave', endDrag);
+
+      svg.addEventListener('touchstart', startDrag, { passive: false });
+      svg.addEventListener('touchmove', drag, { passive: false });
+      svg.addEventListener('touchend', endDrag);
+
+      // Convertir coordenadas de pantalla a coordenadas internas del SVG
+      function getMousePosition(evt) {
+        const CTM = svg.getScreenCTM();
+        if (evt.touches && evt.touches.length > 0) {
+          evt = evt.touches[0];
+        }
+        return {
+          x: (evt.clientX - CTM.e) / CTM.a,
+          y: (evt.clientY - CTM.f) / CTM.d
+        };
+      }
+
+      function startDrag(evt) {
+        let target = evt.target;
+        // Buscar el ancestro que sea un grupo draggable
+        while (target && target !== svg) {
+          if (target.classList.contains('draggable')) {
+            selectedElement = target;
+            break;
+          }
+          target = target.parentNode;
+        }
+
+        if (selectedElement) {
+          evt.preventDefault();
+          const coord = getMousePosition(evt);
+          
+          // Asegurar que exista una matriz de transformación
+          let transform = selectedElement.transform.baseVal;
+          if (transform.numberOfItems === 0 || transform.getItem(0).type !== SVGTransform.SVG_TRANSFORM_TRANSLATE) {
+            let translate = svg.createSVGTransform();
+            translate.setTranslate(0, 0);
+            selectedElement.transform.baseVal.insertItemBefore(translate, 0);
+          }
+          
+          const trans = transform.getItem(0);
+          offset.x = coord.x - trans.matrix.e;
+          offset.y = coord.y - trans.matrix.f;
+
+          // Traer elemento seleccionado al frente visualmente
+          selectedElement.parentNode.appendChild(selectedElement);
+        }
+      }
+
+      // Desplazamiento del elemento
+      function drag(evt) {
+        if (selectedElement) {
+          evt.preventDefault();
+          const coord = getMousePosition(evt);
+          const trans = selectedElement.transform.baseVal.getItem(0);
+          trans.setTranslate(coord.x - offset.x, coord.y - offset.y);
+        }
+      }
+
+      function endDrag(evt) {
+        selectedElement = null;
+      }
+    }
+
+    // Funciones del Panel de Control
+    const notification = document.getElementById('notification');
+    
+    function showNotification(msg) {
+      notification.innerText = msg;
+      notification.classList.remove('opacity-0', 'translate-y-[-10px]', 'pointer-events-none');
+      notification.classList.add('opacity-100', 'translate-y-0');
+      
+      setTimeout(() => {
+        notification.classList.remove('opacity-100', 'translate-y-0');
+        notification.classList.add('opacity-0', 'translate-y-[-10px]', 'pointer-events-none');
+      }, 2500);
+    }
+
+    // Botón Ensamblar
+    document.getElementById('btn-assemble').addEventListener('click', () => {
+      initPositions(originalPositions);
+      showNotification('Bloques acoplados a la perfección.');
+    });
+
+    // Botón Separar
+    document.getElementById('btn-explode').addEventListener('click', () => {
+      initPositions(explodedPositions);
+      showNotification('Bloques independizados listos para mover.');
+    });
+
+    // Botón Cambiar Tema
+    const canvasWrapper = document.getElementById('canvas-wrapper');
+    const themeIcon = document.getElementById('theme-icon');
+    const btnTheme = document.getElementById('btn-theme');
+    let isDark = false;
+
+    btnTheme.addEventListener('click', () => {
+      isDark = !isDark;
+      if (isDark) {
+        canvasWrapper.className = 'w-full h-full canvas-grid-dark transition-all duration-300';
+        btnTheme.innerHTML = '☀️ Ligero';
+        btnTheme.className = 'px-3 py-2 bg-slate-800 hover:bg-slate-700 text-slate-100 rounded-lg text-sm font-medium transition flex items-center gap-2';
+      } else {
+        canvasWrapper.className = 'w-full h-full canvas-grid-light transition-all duration-300';
+        btnTheme.innerHTML = '🌙 Oscuro';
+        btnTheme.className = 'px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-sm font-medium transition flex items-center gap-2';
+      }
+    });
+
+    // Botón Descargar SVG (Exportación limpia del estado actual del lienzo)
+    document.getElementById('btn-download').addEventListener('click', () => {
+      const svgEl = document.getElementById('workspace-svg');
+      
+      // Duplicamos el nodo SVG para limpiarlo antes de descargar
+      const cleanSvg = svgEl.cloneNode(true);
+      
+      // Removemos los atributos de pantalla interactiva, definiendo dimensiones fijas idóneas para exportación
+      cleanSvg.setAttribute('width', '1000');
+      cleanSvg.setAttribute('height', '700');
+      
+      const svgString = new XMLSerializer().serializeToString(cleanSvg);
+      const blob = new Blob([svgString], { type: 'image/svg+xml;charset=utf-8' });
+      const URL = window.URL || window.webkitURL || window;
+      const blobURL = URL.createObjectURL(blob);
+      
+      const a = document.createElement('a');
+      a.href = blobURL;
+      a.download = 'bloques_programacion_corregidos.svg';
+      document.body.appendChild(a);
+      a.click();
+      
+      document.body.removeChild(a);
+      URL.revokeObjectURL(blobURL);
+      
+      showNotification('Archivo SVG descargado con éxito.');
+    });
+  </script>
+</body>
+</html>

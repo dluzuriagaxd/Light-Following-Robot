@@ -41,7 +41,7 @@ function Switch({ id, label, active, onClick, shootThrough }) {
 
 export default function HBridgeSim() {
   const [switches, setSwitches] = useState({ s1: false, s2: false, s3: false, s4: false });
-  const [pwm, setPwm] = useState(200);
+  const [pwm, setPwm] = useState(255);
 
   const toggle = (key) => setSwitches(prev => ({ ...prev, [key]: !prev[key] }));
   const applyPreset = (preset) => setSwitches(PRESETS[preset]);
@@ -148,6 +148,7 @@ export default function HBridgeSim() {
         <div style={{ color: "#f97316", fontSize: 22, fontWeight: 800, margin: "6px 0" }}>{speedPct}% duty = ~{(7.4 * pwm / 255).toFixed(1)}V average</div>
         <input type="range" min="0" max="255" step="1" value={pwm}
           onChange={e => setPwm(parseInt(e.target.value))}
+          onDoubleClick={() => setPwm(255)}
           style={{ width: "100%", accentColor: "#f97316" }} />
         {/* PWM bar visualization */}
         <div style={{ display: "flex", gap: 1, marginTop: 8, height: 12, borderRadius: 4, overflow: "hidden" }}>

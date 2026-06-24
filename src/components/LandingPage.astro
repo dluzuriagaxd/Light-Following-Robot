@@ -1,5 +1,6 @@
 ---
 import MainLayout from "../layouts/MainLayout.astro";
+import Roadmap from "./progress/Roadmap";
 
 interface Props {
 	isAdmin?: boolean;
@@ -9,7 +10,7 @@ const { isAdmin = false } = Astro.props;
 ---
 
 <MainLayout
-	title="Soccer Jr. Academy — Construye tu Robot Futbolista con Arduino"
+	title="Academia Seguidor de Luz — Construye tu Robot Seguidor de Luz"
 	fullWidth={true}
 	sidebarHidden={true}
 >
@@ -40,16 +41,15 @@ const { isAdmin = false } = Astro.props;
 				<h1
 					class="text-7xl md:text-9xl font-black mb-8 tracking-tighter leading-none"
 				>
-					SOCCER <span
+					SEGUIDOR <span
 						class="bg-clip-text text-transparent bg-gradient-to-b from-orange-400 to-orange-600"
-						>JR.</span
+						>DE LUZ</span
 					>
 				</h1>
 				<p
 					class="text-2xl md:text-3xl text-slate-300 max-w-3xl mx-auto mb-16 font-medium leading-relaxed"
 				>
-					Construye, programa y compite con tu propio robot de
-					fútbol. Domina la robótica con C++ profesional.
+					Construye, programa y calibra tu propio robot seguidor de luz. Domina la robótica con bloques de programación visual.
 				</p>
 				<div
 					class="flex flex-col sm:flex-row gap-4 justify-center items-center"
@@ -58,17 +58,22 @@ const { isAdmin = false } = Astro.props;
 						href="/simulador"
 						class="group relative px-8 py-5 bg-white text-slate-950 font-black rounded-2xl transition-all hover:bg-brand-orange hover:text-white active:scale-95 text-lg shadow-2xl shadow-white/10 flex items-center gap-3"
 					>
-						⚽ Simulador Soccer Jr.
+						💡 Simulador Seguidor de Luz
 					</a>
 
 					<a
-						href="/curso/01-introduccion/01-objetivos"
+						href="/curso/01-fundamentos/00-conceptos-previos"
 						class="px-8 py-5 bg-white/5 hover:bg-white/10 border border-white/10 text-white/60 hover:text-white font-bold rounded-2xl transition-all backdrop-blur-md active:scale-95 text-lg"
 					>
 						Ver Curso →
 					</a>
 				</div>
 			</div>
+		</section>
+
+		<!-- Sección: ROADMAP GAMIFICADO -->
+		<section class="py-24 bg-white border-b border-slate-200">
+			<Roadmap client:load />
 		</section>
 
 		<!-- Sección 2: CARACTERÍSTICAS (Grid) -->
@@ -81,16 +86,15 @@ const { isAdmin = false } = Astro.props;
 						<div
 							class="w-16 h-16 bg-orange-100 rounded-2xl flex items-center justify-center mb-8 text-4xl"
 						>
-							⚽
+							💡
 						</div>
 						<h3 class="text-3xl font-black text-slate-900 mb-6">
-							Simulador Soccer Jr.
+							Simulador Seguidor de Luz
 						</h3>
 						<p
 							class="text-slate-500 text-lg leading-relaxed font-medium"
 						>
-							Practica el control Bluetooth, la física del balón y
-							compara drivers L293D vs L298N antes de armar el robot.
+							Practica el control diferencial, experimenta con el ruido de luz y calibra la diferencia base de los sensores.
 						</p>
 					</div>
 
@@ -110,8 +114,7 @@ const { isAdmin = false } = Astro.props;
 						<p
 							class="text-slate-500 text-lg leading-relaxed font-medium"
 						>
-							Aprende a programar en
-							C++ profesional. Cada lección construye sobre la anterior.
+							Aprende a programar en bloques de SteamakersBlocks. Cada lección construye sobre la anterior.
 						</p>
 					</div>
 				</div>
@@ -135,7 +138,7 @@ const { isAdmin = false } = Astro.props;
 						<div class="w-10 h-10 bg-slate-400 rounded-md"></div>
 						<span
 							class="text-2xl font-black tracking-tighter text-slate-500"
-							>SOCCER JR</span
+							>SEGUIDOR DE LUZ</span
 						>
 					</div>
 					<div class="flex items-center gap-2">
@@ -166,16 +169,16 @@ const { isAdmin = false } = Astro.props;
 				<h2
 					class="text-4xl md:text-6xl font-black text-slate-950 mb-10 tracking-tight"
 				>
-					¿Listo para tu primer partido?
+					¿Listo para encender tus motores?
 				</h2>
 				<p class="text-xl text-slate-500 mb-12 font-medium">
-					Construye tu robot Soccer Jr. paso a paso. Primer paso: conocer los materiales.
+					Construye tu robot seguidor de luz paso a paso. Primer paso: conocer los materiales.
 				</p>
 				<a
-					href="/curso/01-introduccion/01-objetivos"
+					href="/curso/01-fundamentos/00-conceptos-previos"
 					class="inline-block px-12 py-6 bg-orange-600 text-white font-black rounded-3xl hover:bg-orange-500 transition-all transform hover:scale-105 active:scale-95 text-2xl shadow-2xl shadow-orange-600/30"
 				>
-					⚽ Comenzar el Curso
+					💡 Comenzar el Curso
 				</a>
 			</div>
 		</section>

@@ -1,0 +1,57 @@
+---
+title: "11. Lógica del Seguidor II: Límites de Luz"
+order: 11
+description: "Programa condicionales para controlar cuándo se detiene el robot por oscuridad y cómo limitar su velocidad máxima."
+---
+
+# 🧠 Lección 11: Lógica del Seguidor II: Límites de Luz
+
+En la clase anterior aprendimos a calcular la diferencia analógica y a programar la zona muerta. Sin embargo, si apagamos la linterna, nuestro robot seguirá intentando moverse debido a las pequeñas variaciones de la luz ambiental del aula.
+
+En esta lección completaremos los **Pasos 3 y 4** de Entrenamiento Lógico en el simulador, programando controles de seguridad para que el robot se detenga en la oscuridad y controle su velocidad cuando la luz sea sumamente intensa.
+
+---
+
+## 🎮 Acceso al Simulador
+Abre la pestaña de simulación y selecciona los pasos correspondientes en la columna izquierda:
+
+**[→ Abrir Simulador de Seguidor de Luz](/simulador)**
+
+---
+
+## 🔬 Paso 3: Umbral de Luz Mínima (Filtro Crepuscular)
+
+Para evitar que el robot intente seguir la sombra o se mueva solo por las luces normales del techo, implementamos una regla de seguridad:
+Si la luz recibida en *ambos* sensores es menor a un número determinado (el **Umbral de Luz Mínima**, ej. `300` de 1023), asumiremos que la linterna está apagada. Por lo tanto, el robot debe **detenerse por completo**.
+
+### Algoritmo lógico del paso 3:
+```
+¿El valor de A0 y A1 es menor a 300?
+  ├── SÍ: Apagar los motores (detener).
+  └── NO: Ejecutar algoritmo diferencial de giro (avanzar o doblar).
+```
+
+### Consigna del Paso 3 en el Simulador:
+* Selecciona el **Paso 3** en el simulador.
+* Configura un valor de umbral (ejemplo: `350`).
+* Apaga la linterna virtual o aléjala mucho. Observa cómo el robot se detiene de inmediato al caer las lecturas por debajo del umbral de luz mínima.
+
+---
+
+## 🔬 Paso 4: Límite de Luz Máxima y Velocidad
+
+Cuando acercamos mucho la linterna al robot, las lecturas analógicas suben casi a su máximo (cerca de `1023`). En esta condición, los motores TT amarillos virtuales o reales recibirán el voltaje máximo y el robot podría patinar en el suelo, perder tracción o pasarse de largo al girar.
+
+En el **Paso 4**, aprenderemos a acotar la velocidad máxima. En lugar de enviar un control continuo del 100% de potencia, escalaremos la velocidad del robot utilizando parámetros controlados (PWM de Arduino) de modo que se desplace de manera controlada incluso ante la máxima intensidad de la linterna.
+
+### Consigna del Paso 4 en el Simulador:
+* Selecciona el **Paso 4** en la barra lateral.
+* Experimenta cambiando la potencia máxima de los motores virtuales.
+* Con la linterna pegada a los sensores del robot virtual, calibra la velocidad para lograr que realice curvas cerradas sin desestabilizarse ni patinar en la pista.
+
+---
+
+> [!TIP]
+> **Pregunta para el Cuaderno:**
+> Si en tu aula la luz del sol entra directamente por la ventana y marca lecturas de `500` en los sensores del robot, ¿qué valor de **Umbral de Luz Mínima** deberías elegir para que tu robot no se mueva solo?
+> *Respuesta:* Deberías elegir un umbral superior a la luz ambiental, por ejemplo `600`. De esta forma, el robot ignorará la luz del sol de `500` y solo se activará cuando le apuntes de cerca con la linterna (que superará las `700` u `800` unidades).

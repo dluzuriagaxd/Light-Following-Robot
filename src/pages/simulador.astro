@@ -1,6 +1,6 @@
 ---
 export const prerender = false;
-import SoccerSimulator from '../components/tools/SoccerSimulator.jsx';
+import LightSimulator from '../components/tools/LightSimulator.jsx';
 import '../styles/global.css';
 ---
 
@@ -10,14 +10,14 @@ import '../styles/global.css';
     <meta charset="utf-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width" />
-    <title>Simulador Soccer Jr. | Robot Soccer Jr. Academy</title>
-    <meta name="description" content="Simulador interactivo de robot fútbol Junior. Practica el control Bluetooth, física del balón y estrategias de juego antes de construir tu robot real." />
+    <title>Simulador Seguidor de Luz | Academia Seguidor de Luz</title>
+    <meta name="description" content="Simulador interactivo de robot seguidor de luz. Practica la calibración de umbral, diferencia base, ruido y promediación de fotoresistencias." />
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
 </head>
 <body class="bg-[#0a0f1e] text-white font-sans antialiased overflow-hidden">
     <!-- Simulator Core (Full Screen) -->
-    <SoccerSimulator client:only="react" />
+    <LightSimulator client:only="react" />
 </body>
 </html>

@@ -1,0 +1,111 @@
+---
+title: "12. Lógica del Seguidor III: Filtro de Ruido y Calibración Real"
+order: 12
+description: "Calibra los valores del sensor, estabiliza la lectura aplicando filtros de promedio y realiza pruebas de desplazamiento reales con tu robot."
+---
+
+import FlowchartBuilder from "../../../components/tools/FlowchartBuilder.jsx";
+
+# 🏁 Lección 12: Lógica del Seguidor III: Filtro de Ruido y Calibración Real
+
+¡Llegamos a la meta final de nuestro proyecto! Tu robot físico ya está armado y has comprendido el funcionamiento básico de su lógica diferencial y los límites de luz en el simulador. 
+
+Hoy completaremos los últimos dos pasos de simulación: la **Calibración Final** (Paso 5) y la **Estabilización de Lecturas** mediante un Filtro de Promedio (Paso 6) para combatir el ruido eléctrico. Luego, cargaremos el firmware final a nuestro robot físico y lo calibraremos en suelo real.
+
+---
+
+## 📽️ Vídeo-Tutorial de Calibración en Suelo
+Sigue paso a paso este tutorial para saber exactamente cómo calibrar y solucionar problemas de tu seguidor real:
+
+<div className="my-6 p-4 rounded-3xl bg-slate-100 border border-slate-200 flex flex-col md:flex-row items-center gap-6 shadow-sm">
+  <div className="w-full md:w-48 aspect-video bg-slate-900 rounded-2xl flex items-center justify-center text-4xl select-none shadow-inner">
+    📺
+  </div>
+  <div className="space-y-2 text-slate-800">
+    <span className="text-[10px] font-black uppercase tracking-widest text-brand-orange">Vídeo 12.1 - Pista</span>
+    <h4 className="text-base font-extrabold leading-snug">Carga del Código Final, Calibración de Umbrales y Pruebas en Suelo</h4>
+    <p className="text-xs text-slate-500 font-medium">Duración estimada: 8 minutos. Aprende a programar la resta analógica (A0 - A1), comparar el error con la zona muerta y calibrar el comportamiento en pista.</p>
+  </div>
+</div>
+
+---
+
+## 🔬 Paso 5: La Calibración Dinámica
+
+En el **Paso 5**, enfrentamos el reto de balancear las lecturas de los sensores. Las fotorresistencias nunca son 100% idénticas de fábrica. Además, las sombras y la inclinación del chasis pueden hacer que un ojo lea permanentemente más luz que el otro.
+
+Para resolver esto, aplicamos un factor de calibración (`calibracionOffset`):
+
+$$\text{Error} = (\text{Lectura Izquierda} - \text{Offset}) - \text{Lectura Derecha}$$
+
+Ajustando este offset logramos que, bajo la misma luz ambiental neutra, el error sea exactamente **cero**, alineando las lecturas para que el robot no tienda a girar solo.
+
+---
+
+## 🔬 Paso 6: El Filtro Promedio contra el Ruido Analógico
+
+En el mundo físico existe el **ruido eléctrico**: fluctuaciones rápidas e indeseadas causadas por las vibraciones de los motores y la resistencia de los cables. Si imprimes lecturas seriales, verás que la señal no es estable (salta rápidamente por ejemplo: `501`, `498`, `505`, `499`).
+
+En el **Paso 6**, implementamos un **Filtro de Promedio**:
+En lugar de tomar decisiones con una sola lectura rápida, tomamos 5 o 10 lecturas seguidas en milisegundos, calculamos el promedio, y usamos ese resultado estable para comandar los motores. Esto elimina los temblores finos del robot por completo.
+
+---
+
+## 📊 Constructor del Diagrama de Flujo del Algoritmo Final
+
+Antes de programar en tu computadora, verifica que comprendes el flujo completo del programa resolviendo este bloque lógico:
+
+<FlowchartBuilder client:only="react" />
+
+---
+
+## 💻 Código Completo del Seguidor de Luz (SteamakersBlocks / C++)
+
+Este es el firmware completo que integrarás en SteamakersBlocks y cargarás a tu Arduino:
+
+```cpp
+// Variables de Calibración
+int umbralLuzMinima = 300; 
+int zonaMuerta = 80;
+int offsetCalibracion = 15; // Ajuste para equilibrar sensores
+int velocidadBase = 150;
+
+// Lectura analógica estabilizada
+int obtenerLecturaFiltrada(int pin) {
+  long suma = 0;
+  for(int i = 0; i < 5; i++) {
+    suma += analogRead(pin);
+    delay(2);
+  }
+  return suma / 5;
+}
+
+void loop() {
+  int luzIzq = obtenerLecturaFiltrada(A0) - offsetCalibracion;
+  int luzDer = obtenerLecturaFiltrada(A1);
+  
+  // Condición de Oscuridad (Parada de seguridad)
+  if (luzIzq < umbralLuzMinima && luzDer < umbralLuzMinima) {
+    detener();
+  } else {
+    int error = luzIzq - luzDer;
+    
+    // Comparación condicional con Zona Muerta
+    if (abs(error) < zonaMuerta) {
+      adelante(velocidadBase);
+    } else if (error > 0) {
+      izquierda(velocidadBase);
+    } else {
+      derecha(velocidadBase);
+    }
+  }
+  delay(20);
+}
+```
+
+---
+
+> [!WARNING]
+> **Guía de Solución de Problemas Frecuentes:**
+> * **El robot huye de la luz:** Si el robot retrocede o se aleja al encender la linterna, invierte los dos cables de los motores derecho/izquierdo en las borneras del Puente H o invierte los bloques de control del motor en tu programa.
+> * **Las lecturas analógicas no cambian:** Revisa que el GND del Puente H esté conectado al GND del Arduino (tierra común). Sin esto, no hay referencia y el Arduino leerá valores aleatorios.

@@ -1,8 +1,6 @@
 ---
 import "../styles/global.css";
 import Sidebar from "../components/Sidebar.astro";
-import LogoutButton from "../components/auth/LogoutButton";
-import LanguageSwitcher from "../components/LanguageSwitcher";
 
 interface Props {
 	title: string;
@@ -25,11 +23,11 @@ const {
 		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 		<meta name="viewport" content="width=device-width" />
 		<meta name="generator" content={Astro.generator} />
-		<title>{title} | Soccer Jr. Telemetry</title>
+		<title>{title} | Seguidor de Luz</title>
 		<link rel="preconnect" href="https://fonts.googleapis.com" />
 		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 		<link
-			href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+			href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
 			rel="stylesheet"
 		/>
 		<link
@@ -38,20 +36,20 @@ const {
 		/>
 	</head>
 	<body
-		class="bg-[#0a0a0a] text-[#ededed] font-sans selection:bg-brand-orange/30 selection:text-brand-orange"
+		class="bg-bg-main text-text-main font-sans selection:bg-brand-orange/30 selection:text-brand-orange antialiased"
 	>
 		<!-- Header (Mobile always, Desktop if forced hide) -->
 		{
 			!hideMenu && (
 				<header
 					class:list={[
-						"flex items-center justify-between p-4 border-b border-border-dark bg-black/80 backdrop-blur-xl sticky top-0 z-40",
+						"flex items-center justify-between p-4 border-b border-border-dark bg-white shadow-sm sticky top-0 z-40",
 						{ "lg:hidden": !sidebarHidden },
 					]}
 				>
 					<button
 						id="menu-toggle"
-						class="p-2 text-white/70 hover:text-brand-orange active:scale-95 transition-all"
+						class="p-2 text-slate-600 hover:text-brand-orange active:scale-95 transition-all"
 						aria-label="Abrir menú"
 					>
 						<svg
@@ -71,15 +69,11 @@ const {
 					</button>
 
 					<div class="flex items-center gap-3">
-						<LanguageSwitcher client:load />
-						<div class="hidden sm:block">
-							<LogoutButton client:load />
+						<div class="w-8 h-8 bg-brand-orange rounded-xl shadow-[0_0_15px_rgba(255,171,25,0.3)] flex items-center justify-center font-bold text-white text-sm">
+							💡
 						</div>
-						<div class="w-8 h-8 bg-brand-orange rounded shadow-[0_0_15px_rgba(249,115,22,0.3)] flex items-center justify-center font-bold text-black text-sm">
-							⚽
-						</div>
-						<span class="font-bold tracking-tight text-white">
-							Soccer Jr. Telemetry
+						<span class="font-display font-black tracking-tight text-slate-800 text-lg">
+							Seguidor de Luz
 						</span>
 					</div>
 				</header>
@@ -102,11 +96,11 @@ const {
 
 				<footer
 					class:list={[
-						"w-full mx-auto px-6 py-8 border-t border-white/5 text-[10px] text-white/20 uppercase tracking-widest font-bold flex justify-between items-center",
+						"w-full mx-auto px-6 py-8 border-t border-border-dark text-[10px] text-slate-400 uppercase tracking-widest font-bold flex justify-between items-center",
 						{ "max-w-4xl": !fullWidth },
 					]}
 				>
-					<span>© 2024 Soccer Jr. Telemetry System</span>
+					<span>© 2026 Academia Seguidor de Luz</span>
 					<span class="text-brand-blue"
 						>Open Source Educational Project</span
 					>

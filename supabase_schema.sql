@@ -119,3 +119,14 @@ INSERT INTO public.activity_types (id, name, display_name, icon) VALUES
 ('type_quiz', 'quiz', 'Cuestionario', '📝'),
 ('type_project', 'project', 'Proyecto', '🚀')
 ON CONFLICT (id) DO NOTHING;
+
+-- Insert lessons for Light-Following Robot
+INSERT INTO public.activities (id, type_id, slug, module_id, title, description, order_index, module_order, estimated_duration_minutes) VALUES 
+('lesson-01-fundamentos-01-blink', 'type_lesson', '01-fundamentos/01-blink', '01-fundamentos', 'El Primer Parpadeo (Blink)', 'Aprende a programar el parpadeo de un LED.', 1, 1, 15),
+('lesson-01-fundamentos-02-led-externo', 'type_lesson', '01-fundamentos/02-led-externo', '01-fundamentos', 'Conectando un LED Externo', 'Controla un LED externo en la placa.', 2, 2, 20),
+('lesson-02-sensores-03-divisor-voltaje', 'type_lesson', '02-sensores/03-divisor-voltaje', '02-sensores', 'El Divisor de Voltaje y la Fotorresistencia', 'Entiende cómo leer la luz con una fotorresistencia.', 3, 1, 25),
+('lesson-02-sensores-04-control-led-ldr', 'type_lesson', '02-sensores/04-control-led-ldr', '02-sensores', 'Controlando el LED con Luz', 'Haz que el LED reaccione a la luz ambiental.', 4, 2, 20),
+('lesson-03-comunicacion-05-monitor-serie', 'type_lesson', '03-comunicacion/05-monitor-serie', '03-comunicacion', 'Viendo los Datos (Monitor Serie)', 'Visualiza los valores de la fotorresistencia.', 5, 1, 15),
+('lesson-03-comunicacion-06-analisis-ruido', 'type_lesson', '03-comunicacion/06-analisis-ruido', '03-comunicacion', 'Analizando el Ruido', 'Aprende a promediar lecturas para mayor estabilidad.', 6, 2, 25),
+('lesson-04-seguidor-luz-07-seguidor-completo', 'type_lesson', '04-seguidor-luz/07-seguidor-completo', '04-seguidor-luz', 'Ensamblando el Seguidor de Luz', 'Une todo para crear el robot que sigue la luz.', 7, 1, 40)
+ON CONFLICT (id) DO NOTHING;

@@ -1,0 +1,93 @@
+---
+title: "2. Programando en Tinkercad (Blink)"
+order: 2
+description: "Aprende a programar el parpadeo del LED integrado en Tinkercad, copiar tu código en C++ y cargarlo a un Arduino Uno real."
+---
+
+import BlinkSimulator from "../../../components/tools/BlinkSimulator.jsx";
+import DigitalSignalSim from "../../../components/tools/DigitalSignalSim.jsx";
+
+# 💡 Lección 2: Programando en Tinkercad (Blink)
+
+¡Bienvenido al emocionante mundo de la programación! En esta lección daremos nuestros primeros pasos programando un microcontrolador virtual en **Tinkercad** para controlar una salida digital. 
+
+El objetivo es hacer que el **LED integrado (marcado con la letra 'L')** en la placa de Arduino Uno se encienda y se apague de forma automática (parpadee). Luego, aprenderás cómo exportar este programa para cargarlo en tu placa física.
+
+---
+
+## 📽️ Vídeo-Tutorial: Programación y Carga Real
+Sigue este tutorial paso a paso para aprender a transferir el código del simulador a la placa física:
+
+<div className="my-6 aspect-video rounded-3xl overflow-hidden shadow-sm border border-slate-200">
+  <iframe 
+    width="100%" 
+    height="100%" 
+    src="https://www.youtube.com/embed/ZxnYsyNdpfA" 
+    title="Programando en Tinkercad y cargando en Arduino IDE" 
+    frameborder="0" 
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+    allowfullscreen>
+  </iframe>
+</div>
+
+---
+
+## 💻 Conceptos Clave
+1. **Salidas Digitales:** El concepto de estados lógicos: **ALTO (HIGH / 5V / Encendido)** y **BAJO (LOW / 0V / Apagado)**.
+2. **El LED integrado (Pin 13):** Un pequeño diodo emisor de luz soldado en la propia placa Arduino para hacer pruebas rápidas.
+3. **Instrucción de Espera (Delay):** Por qué necesitamos darle tiempo al Arduino entre comandos (de lo contrario, prendería y apagaría tan rápido que el ojo humano no vería el parpadeo).
+
+---
+
+## 📡 Simulación de Señal Digital y Osciloscopio
+Observa cómo fluye la energía cuando la señal cambia de estado:
+- El **osciloscopio** grafica la señal subiendo a **5V (ALTO)** y bajando a **0V (BAJO)**.
+- El **LED integrado (L)** de la placa se enciende y apaga en sincronía.
+
+<DigitalSignalSim client:visible />
+
+---
+
+## 🛠️ Práctica 1: Creación del Programa en Tinkercad
+
+1. **Abre Tinkercad** y crea un nuevo circuito con un **Arduino Uno R3**.
+2. Haz clic en el botón **Código** en la esquina superior derecha. Asegúrate de estar en modo **Bloques**.
+3. Recrea el siguiente diagrama de bloques:
+
+### Captura de Código de Bloques en Tinkercad:
+![Blink Blocks Tinkercad](https://images.unsplash.com/photo-1517430816045-df4b7de11d1d?w=800&auto=format&fit=crop&q=60)
+*Nota: Arrastra el bloque "definir LED integrado en ALTO", coloca un bloque "esperar 1 segundo", define "LED integrado en BAJO" y "esperar 1 segundo".*
+> **📸 Información para la imagen (Para el profesor):**
+> - **Descripción:** Captura de pantalla de los bloques de código en Tinkercad para hacer parpadear el LED integrado.
+> - **Dónde guardar:** Directorio `public/images/lessons/`
+> - **Nombre sugerido:** `02-blink-blocks.webp`
+> - **Tamaño sugerido:** 800x450 píxeles (relación de aspecto 16:9).
+> - **Formato:** `.webp` (es un formato más moderno y ligero que JPG/PNG).
+
+4. Haz clic en **Iniciar Simulación** y verifica que el LED con la letra **L** en la placa comience a parpadear.
+
+---
+
+## 🚀 Práctica 2: Subir el Código al Arduino Real
+
+Ahora vamos a pasar de lo virtual a lo real:
+
+1. Con la simulación detenida en Tinkercad, en el menú de **Código**, cambia el selector de vista de "Bloques" a **"Bloques + Texto"**.
+2. Verás el código equivalente escrito en C++ en el lado derecho. **Copia todo ese texto** (o haz clic en el botón de descarga para bajar el archivo `.ino`).
+3. Abre la aplicación **Arduino IDE** en tu computadora.
+4. Borra todo el código que aparezca por defecto y **pega tu código de Tinkercad**.
+5. Conecta tu Arduino Uno a la laptop usando el cable USB.
+6. En la parte superior de Arduino IDE, selecciona tu placa y el puerto COM asignado.
+7. Haz clic en el botón **Subir (flecha hacia la derecha)**. ¡El LED de tu placa física parpadeará ahora mismo!
+
+---
+
+<BlinkSimulator client:visible />
+
+---
+
+> [!IMPORTANT]
+> **Caja de Materiales (Checklist físico):**
+> - [ ] Placa Arduino Uno R3
+> - [ ] Cable USB tipo A-B
+> - [ ] Computadora con **Arduino IDE** instalado y cuenta en Tinkercad.

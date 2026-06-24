@@ -5,8 +5,8 @@ export default function KinematicsMiniSim({ isFullscreen = false, onMaximize = n
   const [y, setY] = useState(0); // robot y position (grid units)
   const [angle, setAngle] = useState(0); // heading angle in radians
   const [vl, setVl] = useState(50); // Left wheel velocity
-  const [vr, setVr] = useState(30); // Right wheel velocity (different speeds for arc)
-  const [dt, setDt] = useState(0.5); // time step (seconds)
+  const [vr, setVr] = useState(50); // Right wheel velocity
+  const [dt, setDt] = useState(0.1); // time step (seconds)
   const [showGrid, setShowGrid] = useState(true);
   const [showCoords, setShowCoords] = useState(true);
   const [showVector, setShowVector] = useState(true);
@@ -330,6 +330,7 @@ export default function KinematicsMiniSim({ isFullscreen = false, onMaximize = n
                 <span className="text-white font-bold">{vl}</span>
               </div>
               <input type="range" min="-100" max="100" value={vl} onChange={(e) => setVl(parseInt(e.target.value))}
+                onDoubleClick={() => setVl(50)}
                 className="w-full accent-orange-500 h-1 bg-black/40 rounded-lg cursor-pointer" />
             </div>
             <div>
@@ -338,6 +339,7 @@ export default function KinematicsMiniSim({ isFullscreen = false, onMaximize = n
                 <span className="text-white font-bold">{vr}</span>
               </div>
               <input type="range" min="-100" max="100" value={vr} onChange={(e) => setVr(parseInt(e.target.value))}
+                onDoubleClick={() => setVr(50)}
                 className="w-full accent-orange-500 h-1 bg-black/40 rounded-lg cursor-pointer" />
             </div>
             <div className="col-span-2">
@@ -346,6 +348,7 @@ export default function KinematicsMiniSim({ isFullscreen = false, onMaximize = n
                 <span className="text-white font-bold">{dt.toFixed(2)}s</span>
               </div>
               <input type="range" min="0.05" max="1.5" step="0.05" value={dt} onChange={(e) => setDt(parseFloat(e.target.value))}
+                onDoubleClick={() => setDt(0.1)}
                 className="w-full accent-yellow-400 h-1 bg-black/40 rounded-lg cursor-pointer" />
             </div>
           </div>

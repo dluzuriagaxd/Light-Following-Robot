@@ -1,0 +1,194 @@
+---
+title: "0. ¿Qué es el Arduino y la Robótica?"
+order: 0
+description: "Aprende qué es el Arduino Uno, cómo funciona su cerebro y qué partes lo componen antes de cargar tu primer código."
+---
+
+import ArduinoAnatomy from "../../../components/tools/ArduinoAnatomy.jsx";
+import StoryTeller from "../../../components/tools/StoryTeller.jsx";
+
+# 🤖 Lección 0: ¿Qué es el Arduino y la Robótica?
+
+<StoryTeller client:load 
+  message="¡Hola, Ingeniero/a! Bienvenido a la base espacial de Control de Misión. Apolo ha aterrizado en Lumina-IX, pero sus sistemas de movimiento no responden. Primero debemos analizar los planos de su computadora central (Arduino Uno R3) para entender cómo procesará nuestras futuras instrucciones." 
+  inquiry="¿Cómo puede una máquina imitar la atracción de un girasol hacia la luz del sol?" 
+  concept="Función"
+  attribute="Indagadores"
+/>
+
+¡Bienvenido al inicio de tu gran aventura! En este curso aprenderás a construir y programar tu propio **Robot Seguidor de Luz (nuestro explorador Apolo)**. Pero antes de indicarle al robot qué hacer, necesitamos conocer la placa que le servirá de cerebro: la **Placa Arduino Uno R3**.
+
+En esta clase introductoria conoceremos qué es un microcontrolador y cómo se conecta con los sensores (ojos) y actuadores (motores) del robot.
+
+---
+
+## 🗺️ Nuestro Camino: ¿Cómo construiremos el Robot?
+
+Para construir este robot seguidor de luz, recorreremos un camino paso a paso donde cada semana aprenderás y conectarás una pieza de este rompecabezas:
+
+1. **Clases 0 a 6 (Fundamentos y Simulación en Tinkercad):** Aprenderemos cómo registrarnos y simular en Tinkercad el encendido de luces (LEDs), el funcionamiento de un divisor de voltaje y cómo programar un interruptor automático que se activa en la oscuridad (LDR + condicionales SI/SINO).
+2. **Clase 7 y 8 (Montaje de Motores y Programación Física):** Ensamblaremos físicamente el chasis, fijaremos los motores y el Puente H. Crearemos nuestro primer código en SteamakersBlocks para mover las llantas y definiremos funciones (`adelante`, `atras`, etc.) para controlar la velocidad.
+3. **Clase 9 (Montaje de Sensores y Cableado Final):** Agregaremos la protoboard física al frente y realizaremos todo el conexionado de los ojos (sensores LDR) mediante divisores de voltaje físicos.
+4. **Clase 10 a 12 (Entrenamiento Lógico y Calibración Final):** Resolveremos paso a paso los 6 retos lógicos del Simulador Web (zona muerta, límites de luz, filtros promedio) y cargaremos el firmware final a nuestro robot real para calibrarlo en suelo.
+
+---
+
+## 🔍 Anatomía del Robot Seguidor de Luz
+
+Para comprender cómo interactúan las partes de nuestro robot, observa la siguiente infografía que muestra sus 5 partes esenciales:
+
+![Anatomía del Robot Seguidor de Luz](https://images.unsplash.com/photo-1485827404703-89b55fcc595e?w=800&auto=format&fit=crop&q=60)
+> **📸 Información para la imagen (Para el profesor):**
+> - **Descripción:** Infografía que muestra el chasis de cartón del robot seguidor de luz, señalando con líneas descriptivas: los Ojos (sensores LDR al frente), el Cerebro (Arduino Uno en el centro), el Corazón de Potencia (Puente H L298N en la parte trasera inferior), los Músculos (motores amarillos y llantas a los lados) y el Cuerpo (plancha de cartón de 15x12 cm).
+> - **Dónde guardar:** Directorio `public/images/lessons/`
+> - **Nombre sugerido:** `00-anatomia-robot.webp`
+> - **Tamaño sugerido:** 800x450 píxeles (relación de aspecto 16:9).
+> - **Formato:** `.webp` (más ligero).
+> - **Prompt sugerido para generación:** *“Infographic of a simple educational DIY cardboard robot, light-following robot, showing an Arduino Uno board in the center, two light sensors (LDR) at the front, a motor driver board at the back, and two yellow toy DC motors with rubber wheels on the sides. clean white background, educational schematic style, 3D render, flat design, labels with lines, 16:9 aspect ratio.”*
+
+### 🔄 Flujo de Señales en el Robot:
+El robot sigue un camino lógico continuo para poder procesar la información y moverse hacia la luz:
+
+<div className="my-8 p-8 bg-slate-50 border-3 border-slate-200/60 rounded-3xl shadow-inner max-w-2xl mx-auto">
+  <div className="space-y-6">
+    
+    {/* Paso 1 */}
+    <div className="flex items-center gap-4 p-5 bg-white border-2 border-slate-200 rounded-2xl shadow-sm">
+      <div className="w-12 h-12 rounded-xl bg-slate-100 flex items-center justify-center text-2xl flex-shrink-0 select-none shadow-sm">
+        🔦
+      </div>
+      <div className="text-left">
+        <span className="text-[10px] font-black uppercase tracking-widest text-slate-400 block">Paso 1: Estímulo</span>
+        <h5 className="text-sm font-black text-slate-700 leading-snug">Luz solar o linterna externa</h5>
+        <p className="text-xs text-slate-500 font-medium mt-0.5">El ambiente proporciona la señal luminosa que guiará al robot.</p>
+      </div>
+    </div>
+
+    {/* Conector */}
+    <div className="flex justify-center text-slate-300 text-xl font-bold select-none my-2">⬇️</div>
+
+    {/* Paso 2 */}
+    <div className="flex items-center gap-4 p-5 bg-white border-2 border-slate-200 rounded-2xl shadow-sm">
+      <div className="w-12 h-12 rounded-xl bg-slate-100 flex items-center justify-center text-2xl flex-shrink-0 select-none shadow-sm">
+        👁️
+      </div>
+      <div className="text-left">
+        <span className="text-[10px] font-black uppercase tracking-widest text-slate-400 block">Paso 2: Sensores</span>
+        <h5 className="text-sm font-black text-slate-700 leading-snug">Fotorresistencias (LDR)</h5>
+        <p className="text-xs text-slate-500 font-medium mt-0.5">Actúan como ojos, midiendo la intensidad de la luz y convirtiéndola en voltaje analógico.</p>
+      </div>
+    </div>
+
+    {/* Conector */}
+    <div className="flex justify-center text-slate-300 text-xl font-bold select-none my-2">⬇️</div>
+
+    {/* Paso 3 */}
+    <div className="flex items-center gap-4 p-5 bg-blue-50/70 border-2 border-blue-100/80 rounded-2xl shadow-sm">
+      <div className="w-12 h-12 rounded-xl bg-blue-100/50 flex items-center justify-center text-2xl flex-shrink-0 select-none shadow-sm">
+        🧠
+      </div>
+      <div className="text-left">
+        <span className="text-[10px] font-black uppercase tracking-widest text-[#3375d6] block">Paso 3: Lógica</span>
+        <h5 className="text-sm font-black text-blue-600 leading-snug">Placa Arduino Uno R3</h5>
+        <p className="text-xs text-slate-600 font-medium mt-0.5">El cerebro procesa el voltaje de los sensores y decide el movimiento adecuado.</p>
+      </div>
+    </div>
+
+    {/* Conector */}
+    <div className="flex justify-center text-slate-300 text-xl font-bold select-none my-2">⬇️</div>
+
+    {/* Paso 4 */}
+    <div className="flex items-center gap-4 p-5 bg-white border-2 border-slate-200 rounded-2xl shadow-sm">
+      <div className="w-12 h-12 rounded-xl bg-slate-100 flex items-center justify-center text-2xl flex-shrink-0 select-none shadow-sm">
+        🔌
+      </div>
+      <div className="text-left">
+        <span className="text-[10px] font-black uppercase tracking-widest text-slate-400 block">Paso 4: Potencia</span>
+        <h5 className="text-sm font-black text-slate-700 leading-snug">Puente H (L298N)</h5>
+        <p className="text-xs text-slate-500 font-medium mt-0.5">Recibe las señales lógicas de baja corriente y distribuye la potencia de las baterías a los motores.</p>
+      </div>
+    </div>
+
+    {/* Conector */}
+    <div className="flex justify-center text-slate-300 text-xl font-bold select-none my-2">⬇️</div>
+
+    {/* Paso 5 */}
+    <div className="flex items-center gap-4 p-5 bg-green-50/70 border-2 border-green-100/80 rounded-2xl shadow-sm">
+      <div className="w-12 h-12 rounded-xl bg-green-100/50 flex items-center justify-center text-2xl flex-shrink-0 select-none shadow-sm">
+        ⚙️
+      </div>
+      <div className="text-left">
+        <span className="text-[10px] font-black uppercase tracking-widest text-[#459645] block">Paso 5: Actuadores</span>
+        <h5 className="text-sm font-black text-green-700 leading-snug">Motores de Corriente Continua (DC)</h5>
+        <p className="text-xs text-slate-600 font-medium mt-0.5">Los músculos del robot giran las ruedas para ejecutar el movimiento.</p>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+---
+
+## 📽️ Vídeo-Tutorial de Inicio
+Observa esta lección grabada para entender de forma rápida qué es el hardware y el software:
+
+<div className="my-6 p-4 rounded-3xl bg-slate-100 border border-slate-200 flex flex-col md:flex-row items-center gap-6 shadow-sm">
+  <div className="w-full md:w-48 aspect-video bg-slate-900 rounded-2xl flex items-center justify-center text-4xl select-none shadow-inner">
+    📺
+  </div>
+  <div className="space-y-2 text-slate-800">
+    <span className="text-[10px] font-black uppercase tracking-widest text-brand-orange">Vídeo 0.1 - Introducción</span>
+    <h4 className="text-base font-extrabold leading-snug">¿Qué es el Arduino y la Robótica Educativa?</h4>
+    <p className="text-xs text-slate-500 font-medium">Duración estimada: 5 minutos. En este vídeo revisaremos la placa de desarrollo y los componentes básicos de tu kit.</p>
+  </div>
+</div>
+
+> **📽️ Información para el vídeo (Para el profesor):**
+> - **Contenido del vídeo:** Demostración física de la placa Arduino Uno R3, los componentes principales del kit (cables, LEDs, protoboard, sensores) y una explicación conceptual sencilla de la diferencia entre Hardware (físico) y Software (lógica de bloques).
+> - **Dónde guardar / publicar:** Subir el video a YouTube (público o no listado) y reemplazar el contenedor anterior con un `<iframe>` de YouTube para que el alumno pueda reproducirlo directamente en la página con vista previa.
+> - **Enlace del vídeo sugerido:** Reemplazar por `https://youtu.be/TU_VIDEO_AQUÍ`
+> - **Duración sugerida:** 5 minutos.
+> - **Formato sugerido:** 1080p, 16:9, formato MP4.
+
+---
+
+## 💻 Conceptos Clave
+Aprende los términos que usaremos durante todo el curso:
+
+1. **Hardware:** Las partes físicas del robot que puedes ver y tocar (la placa Arduino, las fotorresistencias, los motores, las ruedas y los cables).
+2. **Software:** Las instrucciones lógicas (los programas) que le dicen al hardware qué hacer. En este curso los creamos de manera visual arrastrando bloques.
+3. **Microcontrolador:** Un circuito integrado (chip) pequeño en la placa Arduino que actúa como un computador miniatura. Almacena y ejecuta tu código.
+4. **Tinkercad:** Una plataforma en la nube (sitio web) que simula circuitos electrónicos de forma virtual y 100% segura desde tu navegador.
+5. **SteamakersBlocks:** Un software web de programación visual basado en bloques donde diseñaremos los programas de Apolo.
+6. **Arduino IDE:** El programa instalable de escritorio que usaremos en las clases presenciales para compilar y cargar el código final a la placa física mediante el cable USB.
+
+---
+
+## 🎮 Interactivo: Anatomía del Arduino Uno R3
+A continuación, tienes una ilustración interactiva de la placa de Arduino. Haz clic en las zonas punteadas para conocer qué hace cada conector y lee la analogía en el recuadro derecho para recordarlo fácilmente:
+
+<ArduinoAnatomy client:only="react" />
+
+---
+
+> [!IMPORTANT]
+> **Caja de Materiales (Checklist para marcar):**
+> - [ ] Placa Arduino Uno R3 (para inspección visual)
+> - [ ] Computadora con acceso al simulador
+> 
+> *Nota: Para esta clase teórica de inducción, únicamente necesitas observar la placa Arduino de manera física. No utilizaremos pilas, soldaduras ni protoboard en esta primera sesión.*
+
+---
+
+## 📝 Bitácora de Reflexión: Mi Primer Contacto con la Robótica
+
+Responde las siguientes preguntas en tu cuaderno o bitácora de indagación:
+
+1.  **Indagación:** ¿Qué componente o subsistema del robot (sensores de luz fotorresistencias, placa Arduino Uno, Puente H o motores de corriente continua) te llama más la atención y por qué?
+2.  **Metacognición:** ¿Cómo cambió tu idea sobre lo que es un robot y su cerebro electrónico antes y después de interactuar con el simulador de Arduino? ¿Qué analogía o estrategia mental utilizaste hoy para comprender la diferencia entre hardware y software?
+
+---
+
+> [!TIP]
+> **Lectura Previa para la Próxima Semana:**
+> Revisa la lección de la siguiente semana: [1. Cómo ingresar a Tinkercad](/curso/01-fundamentos/01-registro-tinkercad). Crea tu usuario en Tinkercad e indaga sobre los componentes que tiene la biblioteca de circuitos.

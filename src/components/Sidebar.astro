@@ -1,7 +1,6 @@
 ---
 import { getCollection } from "astro:content";
 import SponsorBadge from "./SponsorBadge.astro";
-import LogoutButton from "./auth/LogoutButton";
 
 interface Props {
     hiddenInitially?: boolean;
@@ -17,10 +16,8 @@ const mainNav = [
 
 const toolNav = [
     {
-        label: "⚽ Soccer Jr. Simulator",
+        label: "💡 Simulador Robot",
         href: "/simulador",
-        color: "text-brand-orange",
-        bg: "bg-brand-orange/10",
     },
 ];
 
@@ -52,13 +49,44 @@ const modules = sortedModuleKeys.map((key) => ({
 function isModuleActive(moduleKey: string) {
     return currentPath.includes(`/curso/${moduleKey}`);
 }
+
+const moduleColors: Record<string, { text: string; bg: string; border: string; activeBg: string; itemActive: string }> = {
+    "01-fundamentos": {
+        text: "text-blue-700",
+        bg: "bg-blue-50",
+        border: "border-blue-200",
+        activeBg: "bg-brand-blue text-white",
+        itemActive: "text-blue-700 bg-blue-50 border-l-4 border-brand-blue pl-3",
+    },
+    "02-sensores": {
+        text: "text-green-700",
+        bg: "bg-green-50",
+        border: "border-green-200",
+        activeBg: "bg-brand-green text-white",
+        itemActive: "text-green-700 bg-green-50 border-l-4 border-brand-green pl-3",
+    },
+    "03-motores": {
+        text: "text-purple-700",
+        bg: "bg-purple-50",
+        border: "border-purple-200",
+        activeBg: "bg-brand-purple text-white",
+        itemActive: "text-purple-700 bg-purple-50 border-l-4 border-brand-purple pl-3",
+    },
+    "04-armado": {
+        text: "text-orange-700",
+        bg: "bg-orange-50",
+        border: "border-orange-200",
+        activeBg: "bg-brand-orange text-white",
+        itemActive: "text-orange-700 bg-orange-50 border-l-4 border-brand-orange pl-3",
+    },
+};
 ---
 
 <!-- Sidebar -->
 <aside
     id="sidebar"
     class:list={[
-        "fixed left-0 top-0 bottom-0 z-50 w-72 bg-[#121212] border-r border-border-dark transform -translate-x-full transition-all duration-300 ease-in-out shrink-0 shadow-2xl",
+        "fixed left-0 top-0 bottom-0 z-50 w-72 bg-white border-r border-slate-200 transform -translate-x-full transition-all duration-300 ease-in-out shrink-0 shadow-lg",
         {
             "lg:static lg:top-0 lg:translate-x-0 lg:h-screen lg:flex lg:flex-col lg:shadow-none":
                 !hiddenInitially,
@@ -66,22 +94,22 @@ function isModuleActive(moduleKey: string) {
         { "lg:fixed lg:h-full lg:top-0": hiddenInitially },
     ]}
 >
-    <div class="flex flex-col h-full p-8">
+    <div class="flex flex-col h-full p-6">
         <!-- Sidebar Header with Logo and Close Button -->
         <div class="flex items-center justify-between mb-8 lg:hidden">
             <div class="flex items-center gap-3">
                 <div
-                    class="w-10 h-10 bg-brand-orange rounded-lg shadow-[0_0_15px_rgba(249,115,22,0.3)] flex items-center justify-center font-bold text-black text-lg"
+                    class="w-10 h-10 bg-brand-orange rounded-xl shadow-[0_0_15px_rgba(255,171,25,0.3)] flex items-center justify-center font-bold text-white text-lg"
                 >
-                    ⚽
+                    💡
                 </div>
-                <span class="font-bold tracking-tight text-white"
-                    >Soccer Jr. Academy</span
+                <span class="font-bold tracking-tight text-slate-800"
+                    >Seguidor de Luz</span
                 >
             </div>
             <button
                 id="sidebar-close"
-                class="p-2 text-white/50 hover:text-white hover:bg-white/10 rounded-lg transition-all"
+                class="p-2 text-slate-500 hover:text-slate-700 hover:bg-slate-100 rounded-lg transition-all"
                 aria-label="Cerrar menú"
             >
                 <svg
@@ -101,12 +129,12 @@ function isModuleActive(moduleKey: string) {
         </div>
 
         <!-- Navigation -->
-        <nav class="flex-1 space-y-8 overflow-y-auto pr-2 custom-scrollbar">
+        <nav class="flex-1 space-y-6 overflow-y-auto pr-2 custom-scrollbar">
             <div>
                 <p
-                    class="text-[10px] uppercase tracking-widest text-white/20 font-bold mb-4 px-4"
+                    class="text-[11px] uppercase tracking-widest text-slate-600 font-extrabold mb-3 px-2 font-sans"
                 >
-                    Herramientas Pro
+                    Herramientas
                 </p>
                 <div class="space-y-2">
                     {
@@ -114,29 +142,16 @@ function isModuleActive(moduleKey: string) {
                             <a
                                 href={item.href}
                                 class:list={[
-                                    `flex items-center justify-between px-4 py-3.5 text-sm font-black rounded-xl transition-all duration-300 border group relative overflow-hidden ${item.bg} ${item.color}`,
+                                    "flex items-center justify-between px-4 py-3 text-sm font-black rounded-2xl transition-all duration-200 border-2 group relative overflow-hidden",
                                     currentPath === item.href
-                                        ? "border-white/20 ring-1 ring-white/10"
-                                        : "border-white/5 hover:border-white/20",
+                                        ? "bg-brand-orange text-white border-brand-orange shadow-[2px_2px_0px_#e6950f]"
+                                        : "bg-[#fffbeb] border-[#ffe0b2] hover:bg-[#ffe0b2] text-[#e6950f]",
                                 ]}
                             >
-                                <span class="relative z-10 uppercase tracking-tight">
+                                <span class="relative z-10 uppercase tracking-wider">
                                     {item.label}
                                 </span>
-                                <svg
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    class="w-4 h-4 opacity-40 group-hover:opacity-100 group-hover:translate-x-1 transition-all"
-                                    fill="none"
-                                    viewBox="0 0 24 24"
-                                    stroke="currentColor"
-                                >
-                                    <path
-                                        stroke-linecap="round"
-                                        stroke-linejoin="round"
-                                        stroke-width="3"
-                                        d="M13 7l5 5m0 0l-5 5m5-5H6"
-                                    />
-                                </svg>
+                                <span class="text-xs group-hover:translate-x-1 transition-transform">➔</span>
                             </a>
                         ))
                     }
@@ -145,7 +160,7 @@ function isModuleActive(moduleKey: string) {
 
             <div>
                 <p
-                    class="text-[10px] uppercase tracking-widest text-white/20 font-bold mb-4 px-4"
+                    class="text-[11px] uppercase tracking-widest text-slate-600 font-extrabold mb-3 px-2 font-sans"
                 >
                     Plataforma
                 </p>
@@ -155,10 +170,10 @@ function isModuleActive(moduleKey: string) {
                             <a
                                 href={item.href}
                                 class:list={[
-                                    "flex items-center px-4 py-2.5 text-sm font-semibold rounded-xl transition-all duration-200 group relative overflow-hidden",
+                                    "flex items-center px-4 py-2.5 text-sm font-bold rounded-xl transition-all duration-200 group relative",
                                     currentPath === item.href
-                                        ? "text-white bg-white/[0.05]"
-                                        : "text-white/40 hover:text-white hover:bg-white/[0.03]",
+                                        ? "text-brand-blue bg-blue-50 border border-brand-blue/30"
+                                        : "text-slate-600 hover:text-brand-blue hover:bg-slate-50",
                                 ]}
                             >
                                 <span class="relative z-10">{item.label}</span>
@@ -170,53 +185,63 @@ function isModuleActive(moduleKey: string) {
 
             <div>
                 <p
-                    class="text-[10px] uppercase tracking-widest text-white/20 font-bold mb-4 px-4"
+                    class="text-[11px] uppercase tracking-widest text-slate-600 font-extrabold mb-3 px-2 font-sans"
                 >
-                    Curso Robot Soccer Jr.
+                    Curso
                 </p>
-                <div class="space-y-6">
+                <div class="space-y-5">
                     {
-                        modules.map((mod) => (
-                            <div class="space-y-2">
-                                <button
-                                    class:list={[
-                                        "w-full flex items-center justify-between px-4 py-1 text-[10px] font-black uppercase tracking-[0.2em] transition-colors",
-                                        isModuleActive(mod.key)
-                                            ? "text-brand-orange"
-                                            : "text-white/20",
-                                    ]}
-                                >
-                                    <span>{mod.label}</span>
-                                </button>
-                                <div class="space-y-1 ml-2 border-l border-white/5 pl-2">
-                                    {mod.lessons.map((lesson) => (
-                                        <a
-                                            href={`/curso/${lesson.slug}`}
-                                            class:list={[
-                                                "flex items-center px-4 py-2 text-[11px] font-bold rounded-lg transition-all duration-200 group relative",
-                                                currentPath.includes(
-                                                    lesson.slug,
-                                                )
-                                                    ? "text-brand-orange bg-brand-orange/5"
-                                                    : "text-white/30 hover:text-white hover:bg-white/[0.02]",
-                                            ]}
-                                        >
-                                            <span class="relative z-10">
-                                                {lesson.data.title}
-                                            </span>
-                                        </a>
-                                    ))}
+                        modules.map((mod) => {
+                            const theme = moduleColors[mod.key] || {
+                                text: "text-slate-800",
+                                bg: "bg-slate-100",
+                                border: "border-slate-200",
+                                activeBg: "bg-slate-700 text-white",
+                                itemActive: "text-slate-800 bg-slate-100/50 border-l-4 border-slate-700 pl-3",
+                            };
+                            const isActive = isModuleActive(mod.key);
+                            return (
+                                <div class="space-y-2">
+                                    <div
+                                        class:list={[
+                                            "w-full flex items-center justify-between px-3 py-2 text-[10px] font-black uppercase tracking-[0.15em] rounded-xl border transition-all",
+                                            isActive
+                                                ? `${theme.activeBg} ${theme.border}`
+                                                : `${theme.text} ${theme.bg} ${theme.border}`,
+                                        ]}
+                                    >
+                                        <span>{mod.label}</span>
+                                    </div>
+                                    <div class="space-y-1 ml-2 border-l-2 border-slate-100 pl-2">
+                                        {mod.lessons.map((lesson) => {
+                                            const isLessonActive = currentPath.includes(lesson.slug);
+                                            return (
+                                                <a
+                                                    href={`/curso/${lesson.slug}`}
+                                                    class:list={[
+                                                        "flex items-center px-3 py-2 text-xs font-bold rounded-lg transition-all duration-200 group relative",
+                                                        isLessonActive
+                                                            ? `${theme.itemActive} font-extrabold`
+                                                            : "text-slate-600 hover:text-slate-900 hover:bg-slate-50",
+                                                    ]}
+                                                >
+                                                    <span class="relative z-10">
+                                                        {lesson.data.title}
+                                                    </span>
+                                                </a>
+                                            );
+                                        })}
+                                    </div>
                                 </div>
-                            </div>
-                        ))
+                            );
+                        })
                     }
                 </div>
             </div>
         </nav>
 
         <!-- Sponsor Slot -->
-        <div class="mt-auto pt-8 border-t border-white/5 space-y-4">
-            <LogoutButton client:visible />
+        <div class="mt-auto pt-6 border-t border-slate-100 space-y-4">
             <SponsorBadge />
         </div>
     </div>
@@ -226,7 +251,7 @@ function isModuleActive(moduleKey: string) {
 <div
     id="sidebar-overlay"
     class:list={[
-        "fixed inset-0 bg-black/80 backdrop-blur-sm z-40 hidden transition-opacity duration-300 opacity-0",
+        "fixed inset-0 bg-black/40 backdrop-blur-xs z-40 hidden transition-opacity duration-300 opacity-0",
         { "lg:hidden": !hiddenInitially },
     ]}
 >

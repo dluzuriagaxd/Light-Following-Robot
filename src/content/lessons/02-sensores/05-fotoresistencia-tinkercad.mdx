@@ -1,0 +1,84 @@
+---
+title: "5. Divisor de Voltaje con Fotoresistencia en Tinkercad"
+order: 5
+description: "Aprende cómo funciona el sensor de luz LDR en Tinkercad y cómo armar un divisor de tensión para medir la luz virtual."
+---
+
+# ☀️ Lección 5: Divisor de Voltaje con Fotoresistencia en Tinkercad
+
+En la lección anterior aprendimos a armar un divisor de voltaje clásico con resistencias fijas. Hoy daremos un paso clave para nuestro robot: reemplazaremos una de esas resistencias fijas por una **Fotoresistencia (LDR)**, que es un componente que cambia su resistencia según la luz ambiental.
+
+De esta manera, el cambio de luz se convertirá en un cambio de voltaje analógico que nuestro Arduino Uno podrá leer en el pin **A0**.
+
+---
+
+## 💻 Circuito Virtual en Tinkercad
+
+Para esta práctica, deberás armar el siguiente esquema de conexiones en Tinkercad:
+
+### Captura de Pantalla del Circuito:
+![Circuito Divisor LDR en Tinkercad](https://images.unsplash.com/photo-1517430816045-df4b7de11d1d?w=800&auto=format&fit=crop&q=60)
+*Nota: La imagen de arriba muestra la protoboard virtual con la fotorresistencia en serie a una resistencia fija de 10kΩ conectada a 5V, GND y A0.*
+> **📸 Información para la imagen (Para el profesor):**
+> - **Descripción:** Captura de pantalla de la conexión de la fotorresistencia y la resistencia de 10kΩ como divisor de voltaje en Tinkercad.
+> - **Dónde guardar:** Directorio `public/images/lessons/`
+> - **Nombre sugerido:** `05-divisor-ldr.webp`
+> - **Tamaño sugerido:** 800x450 píxeles (relación de aspecto 16:9).
+> - **Formato:** `.webp` (es un formato más moderno y ligero que JPG/PNG).
+
+---
+
+## 🛠️ Guía de Conexiones en Tinkercad
+
+Sigue estos pasos en el editor de Tinkercad para conectar tu sensor de luz:
+
+1. **Coloca los Componentes:** Arrastra al lienzo:
+   - 1x Arduino Uno R3.
+   - 1x Protoboard (placa de pruebas).
+   - 1x Fotoresistencia (LDR).
+   - 1x Resistencia fija de **10k ohmios** (código de colores: marrón, negro, naranja).
+2. **Cablea la Alimentación:**
+   - Conecta el pin **5V** del Arduino al bus positivo (+) de la protoboard.
+   - Conecta el pin **GND** del Arduino al bus negativo (-) de la protoboard.
+3. **Conecta la Fotoresistencia y la Resistencia:**
+   - Inserta la fotoresistencia y la resistencia de 10kΩ en la protoboard de modo que queden conectadas **en serie** (compartiendo una patita en la misma columna).
+   - Conecta la patita libre de la fotoresistencia al positivo (**5V**).
+   - Conecta la patita libre de la resistencia de 10kΩ a tierra (**GND**).
+4. **Envía la Señal al Arduino:**
+   - Saca un cable desde la unión intermedia (donde se juntan la LDR y la resistencia) y conéctalo al pin analógico **A0** del Arduino.
+
+---
+
+## 💻 El Programa: Lectura por Puerto Serial
+
+Para probar tu circuito, haz clic en el botón **Código** en Tinkercad, selecciona la vista de **Texto** e ingresa el siguiente código para leer el valor del sensor y enviarlo a tu computadora:
+
+```cpp
+void setup() {
+  Serial.begin(9600); // Iniciamos comunicación serial a 9600 baudios
+}
+
+void loop() {
+  int valorLuz = analogRead(A0); // Leemos el pin analógico A0
+  Serial.println(valorLuz);      // Imprimimos el valor en el Monitor Serial
+  delay(100);                    // Esperamos 100 milisegundos
+}
+```
+
+---
+
+## 🔬 ¿Cómo probar el sensor en Tinkercad?
+
+1. Haz clic en **Iniciar Simulación**.
+2. Haz clic sobre la **Fotoresistencia (LDR)** en el circuito. Aparecerá un control deslizante con un icono de un sol y una nube (representa la linterna).
+3. Abre el **Monitor en Serie** (ubicado en la parte inferior de la ventana de Código).
+4. Mueve el deslizador para simular oscuridad (nube) y luz brillante (sol). Observa cómo cambian los números en el monitor en serie:
+   - **Mucha oscuridad:** El monitor mostrará números muy bajos (cercanos a 100 o menos).
+   - **Mucha luz:** El monitor mostrará números altos (cercanos a 900 o más).
+
+---
+
+> [!IMPORTANT]
+> **Pregunta de Análisis:**
+> Si cambiamos la resistencia de 10kΩ por una de 220Ω, ¿los valores en el Monitor Serial seguirán siendo los mismos?
+> *Respuesta:* No, al alterar el valor de la resistencia fija, la división de voltaje cambia completamente y el Arduino no tendrá el rango de lectura adecuado (0 a 1023) para diferenciar la luz de la sombra. ¡Por eso la resistencia de 10kΩ es crucial!

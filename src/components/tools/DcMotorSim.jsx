@@ -5,8 +5,8 @@ const STALL_TORQUE_BASE = 0.8; // kg·cm at 6V
 const NO_LOAD_RPM_BASE = 15000; // motor RPM at 6V
 
 export default function DcMotorSim() {
-  const [voltage, setVoltage] = useState(7.4);
-  const [load, setLoad] = useState(30);
+  const [voltage, setVoltage] = useState(6.0);
+  const [load, setLoad] = useState(0);
   const canvasRef = useRef(null);
   const animRef = useRef(null);
   const angleRef = useRef(0);
@@ -149,6 +149,7 @@ export default function DcMotorSim() {
           <div style={{ color: "#f97316", fontSize: 24, fontWeight: 800, margin: "6px 0" }}>{voltage.toFixed(1)}V</div>
           <input type="range" min="4" max="8.4" step="0.1" value={voltage}
             onChange={e => setVoltage(parseFloat(e.target.value))}
+            onDoubleClick={() => setVoltage(6.0)}
             style={{ width: "100%", accentColor: "#f97316" }} />
           <div style={{ display: "flex", justifyContent: "space-between", color: "rgba(255,255,255,0.3)", fontSize: 10, marginTop: 4 }}>
             <span>4.0V (low)</span><span>8.4V (full)</span>
@@ -160,6 +161,7 @@ export default function DcMotorSim() {
           <div style={{ color: "#60a5fa", fontSize: 24, fontWeight: 800, margin: "6px 0" }}>{load}%</div>
           <input type="range" min="0" max="95" step="1" value={load}
             onChange={e => setLoad(parseInt(e.target.value))}
+            onDoubleClick={() => setLoad(0)}
             style={{ width: "100%", accentColor: "#60a5fa" }} />
           <div style={{ display: "flex", justifyContent: "space-between", color: "rgba(255,255,255,0.3)", fontSize: 10, marginTop: 4 }}>
             <span>0% (free spin)</span><span>100% (stall)</span>

@@ -586,6 +586,7 @@ export default function CollisionMiniSim({ isFullscreen = false, onMaximize = nu
                 step="0.05"
                 value={restitution}
                 onChange={(e) => setRestitution(parseFloat(e.target.value))}
+                onDoubleClick={() => setRestitution(0.8)}
                 className="w-full accent-red-500 h-1 bg-black/40 rounded-lg cursor-pointer"
               />
             </div>
@@ -597,14 +598,14 @@ export default function CollisionMiniSim({ isFullscreen = false, onMaximize = nu
                   <span>Robot Mass (<span className="font-serif italic">m<sub>R</sub></span>)</span>
                   <span className="text-white">{Mr} kg</span>
                 </div>
-                <input type="range" min="0.5" max="10" step="0.5" value={Mr} onChange={(e) => setMr(parseFloat(e.target.value))} disabled={isSimulating} className="w-full accent-blue-500 h-1 bg-black/40 rounded-lg cursor-pointer" />
+                <input type="range" min="0.5" max="10" step="0.5" value={Mr} onChange={(e) => setMr(parseFloat(e.target.value))} onDoubleClick={() => setMr(3.0)} disabled={isSimulating} className="w-full accent-blue-500 h-1 bg-black/40 rounded-lg cursor-pointer" />
               </div>
               <div>
                 <div className="flex justify-between text-[9px] mb-1 font-mono text-green-400">
                   <span>Ball Mass (<span className="font-serif italic">m<sub>B</sub></span>)</span>
                   <span className="text-white">{Mb} kg</span>
                 </div>
-                <input type="range" min="0.5" max="10" step="0.5" value={Mb} onChange={(e) => setMb(parseFloat(e.target.value))} disabled={isSimulating} className="w-full accent-green-500 h-1 bg-black/40 rounded-lg cursor-pointer" />
+                <input type="range" min="0.5" max="10" step="0.5" value={Mb} onChange={(e) => setMb(parseFloat(e.target.value))} onDoubleClick={() => setMb(1.0)} disabled={isSimulating} className="w-full accent-green-500 h-1 bg-black/40 rounded-lg cursor-pointer" />
               </div>
             </div>
 
@@ -621,7 +622,7 @@ export default function CollisionMiniSim({ isFullscreen = false, onMaximize = nu
                     <span>Speed:</span>
                     <span className="text-white">{robotSpeed} px/s</span>
                   </div>
-                  <input type="range" min="0" max="250" step="10" value={robotSpeed} onChange={(e) => setRobotSpeed(parseInt(e.target.value))} disabled={isSimulating} className="w-full accent-blue-500 h-1 bg-black/40 rounded-lg cursor-pointer disabled:opacity-50" />
+                  <input type="range" min="0" max="250" step="10" value={robotSpeed} onChange={(e) => setRobotSpeed(parseInt(e.target.value))} onDoubleClick={() => setRobotSpeed(140)} disabled={isSimulating} className="w-full accent-blue-500 h-1 bg-black/40 rounded-lg cursor-pointer disabled:opacity-50" />
                 </div>
 
                 <div>
@@ -629,7 +630,7 @@ export default function CollisionMiniSim({ isFullscreen = false, onMaximize = nu
                     <span>Angle (<span className="font-serif italic">&theta;</span>):</span>
                     <span className="text-white">{robotAngle}°</span>
                   </div>
-                  <input type="range" min="-180" max="180" step="5" value={robotAngle} onChange={(e) => setRobotAngle(parseInt(e.target.value))} disabled={isSimulating} className="w-full accent-blue-500 h-1 bg-black/40 rounded-lg cursor-pointer disabled:opacity-50" />
+                  <input type="range" min="-180" max="180" step="5" value={robotAngle} onChange={(e) => setRobotAngle(parseInt(e.target.value))} onDoubleClick={() => setRobotAngle(0)} disabled={isSimulating} className="w-full accent-blue-500 h-1 bg-black/40 rounded-lg cursor-pointer disabled:opacity-50" />
                 </div>
               </div>
             </div>
@@ -647,7 +648,7 @@ export default function CollisionMiniSim({ isFullscreen = false, onMaximize = nu
                     <span>Speed:</span>
                     <span className="text-white">{ballSpeed} px/s</span>
                   </div>
-                  <input type="range" min="0" max="250" step="10" value={ballSpeed} onChange={(e) => setBallSpeed(parseInt(e.target.value))} disabled={isSimulating} className="w-full accent-green-500 h-1 bg-black/40 rounded-lg cursor-pointer disabled:opacity-50" />
+                  <input type="range" min="0" max="250" step="10" value={ballSpeed} onChange={(e) => setBallSpeed(parseInt(e.target.value))} onDoubleClick={() => setBallSpeed(0)} disabled={isSimulating} className="w-full accent-green-500 h-1 bg-black/40 rounded-lg cursor-pointer disabled:opacity-50" />
                 </div>
 
                 <div>
@@ -655,7 +656,7 @@ export default function CollisionMiniSim({ isFullscreen = false, onMaximize = nu
                     <span>Angle (<span className="font-serif italic">&theta;</span>):</span>
                     <span className="text-white">{ballAngle}°</span>
                   </div>
-                  <input type="range" min="-180" max="180" step="5" value={ballAngle} onChange={(e) => setBallAngle(parseInt(e.target.value))} disabled={isSimulating} className="w-full accent-green-500 h-1 bg-black/40 rounded-lg cursor-pointer disabled:opacity-50" />
+                  <input type="range" min="-180" max="180" step="5" value={ballAngle} onChange={(e) => setBallAngle(parseInt(e.target.value))} onDoubleClick={() => setBallAngle(0)} disabled={isSimulating} className="w-full accent-green-500 h-1 bg-black/40 rounded-lg cursor-pointer disabled:opacity-50" />
                 </div>
               </div>
             </div>

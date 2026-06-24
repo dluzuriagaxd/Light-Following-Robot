@@ -1,0 +1,64 @@
+---
+title: "10. Lógica del Seguidor I: Algoritmo Base y Tolerancia"
+order: 10
+description: "Comienza a diseñar la lógica de control del robot. Aprende el concepto de error diferencial y cómo programar una zona muerta en el simulador."
+---
+
+# 🧠 Lección 10: Lógica del Seguidor I: Algoritmo Base y Tolerancia
+
+¡Felicidades! Tu robot físico ya está completamente construido y cableado. Antes de programarlo en SteamakersBlocks para cargarlo al robot de verdad, realizaremos una serie de prácticas guiadas en la sección **"Entrenamiento Lógico"** de nuestro **Simulador Web**.
+
+En esta lección cubriremos los **Pasos 1 y 2** de entrenamiento lógico, aprendiendo cómo restar las señales de los dos sensores y cómo evitar vibraciones innecesarias en los motores.
+
+---
+
+## 🎮 Simulador Interactivo: Acceso al Entrenamiento Lógico
+
+Asegúrate de entrar a la sección de simulación desde el menú del curso o el siguiente enlace y cambiar a la pestaña **Entrenamiento Lógico** en la esquina superior izquierda:
+
+**[→ Abrir Simulador de Seguidor de Luz](/simulador)**
+
+---
+
+## 🔬 Paso 1: El Algoritmo Diferencial Base (Diferencia = A0 - A1)
+
+Para que el robot decida hacia dónde girar, debe saber qué "ojo" (fotoresistencia) está captando más luz. Esto se calcula restando la lectura analógica del sensor izquierdo (`A0`) menos el derecho (`A1`):
+
+$$\text{Error} = \text{Lectura Izquierda} - \text{Lectura Derecha}$$
+
+### Lógica de control diferencial:
+- **Si el Error es positivo:** Hay más luz en el sensor izquierdo. El robot debe **girar a la izquierda**.
+- **Si el Error es negativo:** Hay más luz en el sensor derecho. El robot debe **girar a la derecha**.
+- **Si el Error es cero:** La linterna está exactamente al frente. El robot debe **avanzar recto**.
+
+### Consigna del Paso 1 en el Simulador:
+* Entra al Paso 1 en el simulador.
+* Mueve la linterna y observa cómo la variable `resta` cambia en tiempo real de valores positivos a negativos.
+* Verifica cómo responde el robot diferencial simple ante las variaciones rápidas de luz.
+
+---
+
+## 🔬 Paso 2: Zona Muerta o Tolerancia (Evitando Oscilaciones)
+
+En el Paso 1 verás un problema: en la vida real, es casi imposible que los dos sensores lean exactamente el mismo número. Si hay un mínimo cambio (ej. `A0 = 501` y `A1 = 500`), el error será `1`. El robot intentará girar a la izquierda por una milésima de segundo y luego a la derecha, provocando un **temblor o vibración constante (oscilación)** en los motores.
+
+Para resolver esto, implementamos una **Zona Muerta o Tolerancia (Umbral)**:
+Si el error es pequeño (ejemplo: entre `-100` y `+100`), asumiremos que el error es despreciable y el robot simplemente **avanzará recto** sin hacer giros bruscos.
+
+```
+       GIRAR A LA IZQUIERDA      │    AVANZAR RECTO (Zona Muerta)   │      GIRAR A LA DERECHA
+ ────────────────────────────────┼──────────────────────────────────┼────────────────────────────────
+  Error > +100                   │  Error entre -100 y +100         │  Error < -100
+```
+
+### Consigna del Paso 2 en el Simulador:
+* Selecciona el **Paso 2** en la barra lateral.
+* Define una zona muerta de `100` unidades en los controles.
+* Observa cómo el robot se desplaza de manera mucho más fluida y estable frente a cambios pequeños de luz, eliminando las vibraciones en línea recta.
+
+---
+
+> [!IMPORTANT]
+> **Checklist para el Aula:**
+> - [ ] Lograste que el robot virtual del Paso 1 gire hacia el lado correcto según la linterna.
+> - [ ] Calibraste el valor de zona muerta en el Paso 2 para que el robot avance recto de manera estable sin zigzaguear en exceso.

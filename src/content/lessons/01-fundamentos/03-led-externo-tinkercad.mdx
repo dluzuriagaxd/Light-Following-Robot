@@ -1,0 +1,72 @@
+---
+title: "3. Salidas Digitales y Protoboard en Tinkercad"
+order: 3
+description: "Aprende a cablear un LED y una resistencia en una protoboard virtual usando Tinkercad."
+---
+
+import LedExternoSim from "../../../components/tools/LedExternoSim.jsx";
+
+# 🔌 Lección 3: Salidas Digitales y Protoboard en Tinkercad
+
+En la lección anterior controlamos un LED que ya venía integrado en la placa. Hoy daremos un paso gigante: conectaremos componentes electrónicos externos usando un **protoboard virtual (placa de pruebas)** y cables dentro de Tinkercad.
+
+Aprenderemos a conectar un LED en el **Pin Digital 5** del Arduino y a protegerlo para que no se queme usando una resistencia de **220 ohmios**.
+
+---
+
+## 💻 Conceptos Clave
+1. **La Protoboard:** Cómo funciona por dentro su matriz de conexiones de cobre (pistas verticales y horizontales) para conectar circuitos sin necesidad de soldar. [Ver vídeo explicativo](https://youtu.be/wOdlHIrvi80?si=m0pfGGLP4Y5TuEPi)
+2. **El Diodo LED:** Entender su polaridad. Las patitas no son iguales: la pata doblada/larga es el **Ánodo (+)** y se conecta a la señal, la pata recta/corta es el **Cátodo (-)** y va a tierra (GND). [Ver vídeo explicativo](https://www.youtube.com/watch?v=e8NoweGme_w)
+3. **Resistencia de Protección (220Ω):** ¿Por qué la corriente eléctrica puede quemar un LED? Cómo la resistencia limita el flujo de electrones para mantener el circuito seguro.
+
+---
+
+## 🛠️ Práctica en Tinkercad: Conexión del LED
+
+Para esta práctica, deberás armar el siguiente esquema de conexiones en Tinkercad:
+
+### Captura de Pantalla del Circuito:
+![Circuito LED en Tinkercad](https://images.unsplash.com/photo-1517430816045-df4b7de11d1d?w=800&auto=format&fit=crop&q=60)
+*Nota: La imagen muestra una protoboard donde el ánodo del LED se conecta mediante un cable al pin 5 de Arduino, y el cátodo se conecta a una resistencia de 220Ω que finaliza en el bus de tierra (GND).*
+> **📸 Información para la imagen (Para el profesor):**
+> - **Descripción:** Captura de pantalla en Tinkercad mostrando la placa Arduino y la protoboard con el LED y su resistencia correctamente cableados.
+> - **Dónde guardar:** Directorio `public/images/lessons/`
+> - **Nombre sugerido:** `03-circuito-led.webp`
+> - **Tamaño sugerido:** 800x450 píxeles (relación de aspecto 16:9).
+> - **Formato:** `.webp` (es un formato más moderno y ligero que JPG/PNG).
+
+### Pasos para realizar el montaje:
+1. Arrastra una **Placa de pruebas pequeña (protoboard)** al lienzo.
+2. Arrastra un **LED** de cualquier color y colócalo en el centro de la protoboard.
+3. Arrastra una **Resistencia** y cambia su valor a **220 ohms** (colores: rojo, rojo, marrón). Conéctala desde la pata del Cátodo (corta) hacia una columna vacía o directo al bus negativo.
+4. Conecta un cable negro desde la columna de la resistencia (o bus negativo) al pin **GND** de Arduino.
+5. Conecta un cable de color desde la pata del Ánodo (larga) al pin digital **5** de Arduino.
+
+---
+
+## 💻 Programando la Salida en Bloques
+
+1. Abre el panel de **Código** en Tinkercad.
+2. Configura los bloques para activar el **Pin Digital 5**:
+   - Bloque: "Definir pasador 5 en ALTO"
+   - Bloque: "Esperar 1 segundo"
+   - Bloque: "Definir pasador 5 en BAJO"
+   - Bloque: "Esperar 1 segundo"
+3. Haz clic en **Iniciar Simulación**. ¡Tu LED virtual debería comenzar a parpadear!
+
+---
+
+## 🎮 Simulador Interactivo: Arduino + Protoboard en Vivo
+Ejecuta la simulación a continuación para comprobar el recorrido de las señales y cómo se ilumina el LED:
+
+<LedExternoSim client:visible />
+
+---
+
+> [!IMPORTANT]
+> **Caja de Materiales (Físicos para cuando repliques en clase):**
+> - [ ] Placa Arduino Uno R3 y cable USB
+> - [ ] Protoboard pequeña
+> - [ ] 1x Diodo LED (5mm)
+> - [ ] 1x Resistencia de 220 ohmios
+> - [ ] Cables Jumper Macho-Macho

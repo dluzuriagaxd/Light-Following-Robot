@@ -1,3 +1,8 @@
+export interface SpecItem {
+  label: string;
+  value: string;
+}
+
 export interface Material {
   id: string;
   name: string;
@@ -5,110 +10,114 @@ export interface Material {
   descriptionLong: string;
   imageFileName: string;
   buyUrl: string;
-  specs: { label: string; value: string }[];
+  specs: SpecItem[];
 }
 
 export const materials: Material[] = [
   {
-    id: "arduino-nano",
-    name: "Arduino Nano V3 + Shield I/O",
-    description: "Cerebro del robot y placa de expansión para conexiones rápidas.",
-    descriptionLong: "El Arduino Nano V3 es nuestra unidad de procesamiento central. Lo montaremos sobre un Shield de expansión I/O que facilita la conexión de sensores y motores sin necesidad de protoboard, asegurando conexiones robustas ante las vibraciones de la competencia.",
-    imageFileName: "arduino-nano.jpg",
+    id: "arduino-uno",
+    name: "Arduino Uno R3",
+    description: "El cerebro controlador de nuestro robot.",
+    descriptionLong: "El Arduino Uno R3 es una placa de desarrollo basada en el microcontrolador ATmega328P. Es ideal para aprender electrónica y programación ya que cuenta con entradas analógicas para nuestros sensores de luz y salidas digitales/PWM para controlar los motores a través del driver.",
+    imageFileName: "arduino-uno.jpg",
     buyUrl: "#",
     specs: [
       { label: "Microcontrolador", value: "ATmega328P" },
-      { label: "Placa Base", value: "Shield Expansión I/O" },
-      { label: "Voltaje", value: "7V - 12V (VIN)" }
+      { label: "Voltaje de Operación", value: "5V" },
+      { label: "Entradas Analógicas", value: "6 (A0 - A5)" },
+      { label: "Salidas Digitales", value: "14 (6 con PWM)" }
+    ]
+  },
+  {
+    id: "fotoresistencia-ldr",
+    name: "Fotoresistencia (LDR)",
+    description: "El sensor del robot. Detecta la cantidad de luz en el ambiente.",
+    descriptionLong: "Una fotoresistencia o LDR (Light Dependent Resistor) es un componente cuya resistencia eléctrica disminuye a medida que aumenta la intensidad de la luz que incide sobre él. Usaremos dos fotoresistencias en la parte delantera de nuestro robot para que actúen como sensores y detecten el haz de luz de una linterna.",
+    imageFileName: "ldr-sensor.jpg",
+    buyUrl: "#",
+    specs: [
+      { label: "Resistencia con Luz", value: "~1kΩ a 10kΩ" },
+      { label: "Resistencia en Oscuridad", value: "~1MΩ" },
+      { label: "Pines de Conexión", value: "A0 (Izquierdo) / A1 (Derecho)" }
+    ]
+  },
+  {
+    id: "driver-l298n",
+    name: "Módulo Driver L298N",
+    description: "Controlador de potencia para motores DC (Puente H).",
+    descriptionLong: "El módulo L298N es un driver de motores de doble puente H. Permite controlar la velocidad y dirección de giro de dos motores de corriente continua (DC). Funciona como un interruptor electrónico de alta potencia que amplifica las señales de bajo voltaje de la placa Arduino.",
+    imageFileName: "driver-l298n.jpg",
+    buyUrl: "#",
+    specs: [
+      { label: "Chip de Control", value: "L298N Dual H-Bridge" },
+      { label: "Voltaje de Motores", value: "5V - 35V" },
+      { label: "Corriente de Salida", value: "2A por canal" },
+      { label: "Caída de Voltaje Interna", value: "~2V (pérdida por transistores)" }
     ]
   },
   {
     id: "motores-tt",
-    name: "Motores TT",
-    description: "Caja reductora amarilla 1:48. Tracción confiable.",
-    descriptionLong: "Los motores TT con caja reductora proporcionan el torque necesario. Son el estándar en robótica móvil por su bajo costo y facilidad de montaje. Requieren filtrado de ruido mediante capacitores cerámicos para no interferir con el microcontrolador.",
+    name: "Motores TT y Ruedas",
+    description: "Cajas reductoras amarillas 1:48 para la propulsión.",
+    descriptionLong: "Los motores TT con caja reductora proporcionan la fuerza (torque) y velocidad ideales para robótica móvil educativa. Tienen una relación de engranajes de 1:48, lo que les permite mover el chasis del robot con facilidad sobre superficies regulares.",
     imageFileName: "motor-tt.jpg",
     buyUrl: "#",
     specs: [
-      { label: "Relación", value: "1:48" },
-      { label: "Voltaje", value: "3V - 9V" },
-      { label: "Filtrado", value: "Requiere 3x 104 Caps" }
+      { label: "Relación de Reducción", value: "1:48" },
+      { label: "Voltaje Recomendado", value: "3V - 6V" },
+      { label: "Eje de Salida", value: "Doble cara para rueda" }
     ]
   },
   {
-    id: "driver-tb6612fng",
-    name: "Driver TB6612FNG",
-    description: "Puente H de alta eficiencia. Controla velocidad y dirección.",
-    descriptionLong: "A diferencia del clásico L298N, el TB6612FNG es un driver basado en MOSFET, lo que significa que es mucho más eficiente, genera menos calor y es extremadamente compacto. Es ideal para robots de competencia donde cada gramo y miliamperio cuenta.",
-    imageFileName: "driver-tb6612.jpg",
+    id: "led-5mm",
+    name: "LED de 5mm y Resistencia 220Ω",
+    description: "Componentes para practicar salidas digitales y circuitos básicos.",
+    descriptionLong: "Un diodo emisor de luz (LED) de 5mm que utilizaremos en las primeras lecciones para aprender a programar parpadeos (blink) y a controlar un pin de Arduino. Incluye una resistencia limitadora de 220Ω (rojo-rojo-marrón) para proteger el LED de quemarse.",
+    imageFileName: "led-kit.jpg",
     buyUrl: "#",
     specs: [
-      { label: "Tipo", value: "Dual MOSFET H-Bridge" },
-      { label: "Corriente", value: "1.2A (3.2A pico)" },
-      { label: "Eficiencia", value: "Alta (baja caída de tensión)" }
+      { label: "Diámetro del LED", value: "5mm" },
+      { label: "Resistencia de Protección", value: "220 Ohmios" },
+      { label: "Pin de Conexión Práctica", value: "Pin Digital 5" }
     ]
   },
   {
-    id: "sensor-qtr-8rc",
-    name: "Sensor QTR-8RC",
-    description: "Array de reflectancia. 8 sensores IR para detección de línea.",
-    descriptionLong: "El QTR-8RC (o su variante AC) es el estándar para seguidores de línea. Funciona mediante la medición del tiempo de descarga de un capacitor, lo que lo hace muy preciso y menos sensible al ruido ambiental que los sensores analógicos simples.",
-    imageFileName: "sensor-qtr.jpg",
+    id: "resistencia-10k",
+    name: "Resistencias de 10kΩ",
+    description: "Componentes necesarios para formar el divisor de voltaje del LDR.",
+    descriptionLong: "Las fotoresistencias no pueden conectarse directamente a las entradas analógicas de Arduino solas. Necesitamos asociarlas en serie con una resistencia fija de 10kΩ (marrón-negro-naranja) para crear un divisor de tensión. Esto convierte el cambio de resistencia del LDR en un cambio de voltaje medible.",
+    imageFileName: "resistors-10k.jpg",
     buyUrl: "#",
     specs: [
-      { label: "Canales", value: "8" },
-      { label: "Tipo", value: "Digital (RC)" },
-      { label: "Fijación", value: "Tornillos 2mm" }
+      { label: "Valor de Resistencia", value: "10,000 Ohmios" },
+      { label: "Tolerancia", value: "±5% (Capa de carbón)" },
+      { label: "Potencia", value: "1/4 Watt" }
     ]
   },
   {
-    id: "modulo-bluetooth",
-    name: "Módulo Bluetooth",
-    description: "HC-05, HC-06 o HM-10. Comunicación para telemetría.",
-    descriptionLong: "Permite la comunicación inalámbrica. Si usas iOS, el HM-10 (BLE) es el recomendado. Para Android o PC, el HC-05 es lo más común. Requiere un divisor de voltaje en el RX para protegerlo de los 5V del Arduino.",
-    imageFileName: "bluetooth-module.jpg",
+    id: "bateria-energia",
+    name: "Portabaterías y Baterías",
+    description: "Fuente de alimentación portátil para el robot.",
+    descriptionLong: "Utilizaremos un portabaterías con pilas de litio (ej. dos baterías 18650 en serie que entregan ~7.4V) o en su defecto una batería de 9V. Esto permite alimentar de manera independiente los motores a través del driver L298N y el procesador Arduino.",
+    imageFileName: "battery-holder.jpg",
     buyUrl: "#",
     specs: [
-      { label: "Modos", value: "UART Serial" },
-      { label: "Voltaje RX", value: "3.3V (Requiere Divisor)" },
-      { label: "App", value: "Soccer Jr. Dashboard" }
+      { label: "Configuración Litio", value: "18650 2S (7.4V Nominal)" },
+      { label: "Alternativa", value: "Batería de 9V" },
+      { label: "Conector", value: "Jack de poder DC o cables directos" }
     ]
   },
   {
-    id: "fuente-energia",
-    name: "Batería de 9V + Switch",
-    description: "Alimentación portátil con interruptor de seguridad.",
-    descriptionLong: "Utilizaremos una batería de 9V estándar con un broche reforzado y un interruptor basculante para el encendido general. Esto nos permite un arranque rápido y seguro en la línea de partida.",
-    imageFileName: "bateria-9v.jpg",
-    buyUrl: "#",
-    specs: [
-      { label: "Voltaje", value: "9V Nominal" },
-      { label: "Switch", value: "Basculante" }
-    ]
-  },
-  {
-    id: "chasis",
-    name: "Chasis (Diseño Propio)",
-    description: "Estructura diseñada en Tinkercad para impresión 3D o corte láser.",
-    descriptionLong: "En este curso no usamos chasis comerciales genéricos. Diseñaremos nuestra propia estructura para optimizar el peso y la posición de los componentes, fomentando el aprendizaje de dibujo técnico y medidas.",
+    id: "chasis-3d",
+    name: "Chasis Impreso en 3D",
+    description: "La estructura física que soporta todos los componentes del robot.",
+    descriptionLong: "Diseñado para mantener una distancia equilibrada entre las ruedas y colocar los sensores LDR al frente en un ángulo óptimo. Se puede imprimir en plástico PLA o fabricar con corte láser en acrílico, basándonos en las medidas del plano oficial.",
     imageFileName: "chasis-robot.jpg",
     buyUrl: "#",
     specs: [
-      { label: "Software", value: "Tinkercad" },
-      { label: "Fabricación", value: "3D / Láser" },
-      { label: "Material", value: "PLA / Acrílico" }
-    ]
-  },
-  {
-    id: "modulo-pulsador",
-    name: "Módulo Pulsador",
-    description: "Interfaz de usuario para arranque y calibración.",
-    descriptionLong: "Un componente crítico para la interfaz. Nos permite iniciar la calibración y el arranque de carrera sin necesidad de conectar cables o resetear el Arduino constantemente.",
-    imageFileName: "button-module.jpg",
-    buyUrl: "#",
-    specs: [
-      { label: "Pin Arduino", value: "11" },
-      { label: "Tipo", value: "Pull-up / Pull-down" }
+      { label: "Diseño de Referencia", value: "chasis_modelo_pro.svg" },
+      { label: "Material Recomendado", value: "PLA o Acrílico 3mm" },
+      { label: "Fijación de Motores", value: "Tornillos M3" }
     ]
   }
 ];

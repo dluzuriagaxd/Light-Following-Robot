@@ -216,6 +216,7 @@ export default function ChassisDiagram({ isFullscreen = false, onMaximize = null
                 max="180"
                 value={angle}
                 onChange={(e) => setAngle(parseInt(e.target.value))}
+                onDoubleClick={() => setAngle(30)}
                 className="w-full accent-orange-500 h-1 rounded-full bg-black/40 cursor-pointer"
               />
             </div>

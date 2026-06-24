@@ -384,7 +384,7 @@ const PidSimulator = () => {
                     <div className="flex justify-between items-center text-[10px] font-black text-white/40 mb-3 uppercase tracking-tighter">
                         <span>Escala Temporal</span> <span className="text-white bg-[#f97316] px-2 py-0.5 rounded-full text-[9px]">{timeScale.toFixed(1)}x</span>
                     </div>
-                    <input type="range" min="0.1" max="2.0" step="0.1" value={timeScale} onChange={(e) => setTimeScale(parseFloat(e.target.value))} className="w-full h-1 bg-white/10 rounded-full appearance-none cursor-pointer accent-[#f97316]" />
+                    <input type="range" min="0.1" max="2.0" step="0.1" value={timeScale} onChange={(e) => setTimeScale(parseFloat(e.target.value))} onDoubleClick={() => setTimeScale(1.0)} className="w-full h-1 bg-white/10 rounded-full appearance-none cursor-pointer accent-[#f97316]" />
                 </div>
 
                 {/* PID Section */}
@@ -392,9 +392,9 @@ const PidSimulator = () => {
                     <div className="text-white/20 font-black text-[10px] uppercase tracking-widest flex items-center gap-2 mb-2">
                         PID TUNING CONSTANTS
                     </div>
-                    <ControlRow label="Kp" checked={enKp} onToggle={() => setEnKp(!enKp)} value={kp} onChange={setKp} step={0.01} max={0.5} />
-                    <ControlRow label="Kd" checked={enKd} onToggle={() => setEnKd(!enKd)} value={kd} onChange={setKd} step={0.1} max={10} />
-                    <ControlRow label="Ki" checked={enKi} onToggle={() => setEnKi(!enKi)} value={ki} onChange={setKi} step={0.001} max={0.05} />
+                    <ControlRow label="Kp" checked={enKp} onToggle={() => setEnKp(!enKp)} value={kp} onChange={setKp} step={0.01} max={0.5} defaultValue={0.08} />
+                    <ControlRow label="Kd" checked={enKd} onToggle={() => setEnKd(!enKd)} value={kd} onChange={setKd} step={0.1} max={10} defaultValue={2.2} />
+                    <ControlRow label="Ki" checked={enKi} onToggle={() => setEnKi(!enKi)} value={ki} onChange={setKi} step={0.001} max={0.05} defaultValue={0.005} />
 
                     <div className="flex justify-between items-center pt-4 border-t border-white/10 text-[10px] font-black text-white/40 uppercase tracking-widest">
                         <span>Vel. Crucero</span>
@@ -410,9 +410,9 @@ const PidSimulator = () => {
 
 
                     <div className="space-y-4">
-                        <PhysicsSlider label="Power Gain" value={sysPwr} onChange={setSysPwr} min={0.1} max={3.0} step={0.1} />
-                        <PhysicsSlider label="Turn Ratio" value={sysTurn} onChange={setSysTurn} min={0.1} max={5.0} step={0.1} />
-                        <PhysicsSlider label="Inertia" value={sysInertia} onChange={setSysInertia} min={0} max={0.99} step={0.01} />
+                        <PhysicsSlider label="Power Gain" value={sysPwr} onChange={setSysPwr} min={0.1} max={3.0} step={0.1} defaultValue={1.0} />
+                        <PhysicsSlider label="Turn Ratio" value={sysTurn} onChange={setSysTurn} min={0.1} max={5.0} step={0.1} defaultValue={0.9} />
+                        <PhysicsSlider label="Inertia" value={sysInertia} onChange={setSysInertia} min={0} max={0.99} step={0.01} defaultValue={0.95} />
                     </div>
                 </div>
 
@@ -425,7 +425,7 @@ const PidSimulator = () => {
     );
 };
 
-const ControlRow = ({ label, checked, onToggle, value, onChange, step, min = 0, max = 5 }) => (
+const ControlRow = ({ label, checked, onToggle, value, onChange, step, min = 0, max = 5, defaultValue }) => (
     <div className="space-y-2">
         <div className="flex justify-between items-center text-[10px] font-black tracking-widest uppercase">
             <label className="flex items-center gap-3 cursor-pointer text-white/60 group">
@@ -439,12 +439,13 @@ const ControlRow = ({ label, checked, onToggle, value, onChange, step, min = 0, 
             min={min} max={max} step={step}
             value={value}
             onChange={(e) => onChange(parseFloat(e.target.value))}
+            onDoubleClick={() => onChange(defaultValue)}
             className="w-full h-1 bg-white/10 rounded-full appearance-none cursor-pointer accent-[#f97316]"
         />
     </div>
 );
 
-const PhysicsSlider = ({ label, value, onChange, min, max, step }) => (
+const PhysicsSlider = ({ label, value, onChange, min, max, step, defaultValue }) => (
     <div className="space-y-2">
         <div className="flex justify-between items-center text-[10px] font-black tracking-widest uppercase text-white/40">
             <span>{label}</span>
@@ -455,6 +456,7 @@ const PhysicsSlider = ({ label, value, onChange, min, max, step }) => (
             min={min} max={max} step={step}
             value={value}
             onChange={(e) => onChange(parseFloat(e.target.value))}
+            onDoubleClick={() => onChange(defaultValue)}
             className="w-full h-1 bg-white/10 rounded-full appearance-none cursor-pointer accent-white"
         />
     </div>

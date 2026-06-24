@@ -217,6 +217,7 @@ export default function TransistorLossDiagram({ isFullscreen = false, onMaximize
               step="0.1"
               value={currentLoad}
               onChange={(e) => setCurrentLoad(parseFloat(e.target.value))}
+              onDoubleClick={() => setCurrentLoad(1.0)}
               className="w-full accent-green-600 h-1 bg-black/40 rounded-lg cursor-pointer"
             />
           </div>

@@ -249,6 +249,7 @@ export default function BatteryChemistrySim({ isFullscreen = false, onMaximize =
                 step="1"
                 value={soc}
                 onChange={(e) => setSoc(parseInt(e.target.value))}
+                onDoubleClick={() => setSoc(80)}
                 className="w-full accent-yellow-500 h-1 bg-black/40 rounded-lg cursor-pointer"
               />
             </div>
@@ -266,6 +267,7 @@ export default function BatteryChemistrySim({ isFullscreen = false, onMaximize =
                 step="0.1"
                 value={current}
                 onChange={(e) => setCurrent(parseFloat(e.target.value))}
+                onDoubleClick={() => setCurrent(1.5)}
                 className="w-full accent-blue-500 h-1 bg-black/40 rounded-lg cursor-pointer"
               />
             </div>
@@ -283,6 +285,7 @@ export default function BatteryChemistrySim({ isFullscreen = false, onMaximize =
                 step="10"
                 value={rInternal}
                 onChange={(e) => setRInternal(parseInt(e.target.value))}
+                onDoubleClick={() => setRInternal(120)}
                 className="w-full accent-red-500 h-1 bg-black/40 rounded-lg cursor-pointer"
               />
             </div>

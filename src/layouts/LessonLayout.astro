@@ -2,7 +2,6 @@
 import '../styles/global.css';
 import Sidebar from '../components/Sidebar.astro';
 import LessonCheckbox from '../components/progress/LessonCheckbox';
-import LanguageSwitcher from '../components/LanguageSwitcher';
 import { registerVisit, getUserActivityProgress } from "@/lib/progress/utils";
 
 interface Props {
@@ -45,31 +44,30 @@ if (session?.user) {
 		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 		<meta name="viewport" content="width=device-width" />
 		<meta name="generator" content={Astro.generator} />
-		<title>{title} | Soccer Jr. Academy</title>
+		<title>{title} | Academia Seguidor de Luz</title>
 		<link rel="preconnect" href="https://fonts.googleapis.com">
 		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-		<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+		<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 		<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
 	</head>
-	<body class="bg-[#0a0a0a] text-[#ededed] font-sans selection:bg-brand-orange/30 selection:text-brand-orange">
+	<body class="bg-bg-main text-text-main font-sans selection:bg-brand-orange/30 selection:text-brand-orange antialiased">
 		<!-- Global Header / Top Bar -->
-		<header class="flex items-center justify-between p-4 border-b border-white/5 bg-black/80 backdrop-blur-xl sticky top-0 z-50">
+		<header class="flex items-center justify-between p-4 border-b border-border-dark bg-white shadow-sm sticky top-0 z-50">
 			<div class="flex items-center gap-8">
                 <!-- Logo & Brand (Desktop/Mobile) -->
                 <a href="/" class="flex items-center gap-3 group">
-                    <div class="w-10 h-10 bg-brand-orange rounded-xl shadow-[0_0_15px_rgba(249,115,22,0.3)] flex items-center justify-center font-bold text-black text-lg transition-transform group-hover:scale-105">⚽</div>
-                    <span class="font-black tracking-tighter text-white text-lg hidden sm:block">Soccer Jr. Telemetry</span>
+                    <div class="w-10 h-10 bg-brand-orange rounded-xl shadow-[0_0_15px_rgba(255,171,25,0.3)] flex items-center justify-center font-bold text-white text-lg transition-transform group-hover:scale-105">💡</div>
+                    <span class="font-display font-black tracking-tighter text-slate-800 text-lg hidden sm:block">Seguidor de Luz</span>
                 </a>
 
                 <!-- Desktop Quick Tools -->
-                <nav class="hidden lg:flex items-center gap-1 p-1 bg-white/[0.03] rounded-2xl border border-white/5">
-                    <a href="/simulador" class="px-4 py-2 text-[10px] font-black uppercase tracking-widest text-white/40 hover:text-brand-orange hover:bg-brand-orange/10 rounded-xl transition-all">Simulador</a>
+                <nav class="hidden lg:flex items-center gap-1 p-1 bg-slate-100 rounded-2xl border border-slate-200">
+                    <a href="/simulador" class="px-4 py-2 text-[10px] font-black uppercase tracking-widest text-slate-500 hover:text-brand-orange hover:bg-white rounded-xl transition-all">Simulador</a>
                 </nav>
             </div>
 
 			<div class="flex items-center gap-4">
-                <LanguageSwitcher client:load />
-                <button id="menu-toggle" class="lg:hidden p-2 text-white/70 hover:text-brand-orange active:scale-95 transition-all" aria-label="Abrir menú">
+                <button id="menu-toggle" class="lg:hidden p-2 text-slate-600 hover:text-brand-orange active:scale-95 transition-all" aria-label="Abrir menú">
                     <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7" />
                     </svg>
@@ -86,15 +84,15 @@ if (session?.user) {
 					
                     <!-- Central Content (prose) -->
                     <article class="lg:col-span-8 2xl:col-span-9">
-                        <div class="prose prose-invert prose-orange max-w-none 
-                                    prose-headings:font-black prose-headings:tracking-tighter
+                        <div class="prose prose-slate prose-orange max-w-none 
+                                    prose-headings:font-display prose-headings:font-black prose-headings:tracking-tight prose-headings:text-slate-800
                                     prose-h1:text-5xl lg:prose-h1:text-6xl
-                                    prose-p:text-white/60 prose-p:leading-relaxed prose-p:text-lg
-                                    prose-a:text-brand-orange prose-a:no-underline hover:prose-a:underline
-                                    prose-strong:text-white prose-strong:font-bold
-                                    prose-code:text-brand-blue prose-code:bg-brand-blue/10 prose-code:px-1 prose-code:rounded
-                                    prose-pre:bg-[#1a1a1a] prose-pre:border prose-pre:border-white/5 prose-pre:rounded-2xl
-                                    prose-img:rounded-3xl prose-img:border prose-img:border-white/5
+                                    prose-p:text-slate-600 prose-p:leading-relaxed prose-p:text-lg
+                                    prose-a:text-brand-blue prose-a:font-bold prose-a:no-underline hover:prose-a:underline
+                                    prose-strong:text-slate-800 prose-strong:font-bold
+                                    prose-code:text-brand-blue prose-code:bg-brand-blue/10 prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded-lg prose-code:before:content-none prose-code:after:content-none
+                                    prose-pre:bg-slate-900 prose-pre:border prose-pre:border-slate-800 prose-pre:rounded-2xl
+                                    prose-img:rounded-3xl prose-img:border prose-img:border-slate-100
                                     prose-blockquote:border-l-brand-orange prose-blockquote:bg-brand-orange/5 prose-blockquote:py-1 prose-blockquote:px-6 prose-blockquote:rounded-r-xl">
                             <slot />
                         </div>
@@ -109,54 +107,43 @@ if (session?.user) {
                         </div>
 
                         <!-- Navigation Buttons -->
-                        <div class="mt-20 pt-12 border-t border-white/5 flex flex-wrap gap-6 justify-between items-center">
+                        <div class="mt-20 pt-12 border-t border-border-dark flex flex-wrap gap-6 justify-between items-center">
                             {prevLesson ? (
-                                <a href={`/curso/${prevLesson.slug}`} class="group flex flex-col gap-2 p-6 rounded-2xl bg-[#1a1a1a] border border-white/5 transition-all hover:border-brand-orange/30 hover:bg-white/[0.02] max-w-sm flex-1">
-                                    <span class="text-[10px] font-bold uppercase tracking-[0.2em] text-white/20 group-hover:text-brand-orange transition-colors tracking-widest">Anterior</span>
-                                    <span class="text-lg font-black text-white group-hover:translate-x-1 transition-transform">{prevLesson.title}</span>
+                                <a href={`/curso/${prevLesson.slug}`} class="group flex flex-col gap-2 p-6 rounded-2xl bg-white border-2 border-border-dark shadow-[4px_4px_0px_#e2e8f0] hover:shadow-[4px_4px_0px_var(--color-brand-orange)] hover:border-brand-orange transition-all max-w-sm flex-1">
+                                    <span class="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 group-hover:text-brand-orange transition-colors">Anterior</span>
+                                    <span class="text-lg font-display font-bold text-slate-800 group-hover:translate-x-1 transition-transform">{prevLesson.title}</span>
                                 </a>
                             ) : <div></div>}
 
                             {nextLesson ? (
-                                <a href={`/curso/${nextLesson.slug}`} class="group flex flex-col gap-2 p-6 rounded-2xl bg-[#1a1a1a] border border-white/5 transition-all hover:border-brand-orange/30 hover:bg-white/[0.02] text-right max-w-sm flex-1">
-                                    <span class="text-[10px] font-bold uppercase tracking-[0.2em] text-white/20 group-hover:text-brand-orange transition-colors tracking-widest">Siguiente</span>
-                                    <span class="text-lg font-black text-white group-hover:-translate-x-1 transition-transform">{nextLesson.title}</span>
+                                <a href={`/curso/${nextLesson.slug}`} class="group flex flex-col gap-2 p-6 rounded-2xl bg-white border-2 border-border-dark shadow-[4px_4px_0px_#e2e8f0] hover:shadow-[4px_4px_0px_var(--color-brand-orange)] hover:border-brand-orange transition-all text-right max-w-sm flex-1">
+                                    <span class="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 group-hover:text-brand-orange transition-colors">Siguiente</span>
+                                    <span class="text-lg font-display font-bold text-slate-800 group-hover:-translate-x-1 transition-transform">{nextLesson.title}</span>
                                 </a>
                             ) : (
-                                <div class="w-full mt-8 p-10 rounded-[2.5rem] bg-gradient-to-br from-neutral-900 to-black border border-white/10 relative overflow-hidden group">
-                                    <div class="absolute inset-0 bg-[radial-gradient(circle_at_70%_50%,rgba(249,115,22,0.1),transparent_50%)]"></div>
+                                <div class="w-full mt-8 p-10 rounded-[2.5rem] bg-white border-2 border-border-dark shadow-[6px_6px_0px_#e2e8f0] relative overflow-hidden group">
+                                    <div class="absolute inset-0 bg-[radial-gradient(circle_at_70%_50%,rgba(255,171,25,0.05),transparent_50%)]"></div>
                                     <div class="relative z-10 space-y-8">
                                         <div class="space-y-4">
-                                            <h3 class="text-3xl font-black text-white tracking-tighter">¡Felicitaciones! Has completado la teoría.</h3>
-                                            <p class="text-white/40 text-lg font-medium leading-relaxed max-w-2xl">
-                                                Ahora es momento de pasar de la pantalla al hardware. Prepárate para competir implementando el Firmware oficial.
+                                            <h3 class="text-3xl font-display font-bold text-slate-800 tracking-tight">¡Felicitaciones! Has completado la teoría. 🎉</h3>
+                                            <p class="text-slate-500 text-lg font-medium leading-relaxed max-w-2xl">
+                                                Ahora es momento de pasar de la pantalla al hardware. Prepárate para programar tu robot real.
                                             </p>
                                         </div>
                                         
-                                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                            <a href="/simulador" class="flex items-center justify-between p-6 bg-white/5 border border-white/5 rounded-3xl hover:bg-brand-orange hover:text-black transition-all group/btn active:scale-95">
-                                                <div class="flex flex-col">
-                                                    <span class="text-[10px] uppercase font-black tracking-widest opacity-60">Práctica Final</span>
-                                                    <span class="text-xl font-black uppercase tracking-tighter">Simulador PID</span>
-                                                </div>
-                                                <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8 opacity-20 group-hover/btn:opacity-100 transition-opacity" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-                                                </svg>
-                                            </a>
-                                            <a href="/telemetria" class="flex items-center justify-between p-6 bg-white/5 border border-white/5 rounded-3xl hover:bg-brand-blue hover:text-black transition-all group/btn active:scale-95">
-                                                <div class="flex flex-col">
-                                                    <span class="text-[10px] uppercase font-black tracking-widest opacity-60">Análisis Real</span>
-                                                    <span class="text-xl font-black uppercase tracking-tighter">Dashboard de Telemetría</span>
-                                                </div>
-                                                <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8 opacity-20 group-hover/btn:opacity-100 transition-opacity" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z" />
-                                                </svg>
-                                            </a>
-                                        </div>
+                                        <div class="flex justify-center">
+                                             <a href="/simulador" class="flex items-center justify-between gap-6 p-6 w-full max-w-md bg-slate-50 border-2 border-slate-200 rounded-3xl hover:bg-brand-orange hover:text-white hover:border-brand-orange transition-all group/btn active:scale-95 shadow-sm">
+                                                 <div class="flex flex-col text-left">
+                                                     <span class="text-[10px] uppercase font-black tracking-widest text-slate-400 group-hover/btn:text-white/80">Práctica Final</span>
+                                                     <span class="text-xl font-display font-bold text-slate-800 group-hover/btn:text-white">Simulador del Robot</span>
+                                                 </div>
+                                                 <span class="text-3xl opacity-60 group-hover/btn:opacity-100 transition-opacity">🎮</span>
+                                             </a>
+                                         </div>
 
-                                        <div class="pt-6 border-t border-white/5 flex flex-col md:flex-row items-center justify-between gap-6">
-                                            <p class="text-[11px] font-black uppercase tracking-[0.2em] text-white/20 italic">Siguientes Pasos: Descargar Firmware v1.0 -> Competir</p>
-                                            <a href="/index" class="text-xs font-black text-brand-orange hover:text-white transition-colors uppercase tracking-[0.3em]">Volver al Inicio</a>
+                                        <div class="pt-6 border-t border-slate-100 flex flex-col md:flex-row items-center justify-between gap-6">
+                                            <p class="text-[11px] font-black uppercase tracking-[0.2em] text-slate-400 italic">Siguientes Pasos: Descargar Firmware -> Calibrar Sensores</p>
+                                            <a href="/" class="text-xs font-black text-brand-orange hover:text-brand-orange-hover transition-colors uppercase tracking-[0.3em]">Volver al Inicio</a>
                                         </div>
                                     </div>
                                 </div>
@@ -167,13 +154,13 @@ if (session?.user) {
                     <!-- Table of Contents (Right) -->
                     <aside class="hidden lg:block lg:col-span-4 2xl:col-span-3">
                         <div class="sticky top-32 space-y-6">
-                            <div class="px-6 py-4 bg-[#1a1a1a] border border-white/5 rounded-2xl space-y-4">
-                                <h4 class="text-[10px] font-black uppercase tracking-[0.3em] text-white/20">En esta página</h4>
+                            <div class="px-6 py-4 bg-white border border-border-dark rounded-2xl shadow-sm space-y-4">
+                                <h4 class="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">En esta página</h4>
                                 <nav class="flex flex-col gap-3">
                                     {tocHeadings.map(heading => (
                                         <a 
                                             href={`#${heading.slug}`}
-                                            class={`text-sm font-medium transition-all hover:text-brand-orange ${heading.depth === 3 ? 'pl-4 text-white/40' : 'text-white/60'}`}
+                                            class={`text-sm font-medium transition-all hover:text-brand-orange ${heading.depth === 3 ? 'pl-4 text-slate-400' : 'text-slate-600'}`}
                                         >
                                             {heading.text}
                                         </a>
@@ -181,19 +168,19 @@ if (session?.user) {
                                 </nav>
                             </div>
 
-                            <div class="p-6 rounded-2xl bg-brand-blue/5 border border-brand-blue/10 space-y-3">
-                                <div class="w-8 h-8 bg-brand-blue rounded flex items-center justify-center text-black font-bold">?</div>
-                                <h4 class="text-sm font-bold text-white">¿Necesitas ayuda?</h4>
-                                <p class="text-[11px] text-white/40 leading-relaxed">
-                                    Si tienes dudas sobre los fundamentos matemáticos, revisa la sección de materiales.
+                            <div class="p-6 rounded-2xl bg-brand-blue/10 border border-brand-blue/20 space-y-3 shadow-sm">
+                                <div class="w-8 h-8 bg-brand-blue rounded-lg flex items-center justify-center text-white font-bold">?</div>
+                                <h4 class="text-sm font-display font-bold text-slate-800">¿Necesitas ayuda?</h4>
+                                <p class="text-[11px] text-slate-500 leading-relaxed font-semibold">
+                                    Si tienes dudas sobre los fundamentos matemáticos, revisa la sección de materiales o vuelve a leer el divisor de voltaje.
                                 </p>
                             </div>
                         </div>
                     </aside>
 				</div>
 				
-				<footer class="max-w-7xl mx-auto w-full px-6 py-8 border-t border-white/5 text-[10px] text-white/20 uppercase tracking-widest font-bold flex justify-between items-center">
-					<span>© 2024 Soccer Jr. Telemetry System</span>
+				<footer class="max-w-7xl mx-auto w-full px-6 py-8 border-t border-border-dark text-[10px] text-slate-400 uppercase tracking-widest font-bold flex justify-between items-center">
+					<span>© 2026 Academia Seguidor de Luz</span>
 					<span class="text-brand-blue">Open Source Educational Project</span>
 				</footer>
 			</main>

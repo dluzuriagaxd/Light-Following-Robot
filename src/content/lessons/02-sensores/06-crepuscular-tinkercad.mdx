@@ -1,0 +1,88 @@
+---
+title: "6. Interruptor Crepuscular en Tinkercad (LED + LDR)"
+order: 6
+description: "Combina sensores y actuadores simulados: programa al Arduino para encender un LED automáticamente cuando esté oscuro."
+---
+
+import CrepuscularSwitchSim from "../../../components/tools/CrepuscularSwitchSim.jsx";
+
+# 🌙 Lección 6: Interruptor Crepuscular en Tinkercad (LED + LDR)
+
+¡Es hora de tomar decisiones lógicas en nuestro Arduino virtual! En esta práctica combinaremos lo que aprendimos en las lecciones previas: usaremos la lectura analógica de la fotorresistencia en el pin **A0** para decidir cuándo encender o apagar el LED conectado en el pin digital **5**.
+
+Este sistema funciona exactamente igual al alumbrado público de tu ciudad o la pantalla de tu celular que brilla más o menos según la luz del sol: un **interruptor automático sensible a la luz (crepuscular)**.
+
+---
+
+## 📽️ Vídeo-Tutorial: Lógica Condicional en Tinkercad
+Observa el siguiente vídeo para ver cómo estructurar las condiciones lógicas y ajustar el circuito:
+
+<div className="my-6 p-4 rounded-3xl bg-slate-100 border border-slate-200 flex flex-col md:flex-row items-center gap-6 shadow-sm">
+  <div className="w-full md:w-48 aspect-video bg-slate-900 rounded-2xl flex items-center justify-center text-4xl select-none shadow-inner">
+    📺
+  </div>
+  <div className="space-y-2 text-slate-800">
+    <span className="text-[10px] font-black uppercase tracking-widest text-brand-orange">Vídeo 6.1 - Lógica Crepuscular</span>
+    <h4 className="text-base font-extrabold leading-snug">Lógica del Interruptor Crepuscular en Tinkercad</h4>
+    <p className="text-xs text-slate-500 font-medium">Duración estimada: 4 minutos. Muestra de manera interactiva la simulación del circuito completo (LED + LDR) respondiendo a la oscuridad y cómo cambian los condicionales de bloque (SI / SINO) según el valor de umbral.</p>
+  </div>
+</div>
+
+---
+
+## 🛠️ Práctica en Tinkercad: Circuito Combinado (LED + LDR)
+
+Deberás armar un circuito en Tinkercad que una la placa de Arduino, la protoboard, un LED (con su resistencia de 220Ω) y una fotorresistencia LDR (con su resistencia de 10kΩ).
+
+### Captura de Pantalla del Circuito:
+![Circuito LED+LDR en Tinkercad](https://images.unsplash.com/photo-1517430816045-df4b7de11d1d?w=800&auto=format&fit=crop&q=60)
+*Nota: La imagen muestra las dos etapas unidas: la salida digital en el Pin 5 y la lectura analógica del divisor en el Pin A0 compartiendo buses de alimentación comunes.*
+> **📸 Información para la imagen (Para el profesor):**
+> - **Descripción:** Captura de pantalla del circuito interruptor crepuscular completo en Tinkercad, mostrando tanto el LED como la fotorresistencia conectados.
+> - **Dónde guardar:** Directorio `public/images/lessons/`
+> - **Nombre sugerido:** `06-interruptor-crepuscular.webp`
+> - **Tamaño sugerido:** 800x450 píxeles (relación de aspecto 16:9).
+> - **Formato:** `.webp` (es un formato más moderno y ligero que JPG/PNG).
+
+---
+
+## 💻 Programación Lógica (SI / SINO)
+
+En el panel de **Código** en Tinkercad, utilizaremos un bloque condicional **si / si no** para controlar nuestro LED:
+
+1. **La Condición:** Si la lectura analógica en A0 es menor que nuestro **Umbral** (por ejemplo, `400`), significa que está oscuro.
+2. **Acción 1 (SÍ):** Encendemos el LED (Pin 5 en ALTO).
+3. **Acción 2 (NO):** Apagamos el LED (Pin 5 en BAJO).
+
+### Código C++ equivalente de Tinkercad:
+```cpp
+void setup() {
+  pinMode(5, OUTPUT);  // Pin del LED como salida
+  Serial.begin(9600);  // Monitor serial
+}
+
+void loop() {
+  int luz = analogRead(A0); // Leemos el sensor
+  
+  if (luz < 400) {          // Condición de oscuridad
+    digitalWrite(5, HIGH);  // Encendemos el LED
+  } else {
+    digitalWrite(5, LOW);   // Apagamos el LED
+  }
+  delay(100);
+}
+```
+
+---
+
+## 🎮 Simulador Interactivo: Prueba la Lógica Condicional
+Ajusta la posición de la linterna moviendo el deslizador. **Prueba cambiar el umbral de activación escribiendo otro número (ej. 300 o 650) dentro del bloque de programación verde** y observa en qué distancia se apaga o enciende el foco LED:
+
+<CrepuscularSwitchSim client:visible />
+
+---
+
+> [!IMPORTANT]
+> **Pregunta para reflexionar:**
+> Si subes el umbral a **800** en tu código de Tinkercad, ¿necesitarás más oscuridad o menos oscuridad para que el LED se encienda?
+> *Respuesta:* Necesitarás menos oscuridad. Al ser el umbral tan alto, con que haya un poquito de sombra (lectura menor a 800) el LED se encenderá de inmediato. ¡Pruébalo en la simulación!

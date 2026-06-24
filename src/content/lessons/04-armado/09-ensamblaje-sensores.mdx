@@ -1,0 +1,65 @@
+---
+title: "9. Montaje de Sensores y Cableado Final Físico"
+order: 9
+description: "Fija la protoboard de sensores al frente del robot, monta las fotorresistencias y realiza el cableado final compartiendo la tierra común."
+---
+
+# 🛠️ Lección 9: Montaje de Sensores y Cableado Final Físico
+
+¡Tu robot ya tiene estructura física, tracción trasera y sabemos cómo programar los motores! Hoy completaremos toda la etapa de hardware. Agregaremos la protoboard al frente del robot para que funcione como su soporte sensorial (los "ojos" LDR) y realizaremos todo el cableado eléctrico definitivo que unirá los motores, la energía, el Puente H y el Arduino.
+
+En esta clase nos enfocaremos exclusivamente en terminar las conexiones de hardware de forma cuidadosa y prolija. **No escribiremos código todavía.**
+
+---
+
+## 📽️ Vídeo-Tutorial de Conexiones Lógicas y Sensores
+Sigue paso a paso este tutorial para saber exactamente cómo conectar las fotorresistencias en el chasis físico:
+
+<div className="my-6 p-4 rounded-3xl bg-slate-100 border border-slate-200 flex flex-col md:flex-row items-center gap-6 shadow-sm">
+  <div className="w-full md:w-48 aspect-video bg-slate-900 rounded-2xl flex items-center justify-center text-4xl select-none shadow-inner">
+    📺
+  </div>
+  <div className="space-y-2 text-slate-800">
+    <span className="text-[10px] font-black uppercase tracking-widest text-brand-orange">Vídeo 9.1 - Cableado LDR</span>
+    <h4 className="text-base font-extrabold leading-snug">Cableado final y montaje de sensores LDR</h4>
+    <p className="text-xs text-slate-500 font-medium">Duración estimada: 6 minutos. Tutorial físico sobre cómo adherir la protoboard al frente del robot, cablear las fotorresistencias LDR utilizando resistencias fijas de 1kΩ hacia los pines A0 y A1, y juntar las tierras comunes (GND) para tener lecturas analógicas estables.</p>
+  </div>
+</div>
+
+---
+
+## 🛠️ Guía Visual de Conexiones Paso a Paso
+
+Tómate tu tiempo. Sigue estas instrucciones para completar el conexionado de tu robot:
+
+### Paso 1: Fijar la Protoboard Frontal
+* Pega la protoboard pequeña en la parte delantera del chasis de cartón usando cinta doble faz o silicona caliente. Debe quedar centrada al frente para colocar allí los sensores de luz.
+
+### Paso 2: Armar el Circuito de Sensores (Divisor de Voltaje)
+* Inserta las dos fotorresistencias (LDRs) en la protoboard: una al extremo izquierdo y otra al extremo derecho.
+* Conecta una **resistencia de 1000 ohmios (1kΩ)** (marrón-negro-rojo) en serie con una pata de cada fotorresistencia.
+* La pata libre de la fotorresistencia de cada lado se conecta directamente a la línea de alimentación positiva de la protoboard (5V).
+* La pata libre de la resistencia de cada lado se conecta directamente a la línea de tierra de la protoboard (GND).
+* Saca un cable jumper desde la unión intermedia (entre fotorresistencia y resistencia) de cada lado:
+  * El del sensor izquierdo va al pin analógico **A0** del Arduino.
+  * El del sensor derecho va al pin analógico **A1** del Arduino.
+
+### Paso 3: Interconexión de Alimentación y Tierra Común
+* **¡MUY IMPORTANTE!** Conecta la bornera de tierra (GND) del Puente H a uno de los pines **GND** del Arduino. Si no compartes la tierra, las señales lógicas no funcionarán de forma correcta.
+* Conecta la salida de $5\text{V}$ del Puente H al pin **5V** del Arduino (o bien, el cable de alimentación positiva de las pilas al pin **VIN** de Arduino).
+* Conecta el positivo ($5\text{V}$) y negativo (GND) de la protoboard a los respectivos pines de $5\text{V}$ y GND del Arduino.
+
+### Paso 4: Conexión de Señales Lógicas de Control
+* Conecta los pines de entrada **IN1, IN2, IN3 e IN4** del Puente H a los pines digitales **5, 6, 9 y 10** del Arduino Uno, respectivamente, usando cables jumpers Macho-Hembra.
+
+---
+
+> [!IMPORTANT]
+> **Caja de Materiales (Checklist para marcar):**
+> - [ ] Chasis armado con motores y placas fijadas (de la Clase 7)
+> - [ ] Protoboard pequeña
+> - [ ] 2x Fotorresistencias (LDRs)
+> - [ ] 2x Resistencias de 1000 ohmios (1kΩ)
+> - [ ] Cables jumpers Macho-Macho y Macho-Hembra
+> 
+> *Nota: Al finalizar esta sesión, todas las conexiones físicas del robot deben estar completas y revisadas por tu profesor. El robot estará 100% listo para recibir el código del seguidor.*

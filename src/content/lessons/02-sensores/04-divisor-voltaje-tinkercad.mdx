@@ -1,0 +1,74 @@
+---
+title: "4. Entradas Analógicas y Divisor de Voltaje en Tinkercad"
+order: 4
+description: "Aprende cómo funciona una entrada analógica y cómo crear un divisor de tensión básico en Tinkercad."
+---
+
+import LdrVoltageDividerSim from "../../../components/tools/LdrVoltageDividerSim.jsx";
+
+# ⚡ Lección 4: Entradas Analógicas y Divisor de Voltaje en Tinkercad
+
+Hasta ahora, nuestro Arduino solo ha enviado señales de salida (ALTO o BAJO). En esta lección aprenderemos cómo recibir señales del exterior usando las **Entradas Analógicas** (pines **A0** a **A5**). 
+
+Para comprender cómo mide voltajes el Arduino, primero construiremos un circuito simulado llamado **Divisor de Voltaje** utilizando resistencias fijas y un multímetro virtual en Tinkercad.
+
+---
+
+## 💻 Conceptos Clave
+1. **Entradas Analógicas:** A diferencia de las digitales (que leen solo 0V o 5V), las analógicas miden valores intermedios de voltaje (ej. 2.5V). El Arduino traduce ese voltaje a un número entre **0 y 1023** usando su convertidor analógico-digital (ADC).
+2. **Divisor de Voltaje:** Es un circuito en serie que divide el voltaje de entrada (5V) en fracciones proporcionales según los valores de las resistencias utilizadas.
+
+---
+
+## 🛠️ Práctica en Tinkercad: Divisor de Voltaje
+
+Para esta práctica, deberás armar el siguiente esquema de conexiones en Tinkercad:
+
+### Captura de Pantalla del Circuito:
+![Circuito Divisor de Voltaje en Tinkercad](https://images.unsplash.com/photo-1517430816045-df4b7de11d1d?w=800&auto=format&fit=crop&q=60)
+*Nota: La imagen muestra dos resistencias de 10kΩ conectadas en serie sobre la protoboard. El extremo superior se alimenta con 5V, el extremo inferior va a GND, y un cable desde la unión central se conecta al pin A0 y a un multímetro en modo Voltaje.*
+> **📸 Información para la imagen (Para el profesor):**
+> - **Descripción:** Captura de pantalla del esquema en Tinkercad enseñando el conexionado de dos resistencias en serie con un multímetro leyendo el voltaje en el punto central (divisor).
+> - **Dónde guardar:** Directorio `public/images/lessons/`
+> - **Nombre sugerido:** `04-divisor-voltaje.webp`
+> - **Tamaño sugerido:** 800x450 píxeles (relación de aspecto 16:9).
+> - **Formato:** `.webp` (es un formato más moderno y ligero que JPG/PNG).
+
+### Pasos para realizar el montaje:
+1. Coloca un **Arduino Uno R3** y una **Placa de pruebas (protoboard)**.
+2. Conecta **5V** y **GND** de Arduino a los buses positivo y negativo de la protoboard.
+3. Coloca **dos resistencias de 10k ohmios** en serie (colores: marrón, negro, naranja). Una patita de la primera resistencia va a 5V; una patita de la segunda va a GND. Las otras dos patitas se unen en la misma columna.
+4. Conecta el pin analógico **A0** de Arduino a esa columna de unión intermedia.
+5. Arrastra un **Multímetro** virtual, ponlo en modo **Tensión (V)**, y conecta su terminal positivo (+) a la columna intermedia, y su terminal negativo (-) a GND.
+
+---
+
+## 🔬 Simulando y Midiendo el Voltaje
+
+1. Haz clic en **Iniciar Simulación**.
+2. El multímetro debería marcar exactamente **2.50 V**. ¿Por qué? Como ambas resistencias son idénticas (10kΩ cada una), el voltaje de 5V se divide equitativamente a la mitad.
+3. Haz clic en **Código**, selecciona **Texto** y sube este programa para ver qué lee el Arduino:
+
+```cpp
+void setup() {
+  Serial.begin(9600); // Iniciamos el puerto serial
+}
+
+void loop() {
+  int lectura = analogRead(A0); // Leemos el voltaje (0 a 5V) como número (0 a 1023)
+  Serial.println(lectura);      // Imprimimos el número
+  delay(200);
+}
+```
+4. Abre el **Monitor en Serie**. Verás que imprime un número muy cercano a **512** (la mitad exacta de 1023).
+
+---
+
+<LdrVoltageDividerSim client:visible />
+
+---
+
+> [!IMPORTANT]
+> **Reto Analítico:**
+> Si cambias la primera resistencia a una de **20k ohmios** y dejas la segunda en **10k ohmios**, ¿qué voltaje marcará el multímetro y qué número leerá el monitor en serie?
+> *Respuesta:* El voltaje caerá a aproximadamente **1.67V** y el monitor en serie mostrará un valor cercano a **341**. ¡El voltaje medido es directamente proporcional a la resistencia conectada a GND!

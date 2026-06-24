@@ -1,0 +1,86 @@
+---
+title: "7. Motores y Puente H (Conexiones Físicas)"
+order: 7
+description: "Aprende cómo funcionan los motores DC y el Puente H, y construye la estructura física de tu robot pegando los motores y placas al chasis."
+---
+
+import HBridgeSim from "../../../components/tools/HBridgeSim.jsx";
+
+# 🏎️ Lección 7: Motores y Puente H (Conexiones Físicas)
+
+Hasta ahora, hemos controlado luces virtuales y circuitos analógicos de baja potencia. En esta lección daremos el salto más grande de hardware: aprenderemos cómo funcionan los **motores de corriente continua (DC)** y el driver **Puente H L298N**, y comenzaremos el **ensamblaje físico del chasis de nuestro robot**.
+
+Hoy nos enfocaremos enteramente en el ensamble físico y cableado de potencia. ¡Hoy nos convertiremos en mecánicos!
+
+---
+
+## 📽️ Vídeo-Tutorial: Ensamblaje Físico del Chasis
+Sigue paso a paso este tutorial para saber exactamente cómo montar y cablear la etapa de potencia:
+
+<div className="my-6 p-4 rounded-3xl bg-slate-100 border border-slate-200 flex flex-col md:flex-row items-center gap-6 shadow-sm">
+  <div className="w-full md:w-48 aspect-video bg-slate-900 rounded-2xl flex items-center justify-center text-4xl select-none shadow-inner">
+    📺
+  </div>
+  <div className="space-y-2 text-slate-800">
+    <span className="text-[10px] font-black uppercase tracking-widest text-brand-orange">Vídeo 7.1 - Ensamble</span>
+    <h4 className="text-base font-extrabold leading-snug">Conexión Física de la Etapa de Potencia</h4>
+    <p className="text-xs text-slate-500 font-medium">Duración estimada: 7 minutos. Muestra cómo pegar los motores TT, fijar el Arduino Uno y el puente H L298N en el chasis, y realizar las conexiones de alimentación junto al interruptor de encendido.</p>
+  </div>
+</div>
+
+---
+
+## 💻 Conceptos Clave
+* **Motores DC:** Motores que giran cuando reciben electricidad. Si inviertes la polaridad (positivo y negativo), giran en sentido contrario.
+* **Puente H:** Un circuito integrado que permite fluir la corriente en ambas direcciones. Sirve como puente de potencia entre las baterías de alta corriente y el Arduino, protegiendo a este último de quemarse.
+* **Pines de Control (IN1, IN2, IN3, IN4):** Pines digitales del Arduino conectados al Puente H.
+  * Si `IN1 = ALTO` e `IN2 = BAJO`, el motor izquierdo gira hacia **adelante**.
+  * Si `IN1 = BAJO` e `IN2 = ALTO`, el motor izquierdo gira hacia **atrás**.
+  * Si ambos son iguales, el motor se **detiene**.
+
+---
+
+## 🎮 Simulador Interactivo: Funcionamiento del Puente H
+Usa el simulador para hacer clic en las compuertas lógicas (IN1, IN2, IN3, IN4) y observa cómo fluyen las flechas de corriente a través de los transistores del Puente H y hacen girar las llantas virtuales:
+
+<HBridgeSim client:only="react" />
+
+---
+
+## 🛠️ Guía de Armado Físico - Fase 1: Estructura y Potencia
+
+Sigue estas instrucciones de manera ordenada para construir la base de tu robot:
+
+### Paso 1: Cortar el Chasis Base
+* Utiliza una pasta de cuaderno viejo de tapa dura o un trozo de cartón prensado grueso.
+* Con ayuda de una regla y lápiz, marca un rectángulo de **$15\text{ cm}$ de largo por $12\text{ cm}$ de ancho**.
+* Corta con cuidado usando tijeras o estilete (pide ayuda a tu profesor si el material es muy duro).
+
+### Paso 2: Pegar los Motores Amarillos
+* Ubica los dos motores TT amarillos en la parte trasera del chasis (cerca de un extremo lateral).
+* Aplica silicona caliente sobre el cuerpo plano de cada motor y pégalos alineados con los lados del chasis. Las llantas deben sobresalir ligeramente a los costados de la base.
+* Acopla las ruedas a los ejes de los motores.
+
+### Paso 3: Fijar los Cerebros y Conductores
+* Ubica la placa **Arduino Uno R3** en el centro-atrás del chasis. Asegúrala con silicona caliente o cinta aislante doble faz.
+* Ubica el módulo **Puente H L298N** justo detrás del Arduino y fíjalo de la misma manera.
+* Ubica el **portabaterías** en la parte trasera restante para balancear el peso.
+
+### Paso 4: Cableado de Tracción y Energía Básica
+* Conecta los dos cables del motor izquierdo a las borneras OUT1 y OUT2 del Puente H. Asegúralos apretando los tornillos con el destornillador.
+* Conecta los dos cables del motor derecho a las borneras OUT3 y OUT4 del Puente H.
+* Pide ayuda a tu profesor para unir con cinta aislante o soldar el **interruptor basculante de 2 pines** en serie con el cable rojo (positivo) del portabaterías. Esto funcionará como nuestro switch de encendido general.
+
+---
+
+> [!IMPORTANT]
+> **Caja de Materiales (Checklist para marcar):**
+> - [ ] Chasis base cortado (de pasta de cuaderno o cartón prensado, $15\text{ cm} \times 12\text{ cm}$)
+> - [ ] 2x Motores TT amarillos con sus respectivas ruedas
+> - [ ] Placa Arduino Uno R3
+> - [ ] Módulo Puente H L298N
+> - [ ] Portabaterías con 4 pilas AA
+> - [ ] Interruptor basculante (switch de encendido/apagado)
+> - [ ] Silicona caliente, cinta aislante y destornillador
+> 
+> *Nota: En esta clase nos enfocamos únicamente en la construcción física y el cableado de fuerza. No subiremos código al Arduino hoy.*

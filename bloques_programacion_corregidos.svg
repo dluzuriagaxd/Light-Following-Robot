@@ -1,0 +1,90 @@
+<svg id="workspace-svg" xmlns="http://www.w3.org/2000/svg" class="w-full h-full" viewBox="0 0 1000 700" width="1000" height="700">
+        <defs>
+          <!-- Filtro de sombra suave para emular Scratch/MakeCode -->
+          <filter id="block-shadow" x="-5%" y="-5%" width="115%" height="115%">
+            <feDropShadow dx="0" dy="2" stdDeviation="1.5" flood-color="#000000" flood-opacity="0.18"/>
+          </filter>
+          
+          <!-- Estilos tipográficos dentro del SVG para asegurar fidelidad visual al exportar -->
+          <style>
+            .block-text { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 13.5px; font-weight: bold; fill: #FFFFFF; user-select: none; }
+            .dropdown-text { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 13px; font-weight: bold; fill: #FFFFFF; user-select: none; }
+            .input-text { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 13.5px; fill: #111111; text-anchor: middle; user-select: none; }
+          </style>
+        </defs>
+
+        <!-- ==================== GRUPOS INDEPENDIENTES Y ARRASTRABLES ==================== -->
+
+        <!-- 1. BLOQUE: on start -->
+        <g id="bloque-on-start" class="draggable" filter="url(#block-shadow)" transform="translate(50, 50)">
+          <!-- Silueta precisa tipo MakeCode -->
+          <path d="M 0,24 &#10;                   C 0,10 15,0 45,0 &#10;                   C 75,0 90,10 95,24 &#10;                   L 160,24 &#10;                   A 4,4 0 0 1 164,28 &#10;                   L 164,64 &#10;                   A 4,4 0 0 1 160,68 &#10;                   L 44,68 &#10;                   C 42,68 40,70 38,72 &#10;                   L 34,78 &#10;                   C 32,80 28,80 26,78 &#10;                   L 22,72 &#10;                   C 20,70 18,68 16,68 &#10;                   L 16,108 &#10;                   C 18,108 20,110 22,112&#10;                   L 26,118 &#10;                   C 28,120 32,120 34,118 &#10;                   L 38,112 &#10;                   C 40,110 42,108 44,108&#10;                   L 160,108 &#10;                   A 4,4 0 0 1 164,112 &#10;                   L 164,124 &#10;                   A 4,4 0 0 1 160,128 &#10;                   L 4,128 &#10;                   A 4,4 0 0 1 0,124 &#10;                   Z" fill="#FF9F1C" stroke="#E08600" stroke-width="1"/>
+          <text x="16" y="52" class="block-text">on start</text>
+        </g>
+
+        <!-- 2. BLOQUE: forever (Con desfase horizontal corregido de 16px en conectores internos) -->
+        <g id="bloque-forever-contenedor" class="draggable" filter="url(#block-shadow)" transform="translate(50, 230)">
+          <!-- Contenedor exterior 'forever' alineado matemáticamente -->
+          <path d="M 0,24 &#10;                   C 0,10 15,0 45,0 &#10;                   C 75,0 90,10 95,24 &#10;                   L 160,24 &#10;                   A 4,4 0 0 1 164,28 &#10;                   L 164,64 &#10;                   A 4,4 0 0 1 160,68 &#10;                   L 60,68 &#10;                   C 58,68 56,70 54,72 &#10;                   L 50,78 &#10;                   C 48,80 44,80 42,78 &#10;                   L 38,72 &#10;                   C 36,70 34,68 32,68 &#10;                   L 16,68 &#10;                   L 16,252 &#10;                   L 32,252 &#10;                   C 34,252 36,254 38,256&#10;                   L 42,262 &#10;                   C 44,264 48,264 50,262 &#10;                   L 54,256 &#10;                   C 56,254 58,252 60,252&#10;                   L 160,252 &#10;                   A 4,4 0 0 1 164,256 &#10;                   L 164,268 &#10;                   A 4,4 0 0 1 160,272 &#10;                   L 4,272 &#10;                   A 4,4 0 0 1 0,268 &#10;                   Z" fill="#FF9F1C" stroke="#E08600" stroke-width="1"/>
+          <text x="16" y="52" class="block-text">forever</text>
+        </g>
+
+        <!-- 3. SUB-BLOQUE INTERNO: set built-in LED to HIGH -->
+        <g id="bloque-led-high" class="draggable" filter="url(#block-shadow)" transform="translate(66, 298)">
+          <path d="M 0,0 &#10;                   L 16,0 &#10;                   C 18,0 20,2 22,4 &#10;                   L 26,10 &#10;                   C 28,12 32,12 34,10 &#10;                   L 38,4 &#10;                   C 40,2 42,0 44,0 &#10;                   L 246,0 &#10;                   A 4,4 0 0 1 250,4 &#10;                   L 250,42 &#10;                   A 4,4 0 0 1 246,46 &#10;                   L 44,46 &#10;                   C 42,46 40,48 38,50 &#10;                   L 34,56 &#10;                   C 32,58 28,58 26,56 &#10;                   L 22,50 &#10;                   C 20,48 18,46 16,46 &#10;                   L 4,46 &#10;                   A 4,4 0 0 1 0,42 &#10;                   Z" fill="#4C97FF" stroke="#3373CC" stroke-width="1"/>
+          <text x="12" y="28" class="block-text">set built-in LED to</text>
+          <!-- Campo Dropdown HIGH -->
+          <g transform="translate(145, 8)">
+            <rect width="90" height="30" rx="4" fill="#2872E2" stroke="#1F5BB8" stroke-width="1"/>
+            <text x="12" y="20" class="dropdown-text">HIGH</text>
+            <polygon points="70,12 78,12 74,18" fill="#FFFFFF"/>
+          </g>
+        </g>
+
+        <!-- 4. SUB-BLOQUE INTERNO: wait 1 secs (Primero) -->
+        <g id="bloque-wait-1" class="draggable" filter="url(#block-shadow)" transform="translate(66, 344)">
+          <path d="M 0,0 &#10;                   L 16,0 &#10;                   C 18,0 20,2 22,4 &#10;                   L 26,10 &#10;                   C 28,12 32,12 34,10 &#10;                   L 38,4 &#10;                   C 40,2 42,0 44,0 &#10;                   L 186,0 &#10;                   A 4,4 0 0 1 190,4 &#10;                   L 190,42 &#10;                   A 4,4 0 0 1 186,46 &#10;                   L 44,46 &#10;                   C 42,46 40,48 38,50 &#10;                   L 34,56 &#10;                   C 32,58 28,58 26,56 &#10;                   L 22,50 &#10;                   C 20,48 18,46 16,46 &#10;                   L 4,46 &#10;                   A 4,4 0 0 1 0,42 &#10;                   Z" fill="#FF9F1C" stroke="#E08600" stroke-width="1"/>
+          <text x="12" y="28" class="block-text">wait</text>
+          <!-- Entrada numérica -->
+          <g transform="translate(50, 8)">
+            <rect width="42" height="30" rx="15" fill="#FFFFFF" stroke="#D3D6DB" stroke-width="1"/>
+            <text x="21" y="20" class="input-text">1</text>
+          </g>
+          <!-- Dropdown secs -->
+          <g transform="translate(100, 8)">
+            <rect width="80" height="30" rx="4" fill="#E08600"/>
+            <text x="12" y="20" class="dropdown-text">secs</text>
+            <polygon points="60,12 68,12 64,18" fill="#FFFFFF"/>
+          </g>
+        </g>
+
+        <!-- 5. SUB-BLOQUE INTERNO: set built-in LED to LOW -->
+        <g id="bloque-led-low" class="draggable" filter="url(#block-shadow)" transform="translate(66, 390)">
+          <path d="M 0,0 &#10;                   L 16,0 &#10;                   C 18,0 20,2 22,4 &#10;                   L 26,10 &#10;                   C 28,12 32,12 34,10 &#10;                   L 38,4 &#10;                   C 40,2 42,0 44,0 &#10;                   L 246,0 &#10;                   A 4,4 0 0 1 250,4 &#10;                   L 250,42 &#10;                   A 4,4 0 0 1 246,46 &#10;                   L 44,46 &#10;                   C 42,46 40,48 38,50 &#10;                   L 34,56 &#10;                   C 32,58 28,58 26,56 &#10;                   L 22,50 &#10;                   C 20,48 18,46 16,46 &#10;                   L 4,46 &#10;                   A 4,4 0 0 1 0,42 &#10;                   Z" fill="#4C97FF" stroke="#3373CC" stroke-width="1"/>
+          <text x="12" y="28" class="block-text">set built-in LED to</text>
+          <!-- Campo Dropdown LOW -->
+          <g transform="translate(145, 8)">
+            <rect width="90" height="30" rx="4" fill="#2872E2" stroke="#1F5BB8" stroke-width="1"/>
+            <text x="12" y="20" class="dropdown-text">LOW</text>
+            <polygon points="70,12 78,12 74,18" fill="#FFFFFF"/>
+          </g>
+        </g>
+
+        <!-- 6. SUB-BLOQUE INTERNO: wait 1 secs (Segundo) -->
+        <g id="bloque-wait-2" class="draggable" filter="url(#block-shadow)" transform="translate(66, 436)">
+          <path d="M 0,0 &#10;                   L 16,0 &#10;                   C 18,0 20,2 22,4 &#10;                   L 26,10 &#10;                   C 28,12 32,12 34,10 &#10;                   L 38,4 &#10;                   C 40,2 42,0 44,0 &#10;                   L 186,0 &#10;                   A 4,4 0 0 1 190,4 &#10;                   L 190,42 &#10;                   A 4,4 0 0 1 186,46 &#10;                   L 44,46 &#10;                   C 42,46 40,48 38,50 &#10;                   L 34,56 &#10;                   C 32,58 28,58 26,56 &#10;                   L 22,50 &#10;                   C 20,48 18,46 16,46 &#10;                   L 4,46 &#10;                   A 4,4 0 0 1 0,42 &#10;                   Z" fill="#FF9F1C" stroke="#E08600" stroke-width="1"/>
+          <text x="12" y="28" class="block-text">wait</text>
+          <!-- Entrada numérica -->
+          <g transform="translate(50, 8)">
+            <rect width="42" height="30" rx="15" fill="#FFFFFF" stroke="#D3D6DB" stroke-width="1"/>
+            <text x="21" y="20" class="input-text">1</text>
+          </g>
+          <!-- Dropdown secs -->
+          <g transform="translate(100, 8)">
+            <rect width="80" height="30" rx="4" fill="#E08600"/>
+            <text x="12" y="20" class="dropdown-text">secs</text>
+            <polygon points="60,12 68,12 64,18" fill="#FFFFFF"/>
+          </g>
+        </g>
+
+      </svg>

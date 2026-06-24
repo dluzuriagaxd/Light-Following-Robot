@@ -1,0 +1,108 @@
+---
+title: "8. Introducción a SteamakersBlocks y Programación de Motores"
+order: 8
+description: "Regístrate en SteamakersBlocks, ingresa al aula del docente y programa tus primeras funciones de control para mover motores físicos."
+---
+
+# 🤖 Lección 8: Introducción a SteamakersBlocks y Programación de Motores
+
+¡Es hora de programar los motores de nuestro robot real! En esta lección utilizaremos la herramienta de programación por bloques **SteamakersBlocks** para dar instrucciones de movimiento. 
+
+Aprenderemos a estructurar nuestro código de dos formas: primero, programando el movimiento directo en el bucle principal (`loop`), y segundo, ordenando nuestro código mediante **funciones personalizadas** para que sea profesional y modular.
+
+---
+
+## 📽️ Vídeo-Tutoriales Cortos y Detallados
+
+Para facilitar tu aprendizaje, revisa estos tres vídeos breves organizados por etapas:
+
+### 📺 Vídeo 8.1 - Registro e Ingreso al Aula Virtual
+* Muestra cómo crear tu cuenta estudiantil en SteamakersBlocks y asociar tu perfil al código de aula provisto por tu profesor para compartir tus avances.
+*(Placeholder para vídeo 8.1)*
+
+### 📺 Vídeo 8.2 - Primer Código de Movimiento en Loop
+* Explicación de cómo configurar las salidas digitales de los motores y hacerlos girar directamente dentro del bloque principal de ejecución repetitiva (`loop`).
+*(Placeholder para vídeo 8.2)*
+
+### 📺 Vídeo 8.3 - Creación de Funciones de Tracción
+* Cómo crear bloques especiales (Funciones) para que con un solo bloque llamado `adelante()` o `stop()` el robot ejecute múltiples instrucciones complejas de velocidad y dirección.
+*(Placeholder para vídeo 8.3)*
+
+---
+
+## 🏎️ Paso 1: Control de Motores Directo en el Loop
+
+El Puente H L298N está conectado a los pines digitales de nuestro Arduino Uno (IN1, IN2, IN3, IN4). 
+Para mover los motores en el bucle principal, debemos configurar los pines de la siguiente forma:
+
+- **Motor Izquierdo (IN1 e IN2):**
+  - **Adelante:** IN1 en ALTO, IN2 en BAJO.
+  - **Atrás:** IN1 en BAJO, IN2 en ALTO.
+- **Motor Derecho (IN3 e IN4):**
+  - **Adelante:** IN3 en ALTO, IN4 en BAJO.
+  - **Atrás:** IN3 en BAJO, IN4 en ALTO.
+
+### Ejemplo de código directo en el Loop:
+```cpp
+void loop() {
+  // Mover hacia adelante a toda velocidad
+  digitalWrite(5, HIGH);  // IN1
+  digitalWrite(6, LOW);   // IN2
+  digitalWrite(9, HIGH);  // IN3
+  digitalWrite(10, LOW);  // IN4
+  delay(2000);            // Avanza por 2 segundos
+
+  // Detener
+  digitalWrite(5, LOW);
+  digitalWrite(6, LOW);
+  digitalWrite(9, LOW);
+  digitalWrite(10, LOW);
+  delay(1000);            // Detenido por 1 segundo
+}
+```
+
+---
+
+## 🛠️ Paso 2: Abstracción Mediante Funciones Personalizadas
+
+Escribir todos los pines cada vez que queremos que el robot gire es largo y puede provocar errores. Para solucionarlo, usaremos **Funciones**. Una función es un contenedor con un nombre (ej. `adelante`) que ejecuta un grupo de bloques cuando lo llamamos.
+
+En SteamakersBlocks, crea las siguientes funciones:
+
+1. **`adelante(int velocidad)`**: Configura los pines para que ambas ruedas giren al frente.
+2. **`atras(int velocidad)`**: Configura los pines para retroceder.
+3. **`izquierda(int velocidad)`**: Gira la rueda derecha hacia adelante y la izquierda hacia atrás (giro rápido).
+4. **`derecha(int velocidad)`**: Gira la rueda izquierda hacia adelante y la derecha hacia atrás.
+5. **`detener()`**: Apaga todas las señales lógicas hacia el Puente H.
+
+### Ejemplo del programa simplificado con funciones:
+```cpp
+// Definición de la función adelante
+void adelante(int velocidad) {
+  analogWrite(5, velocidad); // Control de velocidad PWM
+  digitalWrite(6, LOW);
+  analogWrite(9, velocidad);
+  digitalWrite(10, LOW);
+}
+
+// Definición de la función detener
+void detener() {
+  digitalWrite(5, LOW);
+  digitalWrite(6, LOW);
+  digitalWrite(9, LOW);
+  digitalWrite(10, LOW);
+}
+
+void loop() {
+  adelante(150); // El robot avanza suavemente
+  delay(2000);
+  detener();
+  delay(1000);
+}
+```
+
+---
+
+> [!TIP]
+> **Reto en Clase:**
+> Intenta programar una rutina en bloques donde tu robot avance hacia adelante por 2 segundos, luego gire a la derecha por 1 segundo y finalmente se detenga. Recuerda que usar funciones hará que tu bloque principal sea súper fácil de leer.
