@@ -47,20 +47,39 @@ export const GET: APIRoute = async ({ locals, url }) => {
     // Enrich with profile names
     const userIds = [...new Set((data ?? []).map((r: any) => r.user_id))];
     let profiles: any[] = [];
+    let progressData: any[] = [];
+
     if (userIds.length > 0) {
         const { data: profileData } = await supabase
             .from("user_profile")
             .select("user_id, full_name, paralelo")
             .in("user_id", userIds);
         profiles = profileData ?? [];
+
+        const { data: progData } = await supabase
+            .from("user_activity_progress")
+            .select("user_id, activity_id, approval_status")
+            .in("user_id", userIds);
+        progressData = progData ?? [];
     }
 
     const profileMap = Object.fromEntries(profiles.map((p: any) => [p.user_id, p]));
-    const enriched = (data ?? []).map((r: any) => ({
-        ...r,
-        student_name: profileMap[r.user_id]?.full_name ?? "Desconocido",
-        paralelo: profileMap[r.user_id]?.paralelo ?? "-",
-    }));
+    const progressMap = {};
+    progressData.forEach((p: any) => {
+        progressMap[`${p.user_id}_${p.activity_id}`] = p.approval_status;
+    });
+
+    const enriched = (data ?? []).map((r: any) => {
+        const activityId = `lesson-${r.lesson_slug.replace(/\//g, "-")}`;
+        const approvalStatus = progressMap[`${r.user_id}_${activityId}`] || "not_submitted";
+        return {
+            ...r,
+            student_name: profileMap[r.user_id]?.full_name ?? "Desconocido",
+            paralelo: profileMap[r.user_id]?.paralelo ?? "-",
+            approval_status: approvalStatus,
+            activity_id: activityId,
+        };
+    });
 
     return new Response(JSON.stringify({ reflections: enriched }), {
         status: 200,

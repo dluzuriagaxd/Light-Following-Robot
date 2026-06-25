@@ -48,20 +48,55 @@ if (user && Astro.locals.supabase) {
 }
 
 // Get student progress from DB
-let progressMap: Record<string, string> = {}; // slug -> status
+let progressMap: Record<string, any> = {}; // slug -> { status, approval_status }
+let activitiesMap: Record<string, boolean> = {}; // id -> requires_manual_approval
+
 if (user && Astro.locals.supabase) {
     try {
-        const { data } = await Astro.locals.supabase
+        // Fetch progress
+        const { data: progData } = await Astro.locals.supabase
             .from("user_activity_progress")
-            .select("activity_id, status")
+            .select("activity_id, status, approval_status")
             .eq("user_id", user.id);
-        if (data) {
-            data.forEach((row: any) => {
-                progressMap[row.activity_id] = row.status;
+        if (progData) {
+            progData.forEach((row: any) => {
+                progressMap[row.activity_id] = { status: row.status, approval_status: row.approval_status };
+            });
+        }
+
+        // Fetch activities
+        const { data: actData } = await Astro.locals.supabase
+            .from("activities")
+            .select("id, requires_manual_approval");
+        if (actData) {
+            actData.forEach((row: any) => {
+                activitiesMap[row.id] = row.requires_manual_approval;
             });
         }
     } catch (e) {
         // Graceful degradation
+    }
+}
+
+let userParaleloName = null;
+let currentSessionDate = new Date();
+let sessionDates = [];
+
+if (user && Astro.locals.supabase && role === "student") {
+    try {
+        const { data: profile } = await Astro.locals.supabase.from("user_profile").select("paralelo").eq("user_id", user.id).single();
+        if (profile?.paralelo) {
+            userParaleloName = profile.paralelo;
+            const { data: parData } = await Astro.locals.supabase.from("paralelos").select("id").eq("name", userParaleloName).single();
+            if (parData?.id) {
+                const { data: sessData } = await Astro.locals.supabase.from("class_sessions").select("session_date").eq("paralelo_id", parData.id).order("session_date");
+                if (sessData) {
+                    sessionDates = sessData.map((s: any) => new Date(s.session_date));
+                }
+            }
+        }
+    } catch (e) {
+        // Ignore errors
     }
 }
 
@@ -318,55 +353,97 @@ const displayName = user?.user_metadata?.full_name ?? user?.email?.split("@")[0]
                                         <span>{mod.label}</span>
                                     </div>
                                     <div class="space-y-1 ml-2 border-l-2 border-slate-100 pl-2">
-                                        {mod.lessons.map((lesson) => {
-                                            const lessonSlug = lesson.slug;
-                                            const isLessonActive = currentPath.includes(lessonSlug);
-                                            
-                                            // Check if lesson is visible (default: visible unless explicitly hidden)
-                                            const isVisible = lessonVisibility[lessonSlug] !== false;
-                                            
-                                            // Check progress
-                                            const activityId = `lesson-${lessonSlug.replace(/\//g, "-")}`;
-                                            const lessonStatus = progressMap[activityId];
-                                            const isCompleted = lessonStatus === "completed";
+                                        {(() => {
+                                            let previousLessonApproved = true;
 
-                                            // Guests see title but no link to content
-                                            if (!user) {
+                                            return mod.lessons.map((lesson, idx) => {
+                                                const lessonSlug = lesson.slug;
+                                                const isLessonActive = currentPath.includes(lessonSlug);
+                                                
+                                                // 1. Check if lesson is explicitly hidden by teacher
+                                                const isVisible = lessonVisibility[lessonSlug] !== false;
+                                                
+                                                // 2. Check progress & approval status
+                                                const activityId = `lesson-${lessonSlug.replace(/\//g, "-")}`;
+                                                const progressObj = progressMap[activityId] || {};
+                                                const lessonStatus = progressObj.status;
+                                                const approvalStatus = progressObj.approval_status;
+                                                const isCompleted = lessonStatus === "completed";
+                                                const requiresApproval = activitiesMap[activityId] ?? true;
+
+                                                // A lesson is considered "Verde" (approved/passed) if:
+                                                // It requires manual approval AND is 'approved'
+                                                // OR it doesn't require manual approval AND is 'completed'
+                                                const isVerde = (requiresApproval && approvalStatus === 'approved') || (!requiresApproval && isCompleted);
+
+                                                // 3. Date-based gating
+                                                // We find the overall index of this lesson across all modules to map to week/session
+                                                const overallIndex = allLessons.findIndex(l => l.slug === lessonSlug);
+                                                let dateLocked = false;
+                                                if (sessionDates.length > 0 && overallIndex >= 0) {
+                                                    const sessionDate = sessionDates[overallIndex];
+                                                    if (sessionDate && new Date() < sessionDate) {
+                                                        dateLocked = true;
+                                                    }
+                                                }
+
+                                                // Evaluate locked status
+                                                let isLocked = false;
+                                                if (!isTeacherOrAdmin) {
+                                                    if (!isVisible) isLocked = true;
+                                                    else if (dateLocked) isLocked = true;
+                                                    else if (!previousLessonApproved) isLocked = true;
+                                                }
+
+                                                // Guests see title but no link to content
+                                                if (!user) {
+                                                    return (
+                                                        <div class="flex items-center gap-2 px-3 py-2 text-xs font-bold rounded-lg text-slate-400 cursor-default">
+                                                            <span class="text-xs">🔒</span>
+                                                            <span>{lesson.data.title}</span>
+                                                        </div>
+                                                    );
+                                                }
+
+                                                // If locked
+                                                if (isLocked) {
+                                                    previousLessonApproved = isVerde;
+                                                    return (
+                                                        <div class="flex items-center gap-2 px-3 py-2 text-xs font-bold rounded-lg text-slate-400 cursor-default" title={dateLocked ? "Todavía no es la fecha de esta clase" : "Debes aprobar la lección anterior"}>
+                                                            <span class="text-xs">🔒</span>
+                                                            <span class="opacity-60">{lesson.data.title}</span>
+                                                        </div>
+                                                    );
+                                                }
+
+                                                // Status Icon logic
+                                                let statusIcon = "○";
+                                                if (isTeacherOrAdmin && !isVisible) statusIcon = "👁️";
+                                                else if (isVerde) statusIcon = "✅";
+                                                else if (approvalStatus === 'pending') statusIcon = "⏳";
+                                                else if (approvalStatus === 'rejected') statusIcon = "❌";
+                                                else if (isCompleted) statusIcon = "✅";
+
+                                                previousLessonApproved = isVerde;
+
                                                 return (
-                                                    <div class="flex items-center gap-2 px-3 py-2 text-xs font-bold rounded-lg text-slate-400 cursor-default">
-                                                        <span class="text-xs">🔒</span>
-                                                        <span>{lesson.data.title}</span>
-                                                    </div>
+                                                    <a
+                                                        href={`/curso/${lessonSlug}`}
+                                                        class:list={[
+                                                            "flex items-center gap-2 px-3 py-2 text-xs font-bold rounded-lg transition-all duration-200 group relative",
+                                                            isLessonActive
+                                                                ? `${theme.itemActive} font-extrabold`
+                                                                : "text-slate-600 hover:text-slate-900 hover:bg-slate-50",
+                                                        ]}
+                                                    >
+                                                        <span class="text-xs shrink-0">
+                                                            {statusIcon}
+                                                        </span>
+                                                        <span class="relative z-10">{lesson.data.title}</span>
+                                                    </a>
                                                 );
-                                            }
-
-                                            // Lesson hidden by teacher → show lock (only students see it; teachers see all)
-                                            if (!isVisible && !isTeacherOrAdmin) {
-                                                return (
-                                                    <div class="flex items-center gap-2 px-3 py-2 text-xs font-bold rounded-lg text-slate-400 cursor-default">
-                                                        <span class="text-xs">🔒</span>
-                                                        <span class="line-through opacity-60">{lesson.data.title}</span>
-                                                    </div>
-                                                );
-                                            }
-
-                                            return (
-                                                <a
-                                                    href={`/curso/${lessonSlug}`}
-                                                    class:list={[
-                                                        "flex items-center gap-2 px-3 py-2 text-xs font-bold rounded-lg transition-all duration-200 group relative",
-                                                        isLessonActive
-                                                            ? `${theme.itemActive} font-extrabold`
-                                                            : "text-slate-600 hover:text-slate-900 hover:bg-slate-50",
-                                                    ]}
-                                                >
-                                                    <span class="text-xs shrink-0">
-                                                        {isCompleted ? "✅" : isTeacherOrAdmin && !isVisible ? "👁️" : "○"}
-                                                    </span>
-                                                    <span class="relative z-10">{lesson.data.title}</span>
-                                                </a>
-                                            );
-                                        })}
+                                            });
+                                        })()}
                                     </div>
                                 </div>
                             );

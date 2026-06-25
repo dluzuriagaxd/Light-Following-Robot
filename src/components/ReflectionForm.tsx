@@ -18,6 +18,7 @@ export default function ReflectionForm({ lessonSlug, questions }: ReflectionForm
     const [loading, setLoading] = useState(false);
     const [checking, setChecking] = useState(true);
     const [submitted, setSubmitted] = useState(false);
+    const [approvalStatus, setApprovalStatus] = useState<string>("not_submitted");
     const [previousAnswers, setPreviousAnswers] = useState<Record<string, string> | null>(null);
     const [error, setError] = useState<string | null>(null);
 
@@ -34,6 +35,7 @@ export default function ReflectionForm({ lessonSlug, questions }: ReflectionForm
                     setPreviousAnswers(prev);
                     setSubmitted(true);
                 }
+                if (data.approval_status) setApprovalStatus(data.approval_status);
             })
             .catch(() => {})
             .finally(() => setChecking(false));
@@ -70,8 +72,15 @@ export default function ReflectionForm({ lessonSlug, questions }: ReflectionForm
             });
             const data = await res.json() as any;
             if (!res.ok) throw new Error(data.error || "Error al guardar");
+            
             setSubmitted(true);
             setPreviousAnswers(answers);
+            
+            // Re-fetch to get updated approval status
+            const statusRes = await fetch(`/api/reflections/submit?lesson_slug=${encodeURIComponent(lessonSlug)}`);
+            const statusData = await statusRes.json();
+            if (statusData.approval_status) setApprovalStatus(statusData.approval_status);
+            
         } catch (err: any) {
             setError(err.message || "Ocurrió un error. Intenta de nuevo.");
         } finally {
@@ -88,26 +97,29 @@ export default function ReflectionForm({ lessonSlug, questions }: ReflectionForm
         );
     }
 
-    if (submitted && previousAnswers) {
+    if (submitted && previousAnswers && approvalStatus !== 'rejected') {
+        const isApproved = approvalStatus === 'approved';
+        const isPending = approvalStatus === 'pending';
+
         return (
-            <div className="my-8 p-5 bg-green-50 border-2 border-green-200 rounded-3xl font-sans">
+            <div className={`my-8 p-5 border-2 rounded-3xl font-sans ${isApproved ? 'bg-green-50 border-green-200' : 'bg-yellow-50 border-yellow-200'}`}>
                 <div className="flex items-center gap-3 mb-4">
-                    <div className="w-8 h-8 bg-green-100 rounded-xl flex items-center justify-center text-green-600 text-lg">
-                        ✅
+                    <div className={`w-8 h-8 rounded-xl flex items-center justify-center text-lg ${isApproved ? 'bg-green-100 text-green-600' : 'bg-yellow-100 text-yellow-600'}`}>
+                        {isApproved ? '✅' : '⏳'}
                     </div>
                     <div>
-                        <h3 className="text-sm font-black text-green-800">
-                            ¡Lección completada! Tu reflexión fue guardada.
+                        <h3 className={`text-sm font-black ${isApproved ? 'text-green-800' : 'text-yellow-800'}`}>
+                            {isApproved ? '¡Lección Aprobada!' : 'En revisión por el profesor'}
                         </h3>
-                        <p className="text-xs text-green-600 font-semibold">
-                            Tu profesor podrá ver tus respuestas.
+                        <p className={`text-xs font-semibold ${isApproved ? 'text-green-600' : 'text-yellow-600'}`}>
+                            {isApproved ? 'Puedes continuar con la siguiente lección.' : 'Tu profesor debe aprobar tus respuestas antes de continuar.'}
                         </p>
                     </div>
                 </div>
                 <div className="space-y-3">
                     {questions.map((q) => (
-                        <div key={q.key} className="p-3 bg-white border border-green-100 rounded-2xl">
-                            <p className="text-[10px] font-black text-green-700 uppercase tracking-widest mb-1">
+                        <div key={q.key} className={`p-3 bg-white border rounded-2xl ${isApproved ? 'border-green-100' : 'border-yellow-100'}`}>
+                            <p className={`text-[10px] font-black uppercase tracking-widest mb-1 ${isApproved ? 'text-green-700' : 'text-yellow-700'}`}>
                                 {q.question}
                             </p>
                             <p className="text-sm text-slate-700 font-semibold leading-relaxed">
@@ -129,10 +141,10 @@ export default function ReflectionForm({ lessonSlug, questions }: ReflectionForm
                 </div>
                 <div>
                     <h3 className="text-sm font-black text-slate-800">
-                        Bitácora de Reflexión
+                        {approvalStatus === 'rejected' ? '❌ Reflexión Rechazada' : 'Bitácora de Reflexión'}
                     </h3>
                     <p className="text-[10px] text-slate-500 font-semibold">
-                        Responde para marcar esta lección como completada. Tu profesor podrá leer tus respuestas.
+                        {approvalStatus === 'rejected' ? 'Tu profesor rechazó tus respuestas anteriores. Por favor, corrígelas y vuelve a enviar.' : 'Responde para marcar esta lección como completada. Tu profesor podrá leer tus respuestas.'}
                     </p>
                 </div>
             </div>

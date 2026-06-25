@@ -53,13 +53,24 @@ export const POST: APIRoute = async ({ locals, request }) => {
         });
     }
 
-    // Also mark lesson as completed in progress
+    // Check if the activity requires manual approval
     const activityId = `lesson-${lesson_slug.replace(/\//g, "-")}`;
+    const { data: activityData } = await supabase
+        .from("activities")
+        .select("requires_manual_approval")
+        .eq("id", activityId)
+        .single();
+    
+    const requiresApproval = activityData?.requires_manual_approval ?? true;
+    const approvalStatus = requiresApproval ? "pending" : "approved";
+
+    // Also mark lesson as completed in progress
     await supabase.from("user_activity_progress").upsert(
         {
             user_id: user.id,
             activity_id: activityId,
             status: "completed",
+            approval_status: approvalStatus,
             completed_at: new Date().toISOString(),
             last_visited_at: new Date().toISOString(),
             progress_percentage: 100,
@@ -105,7 +116,18 @@ export const GET: APIRoute = async ({ locals, url }) => {
         });
     }
 
-    return new Response(JSON.stringify({ answers: data }), {
+    const activityId = `lesson-${lesson_slug.replace(/\//g, "-")}`;
+    const { data: progData } = await supabase
+        .from("user_activity_progress")
+        .select("approval_status")
+        .eq("user_id", user.id)
+        .eq("activity_id", activityId)
+        .single();
+
+    return new Response(JSON.stringify({ 
+        answers: data,
+        approval_status: progData?.approval_status || "not_submitted"
+    }), {
         status: 200,
         headers: { "Content-Type": "application/json" },
     });

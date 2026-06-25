@@ -32,99 +32,157 @@ const SYLLABUS = [
   { week: 7, title: "Clase 7: Lógica del Seguidor y Calibración", slug: "04-armado/10-seguidor-logica-1", preReading: "Repaso de lógica condicional.", objectives: ["Comprender el algoritmo mediante el diagrama de flujo.", "Escribir el código en bloques.", "Cargar y calibrar en pista."], materials: [SUPPLIES.arduino, SUPPLIES.flashlight], socratic: [{ q: "El robot se desvía constantemente. ¿Cómo calibramos?", a: "Ajustando la velocidad base de los motores y el umbral analógico." }], tips: "Si el robot retrocede, la polaridad de motores o la lógica está invertida.", reminder: "¡Robots listos! Organizar carreras de laberintos de luz." },
 ];
 
-// ─── Tabs ──────────────────────────────────────────────────────────────────────
-
-const TABS = [
-  { id: "planner", label: "📅 Planificación", icon: "📅" },
-  { id: "students", label: "👩‍🎓 Estudiantes", icon: "👩‍🎓" },
-  { id: "reflections", label: "🪞 Reflexiones", icon: "🪞" },
-  { id: "visibility", label: "👁️ Visibilidad", icon: "👁️" },
-];
-
-// ─── Helper ───────────────────────────────────────────────────────────────────
-
 const ALL_LESSON_SLUGS = SYLLABUS.map(s => s.slug);
 
-// ─── Main Component ───────────────────────────────────────────────────────────
+const TABS = [
+  { id: "paralelos", label: "👥 Paralelos", icon: "👥" },
+  { id: "calendar", label: "📅 Calendario", icon: "📅" },
+  { id: "attendance", label: "✅ Asistencia", icon: "✅" },
+  { id: "students", label: "📈 Progreso", icon: "📈" },
+  { id: "reflections", label: "🪞 Reflexiones", icon: "🪞" },
+  { id: "visibility", label: "👁️ Configuración", icon: "👁️" },
+];
 
 export default function TeacherPortal() {
-  const [activeTab, setActiveTab] = useState("planner");
-  const [activeWeekTab, setActiveWeekTab] = useState(0);
-  const [startDate, setStartDate] = useState("2026-08-10");
-  const [calculatedDates, setCalculatedDates] = useState([]);
-
-  // Students
+  const [activeTab, setActiveTab] = useState("paralelos");
+  const [paralelos, setParalelos] = useState([]);
+  const [selectedParalelo, setSelectedParalelo] = useState("");
+  const [sessions, setSessions] = useState([]);
   const [students, setStudents] = useState([]);
-  const [studentsLoading, setStudentsLoading] = useState(false);
-  const [paralelloFilter, setParalelloFilter] = useState("");
-
-  // Reflections
   const [reflections, setReflections] = useState([]);
-  const [reflectionsLoading, setReflectionsLoading] = useState(false);
-  const [reflectionLessonFilter, setReflectionLessonFilter] = useState("");
-
-  // Visibility
   const [visibility, setVisibility] = useState({});
-  const [visibilityLoading, setVisibilityLoading] = useState(false);
-  const [savingSlug, setSavingSlug] = useState(null);
-
+  const [attendance, setAttendance] = useState([]);
+  const [selectedSession, setSelectedSession] = useState("");
+  
   const supabase = getBrowserClient();
 
-  // Calculate semester dates
-  useEffect(() => {
-    if (!startDate) return;
-    const start = new Date(startDate + "T00:00:00");
-    const dates = SYLLABUS.map((_, idx) => {
-      const d = new Date(start);
-      d.setDate(start.getDate() + idx * 7);
-      return d.toLocaleDateString("es-EC", { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
-    });
-    setCalculatedDates(dates);
-  }, [startDate]);
+  // ─── Fetchers ───────────────────────────────────────────────────────────────
 
-  // Fetch students
+  const fetchParalelos = useCallback(async () => {
+    const res = await fetch("/api/teacher/paralelos");
+    if (res.ok) {
+      const data = await res.json();
+      setParalelos(data || []);
+      if (data.length > 0 && !selectedParalelo) setSelectedParalelo(data[0].id);
+    }
+  }, [selectedParalelo]);
+
+  const fetchSessions = useCallback(async () => {
+    if (!selectedParalelo) return;
+    const res = await fetch(`/api/teacher/sessions?paralelo_id=${selectedParalelo}`);
+    if (res.ok) setSessions(await res.json());
+  }, [selectedParalelo]);
+
   const fetchStudents = useCallback(async () => {
-    setStudentsLoading(true);
-    const url = `/api/teacher/students${paralelloFilter ? `?paralelo=${encodeURIComponent(paralelloFilter)}` : ""}`;
+    const filter = paralelos.find(p => p.id === selectedParalelo)?.name || "";
+    const url = `/api/teacher/students${filter ? `?paralelo=${encodeURIComponent(filter)}` : ""}`;
     const res = await fetch(url);
-    const data = await res.json();
-    setStudents(data.students ?? []);
-    setStudentsLoading(false);
-  }, [paralelloFilter]);
+    if (res.ok) {
+      const data = await res.json();
+      setStudents(data.students ?? []);
+    }
+  }, [selectedParalelo, paralelos]);
 
-  // Fetch reflections
   const fetchReflections = useCallback(async () => {
-    setReflectionsLoading(true);
-    const url = `/api/teacher/reflections${reflectionLessonFilter ? `?lesson_slug=${encodeURIComponent(reflectionLessonFilter)}` : ""}`;
-    const res = await fetch(url);
-    const data = await res.json();
-    setReflections(data.reflections ?? []);
-    setReflectionsLoading(false);
-  }, [reflectionLessonFilter]);
+    const res = await fetch("/api/teacher/reflections");
+    if (res.ok) {
+      const data = await res.json();
+      setReflections(data.reflections ?? []);
+    }
+  }, []);
 
-  // Fetch visibility
+  const fetchAttendance = useCallback(async () => {
+    if (!selectedSession) return;
+    const res = await fetch(`/api/teacher/attendance?session_id=${selectedSession}`);
+    if (res.ok) setAttendance(await res.json());
+  }, [selectedSession]);
+
   const fetchVisibility = useCallback(async () => {
-    setVisibilityLoading(true);
     const res = await fetch("/api/teacher/lessons-visibility");
-    const data = await res.json();
-    const map = {};
-    (data.lessons ?? []).forEach(l => { map[l.lesson_slug] = l.is_visible; });
-    // Default all lessons to visible if not in DB
-    ALL_LESSON_SLUGS.forEach(slug => {
-      if (map[slug] === undefined) map[slug] = true;
-    });
-    setVisibility(map);
-    setVisibilityLoading(false);
+    if (res.ok) {
+      const data = await res.json();
+      const map = {};
+      (data.lessons ?? []).forEach(l => { map[l.lesson_slug] = l.is_visible; });
+      ALL_LESSON_SLUGS.forEach(slug => { if (map[slug] === undefined) map[slug] = true; });
+      setVisibility(map);
+    }
   }, []);
 
   useEffect(() => {
+    fetchParalelos();
+  }, [fetchParalelos]);
+
+  useEffect(() => {
+    if (activeTab === "calendar") fetchSessions();
+    if (activeTab === "attendance") {
+      fetchSessions();
+      fetchStudents();
+    }
     if (activeTab === "students") fetchStudents();
     if (activeTab === "reflections") fetchReflections();
     if (activeTab === "visibility") fetchVisibility();
-  }, [activeTab, fetchStudents, fetchReflections, fetchVisibility]);
+  }, [activeTab, selectedParalelo, selectedSession, fetchSessions, fetchStudents, fetchReflections, fetchVisibility]);
 
-  const toggleVisibility = async (slug) => {
-    setSavingSlug(slug);
+  useEffect(() => {
+    if (activeTab === "attendance" && selectedSession) {
+      fetchAttendance();
+    }
+  }, [selectedSession, activeTab, fetchAttendance]);
+
+  // ─── Actions ────────────────────────────────────────────────────────────────
+
+  const createParalelo = async (e) => {
+    e.preventDefault();
+    const name = e.target.name.value;
+    const start_date = e.target.start_date.value;
+    await fetch("/api/teacher/paralelos", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name, start_date }),
+    });
+    fetchParalelos();
+    e.target.reset();
+  };
+
+  const createSession = async (e) => {
+    e.preventDefault();
+    const session_date = e.target.session_date.value;
+    const description = e.target.description.value;
+    await fetch("/api/teacher/sessions", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ paralelo_id: selectedParalelo, session_date, description }),
+    });
+    fetchSessions();
+    e.target.reset();
+  };
+
+  const deleteSession = async (id) => {
+    if(!confirm("¿Eliminar sesión?")) return;
+    await fetch(`/api/teacher/sessions?id=${id}`, { method: "DELETE" });
+    fetchSessions();
+  };
+
+  const toggleAttendance = async (studentId, isPresent) => {
+    const newStatus = !isPresent;
+    await fetch("/api/teacher/attendance", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ session_id: selectedSession, student_id: studentId, is_present: newStatus }),
+    });
+    fetchAttendance();
+  };
+
+  const approveReflection = async (userId, activityId, status) => {
+    await fetch("/api/teacher/approve-activity", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ user_id: userId, activity_id: activityId, status }),
+    });
+    fetchReflections(); // refresh
+  };
+
+  const toggleVisibilityAction = async (slug) => {
     const newValue = !visibility[slug];
     await fetch("/api/teacher/lessons-visibility", {
       method: "POST",
@@ -132,48 +190,46 @@ export default function TeacherPortal() {
       body: JSON.stringify({ lesson_slug: slug, is_visible: newValue }),
     });
     setVisibility(prev => ({ ...prev, [slug]: newValue }));
-    setSavingSlug(null);
   };
 
-  const handleLogout = async () => {
-    await supabase.auth.signOut();
-    window.location.href = "/";
-  };
-
-  // ─── Render ────────────────────────────────────────────────────────────────
+  // ─── Renderers ──────────────────────────────────────────────────────────────
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-8 md:py-10 flex flex-col gap-6">
-
-      {/* Top Banner */}
       <header className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white border border-slate-200 p-5 rounded-3xl shadow-sm">
         <div className="flex items-center gap-4">
           <div className="w-12 h-12 bg-brand-blue rounded-2xl flex items-center justify-center text-white text-2xl shadow-sm">🎓</div>
           <div>
             <h1 className="text-xl font-display font-black text-slate-800 tracking-tight">Portal del Docente</h1>
-            <p className="text-xs text-slate-500 font-semibold">Academia Seguidor de Luz — Gestión de curso</p>
+            <p className="text-xs text-slate-500 font-semibold">Gestión de Paralelos, Asistencia y Aprobaciones</p>
           </div>
         </div>
         <div className="flex items-center gap-3">
-          <a href="/" className="px-4 py-2 bg-slate-50 hover:bg-slate-100 text-slate-700 font-black rounded-xl text-xs transition border border-slate-200 active:scale-95 uppercase tracking-wider">
+          {paralelos.length > 0 && (
+            <select
+              value={selectedParalelo}
+              onChange={e => { setSelectedParalelo(e.target.value); setSelectedSession(""); }}
+              className="px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-700 outline-none"
+            >
+              {paralelos.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
+            </select>
+          )}
+          <a href="/" className="px-4 py-2 bg-slate-50 hover:bg-slate-100 text-slate-700 font-black rounded-xl text-xs transition border border-slate-200 uppercase">
             Ver Curso
           </a>
-          <button onClick={handleLogout} className="px-4 py-2 bg-red-50 hover:bg-red-100 text-red-600 font-black rounded-xl text-xs transition border border-red-200 active:scale-95 uppercase tracking-wider">
-            Cerrar Sesión
+          <button onClick={() => supabase.auth.signOut().then(()=>window.location.href="/")} className="px-4 py-2 bg-red-50 hover:bg-red-100 text-red-600 font-black rounded-xl text-xs transition border border-red-200 uppercase">
+            Salir
           </button>
         </div>
       </header>
 
-      {/* Tabs */}
       <div className="flex gap-2 overflow-x-auto pb-1">
         {TABS.map(tab => (
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id)}
             className={`px-4 py-2.5 text-xs font-black rounded-xl whitespace-nowrap transition-all border ${
-              activeTab === tab.id
-                ? "bg-brand-blue text-white border-brand-blue shadow-sm"
-                : "bg-white text-slate-600 border-slate-200 hover:bg-slate-50"
+              activeTab === tab.id ? "bg-brand-blue text-white border-brand-blue shadow-sm" : "bg-white text-slate-600 border-slate-200 hover:bg-slate-50"
             }`}
           >
             {tab.label}
@@ -181,254 +237,194 @@ export default function TeacherPortal() {
         ))}
       </div>
 
-      {/* ── TAB: Planificación ─────────────────────────────────────────────── */}
-      {activeTab === "planner" && (
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-          {/* LEFT: Date planner */}
-          <section className="lg:col-span-5 bg-white border border-slate-200 p-6 rounded-3xl shadow-sm space-y-5">
-            <div>
-              <h2 className="text-base font-display font-black text-slate-800 flex items-center gap-2">📅 Planificador</h2>
-              <p className="text-xs text-slate-500 mt-1 font-semibold">Selecciona el inicio del curso para calcular el cronograma.</p>
-            </div>
-            <input type="date" value={startDate} onChange={e => setStartDate(e.target.value)} className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-brand-blue/50 outline-none text-slate-800 font-bold text-sm" />
-            <div className="space-y-2 max-h-[420px] overflow-y-auto pr-1">
-              {SYLLABUS.map((item, idx) => (
-                <button key={item.week} onClick={() => setActiveWeekTab(idx)}
-                  className={`w-full text-left p-3.5 rounded-2xl border transition-all ${activeWeekTab === idx ? "bg-blue-50 border-brand-blue" : "bg-white border-slate-150 hover:bg-slate-50"}`}>
-                  <div className="flex justify-between text-[10px] font-black uppercase tracking-wider mb-1">
-                    <span className={activeWeekTab === idx ? "text-brand-blue" : "text-slate-500"}>Semana {item.week}</span>
-                    {calculatedDates[idx] && <span className="text-slate-400 font-mono text-[9px]">{calculatedDates[idx]}</span>}
-                  </div>
-                  <p className="text-xs font-bold text-slate-800 leading-snug">{item.title}</p>
-                </button>
-              ))}
-            </div>
-          </section>
-
-          {/* RIGHT: Week detail */}
-          <section className="lg:col-span-7 bg-white border border-slate-200 p-6 rounded-3xl shadow-sm space-y-5">
-            <div className="border-b border-slate-100 pb-4">
-              <span className="text-[10px] font-black uppercase tracking-widest text-brand-blue bg-blue-50 border border-brand-blue/20 px-2.5 py-1 rounded-full">Semana {SYLLABUS[activeWeekTab].week}</span>
-              <h2 className="text-lg font-display font-black text-slate-800 tracking-tight mt-3">{SYLLABUS[activeWeekTab].title}</h2>
-              {calculatedDates[activeWeekTab] && <p className="text-xs text-slate-500 mt-1">📅 {calculatedDates[activeWeekTab]}</p>}
-            </div>
-
-            <div className="p-4 bg-blue-50/60 border border-blue-100 rounded-2xl">
-              <span className="text-[9px] font-black text-brand-blue uppercase tracking-widest block mb-1">📚 Lectura Previa</span>
-              <p className="text-xs text-slate-700 font-semibold leading-relaxed">{SYLLABUS[activeWeekTab].preReading}</p>
-            </div>
-
-            <div>
-              <h3 className="text-xs font-black uppercase tracking-widest text-slate-600 mb-2">🎯 Objetivos</h3>
-              <ul className="space-y-1 text-xs text-slate-700 font-medium pl-4 list-disc">
-                {SYLLABUS[activeWeekTab].objectives.map((obj, i) => <li key={i}>{obj}</li>)}
-              </ul>
-            </div>
-
-            <div>
-              <h3 className="text-xs font-black uppercase tracking-widest text-slate-600 mb-2">🛠️ Materiales</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                {SYLLABUS[activeWeekTab].materials.map((mat, i) => (
-                  <div key={i} className="flex items-center gap-2 p-2.5 bg-slate-50 border border-slate-150 rounded-xl text-xs font-bold text-slate-700">
-                    <span className="text-brand-orange">✔</span><span>{mat}</span>
-                  </div>
-                ))}
+      <div className="bg-white border border-slate-200 p-6 rounded-3xl shadow-sm space-y-6 min-h-[500px]">
+        
+        {/* PARALELOS */}
+        {activeTab === "paralelos" && (
+          <div>
+            <h2 className="text-base font-display font-black mb-4">Gestión de Paralelos</h2>
+            <form onSubmit={createParalelo} className="flex gap-3 mb-6 items-end bg-slate-50 p-4 rounded-xl border border-slate-200">
+              <div className="flex-1">
+                <label className="block text-xs font-bold text-slate-600 mb-1">Nombre (ej: "A", "Mañana")</label>
+                <input name="name" required className="w-full px-3 py-2 rounded-lg border border-slate-300" />
               </div>
-            </div>
-
-            <div className="space-y-3">
-              <h3 className="text-xs font-black uppercase tracking-widest text-slate-600">❓ Preguntas Socráticas</h3>
-              {SYLLABUS[activeWeekTab].socratic.map((soc, i) => (
-                <div key={i} className="p-4 bg-white border border-slate-200 rounded-2xl space-y-2">
-                  <div className="flex items-start gap-2 text-xs"><span className="text-brand-orange font-black">P:</span><strong className="text-slate-800">{soc.q}</strong></div>
-                  <div className="pl-5 flex items-start gap-2 text-xs text-slate-600"><span className="text-green-600 font-bold">R:</span><p className="italic font-semibold">{soc.a}</p></div>
+              <div className="flex-1">
+                <label className="block text-xs font-bold text-slate-600 mb-1">Fecha de Inicio</label>
+                <input name="start_date" type="date" required className="w-full px-3 py-2 rounded-lg border border-slate-300" />
+              </div>
+              <button type="submit" className="px-4 py-2 bg-brand-blue text-white font-bold rounded-lg h-[42px]">Crear Paralelo</button>
+            </form>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {paralelos.map(p => (
+                <div key={p.id} className="p-4 border border-slate-200 rounded-xl">
+                  <h3 className="font-black text-lg text-brand-blue">{p.name}</h3>
+                  <p className="text-sm text-slate-600">Inicio: {new Date(p.start_date).toLocaleDateString()}</p>
                 </div>
               ))}
             </div>
+          </div>
+        )}
 
-            {SYLLABUS[activeWeekTab].week < 7 && (
-              <div className="p-4 bg-amber-50 border-2 border-amber-200 rounded-2xl flex items-start gap-3">
-                <span className="text-xl">⚠️</span>
-                <div>
-                  <h4 className="text-xs font-bold text-amber-800 uppercase tracking-wide mb-1">Recordatorio para la siguiente clase</h4>
-                  <p className="text-xs text-amber-950 font-semibold">{SYLLABUS[activeWeekTab].reminder}</p>
+        {/* CALENDAR */}
+        {activeTab === "calendar" && (
+          <div>
+            <h2 className="text-base font-display font-black mb-4">Calendario Flexible</h2>
+            {!selectedParalelo ? <p className="text-sm text-slate-500">Selecciona o crea un paralelo primero.</p> : (
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                <div className="lg:col-span-4 bg-slate-50 p-4 rounded-xl border border-slate-200">
+                  <h3 className="font-bold text-sm mb-3">Agendar Nueva Sesión</h3>
+                  <form onSubmit={createSession} className="space-y-3">
+                    <div>
+                      <label className="block text-xs font-bold text-slate-600 mb-1">Fecha</label>
+                      <input name="session_date" type="date" required className="w-full px-3 py-2 rounded-lg border border-slate-300" />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-bold text-slate-600 mb-1">Descripción / Lección a impartir</label>
+                      <input name="description" required placeholder="Ej: Práctica 1 y 2 juntas" className="w-full px-3 py-2 rounded-lg border border-slate-300" />
+                    </div>
+                    <button type="submit" className="w-full px-4 py-2 bg-brand-blue text-white font-bold rounded-lg">Añadir al Calendario</button>
+                  </form>
+                </div>
+                <div className="lg:col-span-8 space-y-3">
+                  {sessions.length === 0 ? <p className="text-sm text-slate-500">No hay sesiones agendadas.</p> : sessions.map(s => (
+                    <div key={s.id} className="flex justify-between items-center p-4 border border-slate-200 rounded-xl hover:bg-slate-50">
+                      <div>
+                        <p className="font-bold text-slate-800">{new Date(s.session_date).toLocaleDateString("es-EC", { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</p>
+                        <p className="text-sm text-slate-600">{s.description}</p>
+                      </div>
+                      <button onClick={() => deleteSession(s.id)} className="text-red-500 font-bold text-xs px-3 py-1 bg-red-50 rounded-lg">Eliminar</button>
+                    </div>
+                  ))}
                 </div>
               </div>
             )}
-          </section>
-        </div>
-      )}
-
-      {/* ── TAB: Estudiantes ───────────────────────────────────────────────── */}
-      {activeTab === "students" && (
-        <div className="bg-white border border-slate-200 p-6 rounded-3xl shadow-sm space-y-5">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-            <h2 className="text-base font-display font-black text-slate-800">👩‍🎓 Progreso de Estudiantes</h2>
-            <div className="flex gap-2">
-              <input
-                type="text"
-                placeholder="Filtrar por paralelo..."
-                value={paralelloFilter}
-                onChange={e => setParalelloFilter(e.target.value)}
-                className="px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-700 outline-none focus:border-brand-blue w-36"
-              />
-              <button onClick={fetchStudents} className="px-3 py-2 bg-brand-blue text-white text-xs font-black rounded-xl hover:bg-brand-blue/90 transition">Buscar</button>
-            </div>
           </div>
+        )}
 
-          {studentsLoading ? (
-            <div className="space-y-2">{[...Array(4)].map((_, i) => <div key={i} className="h-12 bg-slate-100 rounded-2xl animate-pulse" />)}</div>
-          ) : students.length === 0 ? (
-            <div className="text-center py-12 text-slate-400">
-              <span className="text-4xl block mb-3">👥</span>
-              <p className="text-sm font-semibold">No se encontraron estudiantes.</p>
-              <p className="text-xs mt-1">Verifica que la base de datos esté configurada y haya perfiles con rol "student".</p>
-            </div>
-          ) : (
+        {/* ATTENDANCE */}
+        {activeTab === "attendance" && (
+          <div>
+            <h2 className="text-base font-display font-black mb-4">Asistencia de la Clase</h2>
+            {!selectedParalelo ? <p className="text-sm text-slate-500">Selecciona un paralelo arriba.</p> : (
+              <div className="space-y-6">
+                <div className="flex gap-4 items-center">
+                  <label className="font-bold text-sm text-slate-700">Selecciona la Sesión:</label>
+                  <select value={selectedSession} onChange={e => setSelectedSession(e.target.value)} className="px-3 py-2 border border-slate-300 rounded-lg outline-none min-w-[200px]">
+                    <option value="">-- Elige una sesión --</option>
+                    {sessions.map(s => (
+                      <option key={s.id} value={s.id}>{new Date(s.session_date).toLocaleDateString()} - {s.description}</option>
+                    ))}
+                  </select>
+                </div>
+                {selectedSession && (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+                    {students.map(student => {
+                      const isPresent = attendance.find(a => a.student_id === student.user_id)?.is_present || false;
+                      return (
+                        <div key={student.user_id} className={`p-3 rounded-xl border flex items-center justify-between cursor-pointer transition ${isPresent ? "bg-green-50 border-green-200" : "bg-white border-slate-200"}`} onClick={() => toggleAttendance(student.user_id, isPresent)}>
+                          <span className="font-bold text-sm">{student.full_name}</span>
+                          <span className="text-xl">{isPresent ? "✅" : "❌"}</span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* PROGRESS */}
+        {activeTab === "students" && (
+          <div>
+            <h2 className="text-base font-display font-black mb-4">Progreso General del Paralelo</h2>
             <div className="overflow-x-auto">
-              <table className="w-full text-xs">
+              <table className="w-full text-xs text-left">
                 <thead>
-                  <tr className="border-b border-slate-100">
-                    <th className="text-left px-3 py-2 font-black text-slate-500 uppercase tracking-wider">Estudiante</th>
-                    <th className="text-left px-3 py-2 font-black text-slate-500 uppercase tracking-wider">Paralelo</th>
-                    <th className="text-center px-3 py-2 font-black text-slate-500 uppercase tracking-wider">Lecciones</th>
-                    <th className="text-left px-3 py-2 font-black text-slate-500 uppercase tracking-wider">Última visita</th>
+                  <tr className="border-b border-slate-200 text-slate-500 uppercase">
+                    <th className="p-3">Estudiante</th>
+                    <th className="p-3">Progreso (%)</th>
+                    <th className="p-3">Lecciones Completadas</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-50">
-                  {students.map((s) => (
-                    <tr key={s.user_id} className="hover:bg-slate-50 transition">
-                      <td className="px-3 py-3">
-                        <div className="flex items-center gap-2">
-                          <div className="w-7 h-7 bg-brand-orange/10 rounded-lg flex items-center justify-center text-xs font-black text-brand-orange border border-brand-orange/20">
-                            {s.full_name?.[0]?.toUpperCase() ?? "?"}
-                          </div>
-                          <div>
-                            <p className="font-black text-slate-800">{s.full_name ?? "Sin nombre"}</p>
-                          </div>
+                <tbody className="divide-y divide-slate-100">
+                  {students.map(s => (
+                    <tr key={s.user_id}>
+                      <td className="p-3 font-bold">{s.full_name}</td>
+                      <td className="p-3">
+                        <div className="w-full bg-slate-100 rounded-full h-2 max-w-[100px]">
+                          <div className="bg-brand-blue h-full rounded-full" style={{ width: `${Math.round((s.completed_lessons / SYLLABUS.length) * 100)}%` }} />
                         </div>
                       </td>
-                      <td className="px-3 py-3">
-                        <span className="px-2 py-1 bg-slate-100 rounded-lg font-bold text-slate-600">{s.paralelo ?? "-"}</span>
-                      </td>
-                      <td className="px-3 py-3 text-center">
-                        <span className="font-black text-brand-orange">{s.completed_lessons}</span>
-                        <span className="text-slate-400"> / {SYLLABUS.length}</span>
-                        <div className="w-full bg-slate-100 rounded-full h-1.5 mt-1.5 max-w-[80px] mx-auto overflow-hidden">
-                          <div className="bg-brand-orange h-full rounded-full" style={{ width: `${Math.round((s.completed_lessons / SYLLABUS.length) * 100)}%` }} />
-                        </div>
-                      </td>
-                      <td className="px-3 py-3 text-slate-500 font-semibold">
-                        {s.last_visited_at ? new Date(s.last_visited_at).toLocaleDateString("es-EC", { day: "2-digit", month: "short" }) : "—"}
-                      </td>
+                      <td className="p-3">{s.completed_lessons} / {SYLLABUS.length}</td>
                     </tr>
                   ))}
                 </tbody>
               </table>
             </div>
-          )}
-        </div>
-      )}
-
-      {/* ── TAB: Reflexiones ───────────────────────────────────────────────── */}
-      {activeTab === "reflections" && (
-        <div className="bg-white border border-slate-200 p-6 rounded-3xl shadow-sm space-y-5">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-            <h2 className="text-base font-display font-black text-slate-800">🪞 Respuestas de Reflexión</h2>
-            <div className="flex gap-2">
-              <select
-                value={reflectionLessonFilter}
-                onChange={e => setReflectionLessonFilter(e.target.value)}
-                className="px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-700 outline-none focus:border-brand-blue"
-              >
-                <option value="">Todas las lecciones</option>
-                {SYLLABUS.map(s => <option key={s.slug} value={s.slug}>{s.title}</option>)}
-              </select>
-              <button onClick={fetchReflections} className="px-3 py-2 bg-brand-blue text-white text-xs font-black rounded-xl hover:bg-brand-blue/90 transition">Buscar</button>
-            </div>
           </div>
+        )}
 
-          {reflectionsLoading ? (
-            <div className="space-y-2">{[...Array(3)].map((_, i) => <div key={i} className="h-20 bg-slate-100 rounded-2xl animate-pulse" />)}</div>
-          ) : reflections.length === 0 ? (
-            <div className="text-center py-12 text-slate-400">
-              <span className="text-4xl block mb-3">🪞</span>
-              <p className="text-sm font-semibold">No hay reflexiones todavía.</p>
-              <p className="text-xs mt-1">Las respuestas aparecerán aquí cuando los estudiantes completen una lección.</p>
-            </div>
-          ) : (
-            <div className="space-y-3">
-              {reflections.map((r) => (
-                <div key={r.id} className="p-4 bg-slate-50 border border-slate-200 rounded-2xl space-y-2">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <div className="w-7 h-7 bg-brand-orange/10 rounded-lg flex items-center justify-center text-xs font-black text-brand-orange border border-brand-orange/20">
-                        {r.student_name?.[0]?.toUpperCase() ?? "?"}
-                      </div>
-                      <div>
-                        <p className="text-xs font-black text-slate-800">{r.student_name}</p>
-                        <p className="text-[10px] text-slate-400 font-semibold">Paralelo {r.paralelo}</p>
-                      </div>
+        {/* REFLECTIONS */}
+        {activeTab === "reflections" && (
+          <div>
+            <h2 className="text-base font-display font-black mb-4">Revisión de Tareas y Reflexiones</h2>
+            <div className="space-y-4">
+              {reflections.map(r => (
+                <div key={`${r.user_id}-${r.activity_id}`} className={`p-4 rounded-xl border-l-4 border ${r.approval_status === 'approved' ? 'border-l-green-500 bg-green-50/30' : r.approval_status === 'pending' ? 'border-l-yellow-400 bg-yellow-50/30' : 'border-l-red-500 bg-red-50/30'}`}>
+                  <div className="flex justify-between items-start mb-2">
+                    <div>
+                      <p className="font-bold text-sm">{r.student_name} <span className="text-slate-500 font-normal text-xs">(Paralelo {r.paralelo})</span></p>
+                      <p className="text-xs text-slate-500">{r.lesson_slug}</p>
                     </div>
-                    <div className="text-right">
-                      <p className="text-[10px] text-slate-400 font-semibold">{r.lesson_slug}</p>
-                      <p className="text-[10px] text-slate-400">{new Date(r.submitted_at).toLocaleDateString("es-EC")}</p>
+                    <div className="flex gap-2">
+                      {r.approval_status === 'pending' && (
+                        <>
+                          <button onClick={() => approveReflection(r.user_id, r.activity_id, 'approved')} className="px-3 py-1 bg-green-500 text-white rounded text-xs font-bold">Aprobar 🟢</button>
+                          <button onClick={() => approveReflection(r.user_id, r.activity_id, 'rejected')} className="px-3 py-1 bg-red-500 text-white rounded text-xs font-bold">Rechazar 🔴</button>
+                        </>
+                      )}
+                      {r.approval_status === 'approved' && <span className="px-3 py-1 bg-green-100 text-green-700 rounded text-xs font-bold">Aprobado 🟢</span>}
+                      {r.approval_status === 'rejected' && <span className="px-3 py-1 bg-red-100 text-red-700 rounded text-xs font-bold">Rechazado 🔴</span>}
                     </div>
                   </div>
-                  <div className="pl-2 border-l-2 border-brand-orange/30">
-                    <p className="text-[10px] font-black text-brand-orange uppercase tracking-wider mb-0.5">{r.question_key}</p>
-                    <p className="text-sm text-slate-700 font-semibold leading-relaxed">{r.answer_text}</p>
+                  <div className="bg-white p-3 rounded border border-slate-200">
+                    <p className="text-xs font-bold text-brand-orange mb-1">{r.question_key}</p>
+                    <p className="text-sm text-slate-700">{r.answer_text}</p>
                   </div>
                 </div>
               ))}
             </div>
-          )}
-        </div>
-      )}
-
-      {/* ── TAB: Visibilidad ───────────────────────────────────────────────── */}
-      {activeTab === "visibility" && (
-        <div className="bg-white border border-slate-200 p-6 rounded-3xl shadow-sm space-y-5">
-          <div>
-            <h2 className="text-base font-display font-black text-slate-800">👁️ Control de Visibilidad de Lecciones</h2>
-            <p className="text-xs text-slate-500 mt-1 font-semibold">Activa o desactiva el acceso de los estudiantes a cada lección. Los cambios se aplican de inmediato.</p>
           </div>
+        )}
 
-          {visibilityLoading ? (
-            <div className="space-y-2">{[...Array(8)].map((_, i) => <div key={i} className="h-14 bg-slate-100 rounded-2xl animate-pulse" />)}</div>
-          ) : (
-            <div className="space-y-2">
+        {/* VISIBILITY */}
+        {activeTab === "visibility" && (
+          <div>
+             <h2 className="text-base font-display font-black mb-4">Configuración de Visibilidad</h2>
+             <p className="text-sm text-slate-500 mb-6">Bloquea o desbloquea lecciones manualmente.</p>
+             <div className="space-y-2">
               {SYLLABUS.map(s => {
                 const isVisible = visibility[s.slug] !== false;
-                const isSaving = savingSlug === s.slug;
                 return (
-                  <div key={s.slug} className="flex items-center justify-between p-4 bg-slate-50 border border-slate-200 rounded-2xl hover:bg-slate-100 transition-all">
-                    <div className="flex items-center gap-3 min-w-0">
+                  <div key={s.slug} className="flex items-center justify-between p-4 bg-slate-50 border border-slate-200 rounded-xl">
+                    <div className="flex items-center gap-3">
                       <span className="text-lg">{isVisible ? "🟢" : "🔒"}</span>
-                      <div className="min-w-0">
-                        <p className="text-sm font-black text-slate-800 truncate">{s.title}</p>
-                        <p className="text-[10px] text-slate-400 font-mono">{s.slug}</p>
+                      <div>
+                        <p className="text-sm font-black text-slate-800">{s.title}</p>
                       </div>
                     </div>
-                    <button
-                      onClick={() => toggleVisibility(s.slug)}
-                      disabled={isSaving}
-                      className={`shrink-0 ml-3 px-4 py-2 text-xs font-black rounded-xl transition-all border-2 ${
-                        isVisible
-                          ? "bg-green-50 text-green-700 border-green-200 hover:bg-red-50 hover:text-red-700 hover:border-red-200"
-                          : "bg-slate-100 text-slate-500 border-slate-200 hover:bg-green-50 hover:text-green-700 hover:border-green-200"
-                      } disabled:opacity-50 disabled:cursor-wait`}
-                    >
-                      {isSaving ? "..." : isVisible ? "Visible ✓" : "Oculta"}
+                    <button onClick={() => toggleVisibilityAction(s.slug)} className={`px-4 py-2 text-xs font-black rounded-xl border-2 ${isVisible ? "bg-green-50 text-green-700 border-green-200" : "bg-slate-100 text-slate-500 border-slate-200"}`}>
+                      {isVisible ? "Visible" : "Oculta"}
                     </button>
                   </div>
                 );
               })}
             </div>
-          )}
-        </div>
-      )}
+          </div>
+        )}
 
+      </div>
     </div>
   );
 }
