@@ -46,6 +46,7 @@ CREATE TABLE IF NOT EXISTS public.user_activity_progress (
     max_score             INTEGER,
     attempts_count        INTEGER DEFAULT 0,
     notes                 TEXT,
+    teacher_feedback      TEXT,
     created_at            TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at            TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     UNIQUE(user_id, activity_id)

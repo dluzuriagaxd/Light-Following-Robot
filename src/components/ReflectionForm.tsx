@@ -21,6 +21,25 @@ export default function ReflectionForm({ lessonSlug, questions }: ReflectionForm
     const [approvalStatus, setApprovalStatus] = useState<string>("not_submitted");
     const [previousAnswers, setPreviousAnswers] = useState<Record<string, string> | null>(null);
     const [error, setError] = useState<string | null>(null);
+    const [allCheckboxesChecked, setAllCheckboxesChecked] = useState(true);
+    const [teacherFeedback, setTeacherFeedback] = useState<string | null>(null);
+
+    // Validate checkboxes
+    useEffect(() => {
+        const checkCheckboxes = () => {
+            const checkboxes = document.querySelectorAll('.prose input[type="checkbox"]');
+            if (checkboxes.length === 0) {
+                setAllCheckboxesChecked(true);
+                return;
+            }
+            const allChecked = Array.from(checkboxes).every((cb: any) => cb.checked);
+            setAllCheckboxesChecked(allChecked);
+        };
+
+        checkCheckboxes();
+        window.addEventListener('lesson-checkbox-changed', checkCheckboxes);
+        return () => window.removeEventListener('lesson-checkbox-changed', checkCheckboxes);
+    }, []);
 
     // Check for previous answers on mount
     useEffect(() => {
@@ -36,6 +55,7 @@ export default function ReflectionForm({ lessonSlug, questions }: ReflectionForm
                     setSubmitted(true);
                 }
                 if (data.approval_status) setApprovalStatus(data.approval_status);
+                if (data.teacher_feedback) setTeacherFeedback(data.teacher_feedback);
             })
             .catch(() => {})
             .finally(() => setChecking(false));
@@ -116,6 +136,17 @@ export default function ReflectionForm({ lessonSlug, questions }: ReflectionForm
                         </p>
                     </div>
                 </div>
+
+                {teacherFeedback && (
+                    <div className="mb-4 p-4 bg-white border border-brand-orange/30 rounded-2xl shadow-sm">
+                        <div className="flex items-center gap-2 mb-2">
+                            <span className="text-sm">👩‍🏫</span>
+                            <span className="text-xs font-black uppercase tracking-widest text-brand-orange">Comentario del Profesor</span>
+                        </div>
+                        <p className="text-sm text-slate-700 italic">"{teacherFeedback}"</p>
+                    </div>
+                )}
+
                 <div className="space-y-3">
                     {questions.map((q) => (
                         <div key={q.key} className={`p-3 bg-white border rounded-2xl ${isApproved ? 'border-green-100' : 'border-yellow-100'}`}>
@@ -178,9 +209,15 @@ export default function ReflectionForm({ lessonSlug, questions }: ReflectionForm
                     </div>
                 )}
 
+                {!allCheckboxesChecked && !error && (
+                    <div className="p-3 text-sm text-yellow-700 bg-yellow-50 border border-yellow-200 rounded-xl font-semibold flex items-center gap-2">
+                        <span>⚠️</span> Debes marcar todas las casillas de materiales o lecturas requeridas en la lección antes de enviar.
+                    </div>
+                )}
+
                 <button
                     type="submit"
-                    disabled={loading}
+                    disabled={loading || !allCheckboxesChecked}
                     className="w-full py-3 px-4 bg-brand-orange hover:bg-brand-orange/90 text-white font-black rounded-2xl transition-all active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed text-sm shadow-[0_4px_0_#e6950f] hover:shadow-[0_2px_0_#e6950f] hover:translate-y-[2px] active:shadow-none active:translate-y-[4px]"
                 >
                     {loading ? (

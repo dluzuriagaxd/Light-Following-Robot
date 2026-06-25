@@ -173,11 +173,11 @@ export default function TeacherPortal() {
     fetchAttendance();
   };
 
-  const approveReflection = async (userId, activityId, status) => {
+  const approveReflection = async (userId, activityId, status, feedback) => {
     await fetch("/api/teacher/approve-activity", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ user_id: userId, activity_id: activityId, status }),
+      body: JSON.stringify({ user_id: userId, activity_id: activityId, status, feedback }),
     });
     fetchReflections(); // refresh
   };
@@ -378,20 +378,35 @@ export default function TeacherPortal() {
                       <p className="text-xs text-slate-500">{r.lesson_slug}</p>
                     </div>
                     <div className="flex gap-2">
-                      {r.approval_status === 'pending' && (
-                        <>
-                          <button onClick={() => approveReflection(r.user_id, r.activity_id, 'approved')} className="px-3 py-1 bg-green-500 text-white rounded text-xs font-bold">Aprobar 🟢</button>
-                          <button onClick={() => approveReflection(r.user_id, r.activity_id, 'rejected')} className="px-3 py-1 bg-red-500 text-white rounded text-xs font-bold">Rechazar 🔴</button>
-                        </>
-                      )}
                       {r.approval_status === 'approved' && <span className="px-3 py-1 bg-green-100 text-green-700 rounded text-xs font-bold">Aprobado 🟢</span>}
                       {r.approval_status === 'rejected' && <span className="px-3 py-1 bg-red-100 text-red-700 rounded text-xs font-bold">Rechazado 🔴</span>}
                     </div>
                   </div>
-                  <div className="bg-white p-3 rounded border border-slate-200">
+                  <div className="bg-white p-3 rounded border border-slate-200 mb-3">
                     <p className="text-xs font-bold text-brand-orange mb-1">{r.question_key}</p>
                     <p className="text-sm text-slate-700">{r.answer_text}</p>
                   </div>
+                  {r.approval_status === 'pending' && (
+                    <form 
+                      onSubmit={(e) => {
+                        e.preventDefault();
+                        const feedback = new FormData(e.target).get("feedback");
+                        const status = e.nativeEvent.submitter.value;
+                        approveReflection(r.user_id, r.activity_id, status, feedback);
+                      }}
+                      className="flex flex-col sm:flex-row gap-2 mt-2"
+                    >
+                      <input 
+                        name="feedback" 
+                        placeholder="Escribe una respuesta o comentario para el estudiante..." 
+                        className="flex-1 px-3 py-2 border border-slate-300 rounded text-sm outline-none focus:border-brand-blue"
+                      />
+                      <div className="flex gap-2">
+                        <button type="submit" value="approved" className="px-3 py-2 bg-green-500 text-white rounded text-xs font-bold hover:bg-green-600 transition whitespace-nowrap">Aprobar 🟢</button>
+                        <button type="submit" value="rejected" className="px-3 py-2 bg-red-500 text-white rounded text-xs font-bold hover:bg-red-600 transition whitespace-nowrap">Rechazar 🔴</button>
+                      </div>
+                    </form>
+                  )}
                 </div>
               ))}
             </div>

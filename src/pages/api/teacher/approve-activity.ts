@@ -19,7 +19,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
 
     const { supabase } = locals as any;
     const body = await request.json();
-    const { user_id, activity_id, status } = body;
+    const { user_id, activity_id, status, feedback } = body;
 
     if (!user_id || !activity_id || !status) {
         return new Response(JSON.stringify({ error: "Datos incompletos" }), {
@@ -35,9 +35,14 @@ export const POST: APIRoute = async ({ request, locals }) => {
         });
     }
 
+    const payload: any = { approval_status: status };
+    if (feedback !== undefined) {
+        payload.teacher_feedback = feedback;
+    }
+
     const { error } = await supabase
         .from("user_activity_progress")
-        .update({ approval_status: status })
+        .update(payload)
         .eq("user_id", user_id)
         .eq("activity_id", activity_id);
 

@@ -119,14 +119,15 @@ export const GET: APIRoute = async ({ locals, url }) => {
     const activityId = `lesson-${lesson_slug.replace(/\//g, "-")}`;
     const { data: progData } = await supabase
         .from("user_activity_progress")
-        .select("approval_status")
+        .select("approval_status, teacher_feedback")
         .eq("user_id", user.id)
         .eq("activity_id", activityId)
         .single();
 
     return new Response(JSON.stringify({ 
         answers: data,
-        approval_status: progData?.approval_status || "not_submitted"
+        approval_status: progData?.approval_status || "not_submitted",
+        teacher_feedback: progData?.teacher_feedback || null
     }), {
         status: 200,
         headers: { "Content-Type": "application/json" },

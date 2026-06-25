@@ -79,7 +79,7 @@ if (session?.user) {
 			<Sidebar />
 
 			<!-- main Content Area -->
-			<main class="flex-1 flex flex-col min-h-screen overflow-x-hidden">
+			<main class="flex-1 flex flex-col min-h-screen">
 				<div class="flex-1 max-w-7xl mx-auto w-full px-6 py-12 lg:py-20 grid grid-cols-1 lg:grid-cols-12 gap-12">
 					
                     <!-- Central Content (prose) -->
@@ -172,7 +172,7 @@ if (session?.user) {
                                 <div class="w-8 h-8 bg-brand-blue rounded-lg flex items-center justify-center text-white font-bold">?</div>
                                 <h4 class="text-sm font-display font-bold text-slate-800">¿Necesitas ayuda?</h4>
                                 <p class="text-[11px] text-slate-500 leading-relaxed font-semibold">
-                                    Si tienes dudas sobre los fundamentos matemáticos, revisa la sección de materiales o vuelve a leer el divisor de voltaje.
+                                    Si tienes dudas sobre esta lección, recuerda anotarlas en tu bitácora para compartirlas con tu profesor en la clase presencial.
                                 </p>
                             </div>
                         </div>
@@ -207,6 +207,18 @@ if (session?.user) {
 
 			menuToggle?.addEventListener('click', toggleMenu);
 			overlay?.addEventListener('click', toggleMenu);
+
+			// Enable Markdown Checkboxes
+			document.addEventListener("DOMContentLoaded", () => {
+				const checkboxes = document.querySelectorAll('.prose input[type="checkbox"]');
+				checkboxes.forEach(cb => {
+					cb.removeAttribute('disabled');
+					cb.classList.add('cursor-pointer', 'w-4', 'h-4', 'text-brand-orange', 'rounded', 'border-slate-300', 'focus:ring-brand-orange', 'accent-brand-orange');
+					cb.addEventListener('change', () => {
+						window.dispatchEvent(new Event('lesson-checkbox-changed'));
+					});
+				});
+			});
 		</script>
 	</body>
 </html>

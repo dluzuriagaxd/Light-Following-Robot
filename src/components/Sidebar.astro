@@ -341,17 +341,18 @@ const displayName = user?.user_metadata?.full_name ?? user?.email?.split("@")[0]
                             };
                             const isActive = isModuleActive(mod.key);
                             return (
-                                <div class="space-y-2">
-                                    <div
+                                <details class="space-y-2 group/module" open={isActive}>
+                                    <summary
                                         class:list={[
-                                            "w-full flex items-center justify-between px-3 py-2 text-[10px] font-black uppercase tracking-[0.15em] rounded-xl border transition-all",
+                                            "w-full flex items-center justify-between px-3 py-2 text-[10px] font-black uppercase tracking-[0.15em] rounded-xl border transition-all cursor-pointer select-none list-none [&::-webkit-details-marker]:hidden",
                                             isActive
                                                 ? `${theme.activeBg} ${theme.border}`
                                                 : `${theme.text} ${theme.bg} ${theme.border}`,
                                         ]}
                                     >
                                         <span>{mod.label}</span>
-                                    </div>
+                                        <span class="text-xs transition-transform duration-200 group-open/module:rotate-90">▶</span>
+                                    </summary>
                                     <div class="space-y-1 ml-2 border-l-2 border-slate-100 pl-2">
                                         {(() => {
                                             let previousLessonApproved = true;
@@ -445,7 +446,7 @@ const displayName = user?.user_metadata?.full_name ?? user?.email?.split("@")[0]
                                             });
                                         })()}
                                     </div>
-                                </div>
+                                </details>
                             );
                         })
                     }
