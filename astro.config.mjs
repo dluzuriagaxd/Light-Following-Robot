@@ -11,8 +11,8 @@ export default defineConfig({
   output: 'server',
   env: {
     schema: {
-      PUBLIC_SUPABASE_URL: envField.string({ context: 'client', access: 'public', default: 'https://nbhvyqdcijfgtzdfqzyd.supabase.co' }),
-      PUBLIC_SUPABASE_ANON_KEY: envField.string({ context: 'client', access: 'public', default: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5iaHZ5cWRjaWpmZ3R6ZGZxenlkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODEwNDIxNzgsImV4cCI6MjA5NjYxODE3OH0.96n27brL8OG5nA2SgOHbYPwU0PEd1WnKfhe9hfxVorc' }),
+      PUBLIC_SUPABASE_URL: envField.string({ context: 'client', access: 'public', default: 'https://yaoxscygxtafbfismerj.supabase.co' }),
+      PUBLIC_SUPABASE_ANON_KEY: envField.string({ context: 'client', access: 'public', default: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inlhb3hzY3lneHRhZmJmaXNtZXJqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIzMDk3MDYsImV4cCI6MjA5Nzg4NTcwNn0.1IT-DcutvwpuuKyEmer7Mdo0M37BzBmcTGkRvsuHWyo' }),
       PUBLIC_MAINTENANCE_MODE: envField.boolean({ context: 'client', access: 'public', default: false }),
     }
   },
